@@ -28,37 +28,6 @@
 5. پوشهٔ `clipnote` را انتخاب کنید.
 6. افزونه آمادهٔ استفاده است!
 
-## ساختار فایل‌ها
-
-```
-clipnote/
-├── manifest.json
-├── background.js
-├── shared.js
-├── shared.css
-├── popup.html
-├── popup.css
-├── popup.js
-├── options.html
-├── options.css
-├── options.js
-├── icons/
-│   ├── icon16.png
-│   ├── icon32.png
-│   ├── icon48.png
-│   └── icon128.png
-└── generate_icons.py
-```
-
-## تولید مجدد آیکون‌ها
-
-در صورت نیاز، آیکون‌ها را می‌توانید دوباره بسازید:
-
-```bash
-cd clipnote
-python3 generate_icons.py
-```
-
 ## نکات امنیتی
 
 - تمام داده‌ها با استفاده از Chrome Storage API به‌صورت محلی ذخیره می‌شوند.
