@@ -1,0 +1,225 @@
+/**
+ * popup.css - Styles specific to the ClipNote popup.
+ */
+
+.cn-popup-body {
+  width: 380px;
+  min-height: 520px;
+  max-height: 600px;
+  overflow: hidden;
+  background: var(--cn-bg);
+}
+
+.cn-popup {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  max-height: 600px;
+  overflow: hidden;
+}
+
+/* Header */
+.cn-popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--cn-border);
+  background: var(--cn-surface);
+  flex-shrink: 0;
+}
+
+.cn-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cn-logo-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+}
+
+.cn-logo-text {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--cn-text);
+}
+
+.cn-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cn-header-actions .cn-btn-primary.active {
+  background: var(--cn-primary-hover);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+/* Search */
+.cn-popup-search {
+  padding: 10px 14px;
+  background: var(--cn-surface);
+  border-bottom: 1px solid var(--cn-border);
+  flex-shrink: 0;
+}
+
+/* Quick Capture */
+.cn-quick-capture {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  background: var(--cn-surface);
+  border-bottom: 1px solid var(--cn-border);
+  flex-shrink: 0;
+  animation: cn-fade-in 0.2s ease-out;
+}
+
+.cn-quick-capture-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--cn-text-secondary);
+}
+
+.cn-capture-title {
+  font-weight: 600;
+  border-color: var(--cn-primary) !important;
+  background: var(--cn-bg) !important;
+}
+
+.cn-capture-textarea {
+  min-height: 80px;
+  resize: vertical;
+  background: var(--cn-bg) !important;
+}
+
+.cn-quick-capture-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cn-search-box {
+  position: relative;
+}
+
+.cn-search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--cn-text-muted);
+  pointer-events: none;
+}
+
+.cn-search-box .cn-input {
+  padding-left: 32px;
+}
+
+/* Filters */
+.cn-popup-filters {
+  display: flex;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--cn-bg);
+  border-bottom: 1px solid var(--cn-border);
+  overflow-x: auto;
+  flex-shrink: 0;
+}
+
+.cn-filter-btn {
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--cn-border);
+  background: var(--cn-surface);
+  color: var(--cn-text-secondary);
+  font-size: 0.8rem;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: all var(--cn-transition);
+}
+
+.cn-filter-btn:hover {
+  border-color: var(--cn-primary);
+  color: var(--cn-primary);
+}
+
+.cn-filter-btn.active {
+  background: var(--cn-primary);
+  border-color: var(--cn-primary);
+  color: #ffffff;
+}
+
+/* Content */
+.cn-popup-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 14px;
+  background: var(--cn-bg);
+}
+
+.cn-popup-notes {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cn-popup-notes .cn-note-item {
+  padding: 10px 12px;
+}
+
+.cn-popup-notes .cn-note-actions {
+  opacity: 1;
+}
+
+.cn-popup-notes .cn-note-title {
+  font-size: 0.9rem;
+}
+
+.cn-popup-notes .cn-note-preview {
+  font-size: 0.8rem;
+  -webkit-line-clamp: 2;
+}
+
+.cn-popup-notes .cn-note-meta {
+  font-size: 0.7rem;
+}
+
+/* Footer */
+.cn-popup-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-top: 1px solid var(--cn-border);
+  background: var(--cn-surface);
+  flex-shrink: 0;
+}
+
+/* Section headers inside popup */
+.cn-section-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 0 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--cn-text-muted);
+}
+
+.cn-section-header:first-child {
+  margin-top: 0;
+}
+
+/* Empty state */
+.cn-popup-content .cn-empty {
+  padding: 30px 20px;
+}

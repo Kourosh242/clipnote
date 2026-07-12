@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="fa" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ClipNote</title>
+  <link rel="stylesheet" href="shared.css">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body class="cn-popup-body">
+  <div class="cn-popup">
+    <!-- Header -->
+    <header class="cn-popup-header">
+      <div class="cn-logo">
+        <img src="icons/icon32.png" alt="" class="cn-logo-icon">
+        <span class="cn-logo-text">ClipNote</span>
+      </div>
+      <div class="cn-header-actions">
+        <button id="btn-new-note" class="cn-btn cn-btn-primary cn-btn-sm" title="New Note (Ctrl+N)">
+          <span>＋</span> New
+        </button>
+        <button id="btn-open-manager" class="cn-btn cn-btn-ghost cn-btn-icon" title="Open Full Manager">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Search -->
+    <div class="cn-popup-search">
+      <div class="cn-search-box">
+        <svg class="cn-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="text" id="popup-search" class="cn-input" placeholder="Search notes, tags, categories... (Ctrl+F)">
+      </div>
+    </div>
+
+    <!-- Quick Capture Form -->
+    <div id="quick-capture" class="cn-quick-capture cn-hidden">
+      <div class="cn-quick-capture-header">
+        <span>✏️ Quick Note</span>
+        <button id="btn-cancel-capture" class="cn-action-btn danger" title="Cancel">✕</button>
+      </div>
+      <input type="text" id="capture-title" class="cn-input cn-capture-title" placeholder="Title / Topic" dir="auto">
+      <textarea id="capture-content" class="cn-input cn-capture-textarea" placeholder="Write your note here..." dir="auto"></textarea>
+      <div class="cn-quick-capture-actions">
+        <span id="capture-chars" class="cn-text-xs cn-text-muted">0 chars</span>
+        <button id="btn-save-capture" class="cn-btn cn-btn-primary cn-btn-sm">💾 Save Note</button>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="cn-popup-filters">
+      <button class="cn-filter-btn active" data-filter="all">All</button>
+      <button class="cn-filter-btn" data-filter="pinned">📌 Pinned</button>
+      <button class="cn-filter-btn" data-filter="favorites">⭐ Favorites</button>
+    </div>
+
+    <!-- Content -->
+    <main class="cn-popup-content" id="popup-content">
+      <div id="popup-notes-list" class="cn-popup-notes"></div>
+      <div id="popup-empty" class="cn-empty cn-hidden">
+        <div class="cn-empty-icon">📝</div>
+        <p>No notes found</p>
+        <p class="cn-text-sm">Create your first note to get started</p>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="cn-popup-footer">
+      <span id="popup-count" class="cn-text-xs cn-text-muted">0 notes</span>
+      <button id="btn-settings" class="cn-btn cn-btn-ghost cn-btn-sm">Settings</button>
+    </footer>
+  </div>
+
+  <script src="shared.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
