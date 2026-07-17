@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ClipNote Manager</title>
+  <link rel="stylesheet" href="shared.css">
+  <link rel="stylesheet" href="options.css">
+</head>
+<body class="cn-options-body">
+  <div class="cn-app">
+    <aside class="cn-sidebar" id="sidebar">
+      <div class="cn-sidebar-header">
+        <div class="cn-logo">
+          <img src="icons/icon32.png" alt="" class="cn-logo-icon">
+          <span class="cn-logo-text">ClipNote</span>
+        </div>
+        <button id="btn-collapse" class="cn-btn cn-btn-ghost cn-btn-icon" type="button" title="Collapse Sidebar">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        </button>
+      </div>
+
+      <div class="cn-sidebar-search">
+        <div class="cn-search-box">
+          <svg class="cn-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input type="text" id="global-search" class="cn-input" placeholder="Search (Ctrl+F)">
+        </div>
+      </div>
+
+      <nav class="cn-sidebar-nav">
+        <button class="cn-nav-item active" data-view="all" id="nav-all-notes" type="button">
+          <span class="cn-nav-icon">📝</span>
+          <span class="cn-nav-text" id="nav-all-notes-label">All Notes</span>
+          <span id="count-all" class="cn-nav-count">0</span>
+        </button>
+      </nav>
+
+      <div class="cn-sidebar-section">
+        <div class="cn-section-title" id="workspace-section-title">Workspaces</div>
+        <div id="workspaces-list" class="cn-workspaces-list"></div>
+        <button id="btn-add-workspace" class="cn-btn cn-btn-ghost cn-btn-sm cn-add-btn" type="button">
+          <span>＋</span><span class="cn-btn-text" id="add-workspace-label">Add Workspace</span>
+        </button>
+      </div>
+
+      <div class="cn-sidebar-section">
+        <div class="cn-section-title" id="category-section-title">Categories</div>
+        <div id="categories-list" class="cn-categories-list"></div>
+        <button id="btn-add-category" class="cn-btn cn-btn-ghost cn-btn-sm cn-add-btn" type="button">
+          <span>＋</span><span class="cn-btn-text" id="add-category-label">Add Category</span>
+        </button>
+      </div>
+
+      <div class="cn-sidebar-section">
+        <div class="cn-section-title" id="tag-section-title">Tags</div>
+        <div id="tags-list" class="cn-tags-list"></div>
+      </div>
+
+      <div class="cn-sidebar-footer">
+        <button id="btn-new-note" class="cn-btn cn-btn-primary cn-new-note-btn" type="button">
+          <span>＋</span><span class="cn-btn-text" id="new-note-label">New Note</span>
+        </button>
+        <button id="btn-settings-nav" class="cn-btn cn-btn-ghost cn-btn-sm" type="button">⚙️ <span id="settings-nav-label">Settings</span></button>
+      </div>
+    </aside>
+
+    <main class="cn-main">
+      <div id="view-list" class="cn-view">
+        <header class="cn-main-header">
+          <div>
+            <h1 id="list-title" class="cn-page-title">All Notes</h1>
+            <p id="list-subtitle" class="cn-page-subtitle">Manage your clipboard notes</p>
+          </div>
+          <div class="cn-main-actions">
+            <button id="btn-new-note-header" class="cn-btn cn-btn-primary cn-btn-sm" type="button">＋ <span id="new-note-header-label">New Note</span></button>
+          </div>
+        </header>
+
+        <div class="cn-toolbar cn-toolbar-extended">
+          <div class="cn-search-box cn-toolbar-search">
+            <svg class="cn-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" id="list-search" class="cn-input" placeholder="Search title, content, tags, categories...">
+          </div>
+          <select id="list-workspace-filter" class="cn-input cn-select cn-workspace-filter"></select>
+          <select id="list-sort" class="cn-input cn-select cn-sort-select">
+            <option value="updated-desc">Last Updated</option>
+            <option value="created-desc">Created Date</option>
+            <option value="title-asc">Title A-Z</option>
+            <option value="title-desc">Title Z-A</option>
+          </select>
+          <div class="cn-view-toggle" id="list-view-toggle">
+            <button id="btn-overview-view" class="cn-btn cn-btn-ghost cn-btn-sm active" data-mode="overview" type="button">Overview</button>
+          </div>
+        </div>
+
+        <div id="notes-grid" class="cn-notes-grid"></div>
+
+        <div id="list-empty" class="cn-empty cn-hidden">
+          <div class="cn-empty-icon">📝</div>
+          <p id="list-empty-title">No notes found</p>
+          <p id="list-empty-subtitle" class="cn-text-sm">Press Ctrl+N to create a new note</p>
+        </div>
+      </div>
+
+      <div id="view-editor" class="cn-view cn-hidden">
+        <header class="cn-main-header">
+          <div class="cn-editor-header-left">
+            <button id="btn-back" class="cn-btn cn-btn-ghost cn-btn-icon" type="button" title="Back to list">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            </button>
+            <div>
+              <input type="text" id="note-title" class="cn-title-input" placeholder="Note Title" dir="auto">
+              <div class="cn-editor-meta">
+                <span id="note-created">Created: -</span>
+                <span>•</span>
+                <span id="note-updated">Updated: -</span>
+                <span>•</span>
+                <span id="note-chars">0 chars</span>
+                <span>•</span>
+                <span id="note-lock-badge">Unlocked</span>
+              </div>
+            </div>
+          </div>
+          <div class="cn-editor-actions">
+            <span id="auto-save-status" class="cn-save-status"></span>
+            <button id="btn-save" class="cn-btn cn-btn-primary cn-btn-sm" type="button">💾 <span id="save-btn-label">Save</span></button>
+            <button id="btn-undo" class="cn-btn cn-btn-ghost cn-btn-sm" type="button">↩ <span id="undo-btn-label">Undo</span></button>
+            <button id="btn-copy-note" class="cn-btn cn-btn-ghost cn-btn-sm" type="button">📋 <span id="copy-btn-label">Copy</span></button>
+            <button id="btn-delete" class="cn-btn cn-btn-danger cn-btn-sm" type="button">🗑 <span id="delete-btn-label">Delete</span></button>
+          </div>
+        </header>
+
+        <div class="cn-editor-toolbar">
+          <div class="cn-editor-field">
+            <label for="note-workspace" id="label-note-workspace">Workspace</label>
+            <select id="note-workspace" class="cn-input cn-select"></select>
+          </div>
+          <div class="cn-editor-field">
+            <label for="note-category" id="label-note-category">Category</label>
+            <select id="note-category" class="cn-input cn-select"></select>
+          </div>
+          <div class="cn-editor-field cn-editor-field-tags">
+            <label for="note-tags" id="label-note-tags">Tags</label>
+            <div class="cn-input-inline-group">
+              <input type="text" id="note-tags" class="cn-input" placeholder="python, api, md" list="tag-suggestions-list">
+              <button id="btn-add-tag" class="cn-btn cn-btn-ghost cn-btn-sm" type="button">+ <span id="add-tag-label">Add Tag</span></button>
+            </div>
+            <datalist id="tag-suggestions-list"></datalist>
+          </div>
+          <div class="cn-editor-field">
+            <label id="label-note-color">Color</label>
+            <div id="note-color-options" class="cn-color-options"></div>
+          </div>
+          <div class="cn-editor-field cn-editor-checks">
+            <label class="cn-check-label">
+              <input type="checkbox" id="note-pin"> <span id="pin-label">📌 Pin</span>
+            </label>
+            <label class="cn-check-label">
+              <input type="checkbox" id="note-favorite"> <span id="favorite-label">⭐ Favorite</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="cn-editor-helper-grid">
+          <section class="cn-helper-card cn-card">
+            <div class="cn-card-body">
+              <div class="cn-helper-head">
+                <h3 id="quick-tags-title">Quick Tags</h3>
+                <span id="quick-tags-subtitle" class="cn-text-xs cn-text-muted">Default + custom tags</span>
+              </div>
+              <div id="note-quick-tags" class="cn-chip-list"></div>
+            </div>
+          </section>
+
+          <section class="cn-helper-card cn-card">
+            <div class="cn-card-body">
+              <div class="cn-helper-head">
+                <h3 id="smart-tags-title">Smart Suggestions</h3>
+                <div class="cn-inline-actions">
+                  <button id="btn-apply-all-suggestions" class="cn-btn cn-btn-ghost cn-btn-sm" type="button">Accept All</button>
+                  <button id="btn-edit-suggestions" class="cn-btn cn-btn-ghost cn-btn-sm" type="button">Edit</button>
+                </div>
+              </div>
+              <div id="note-suggested-tags" class="cn-suggestions-list"></div>
+            </div>
+          </section>
+
+          <section class="cn-helper-card cn-card">
+            <div class="cn-card-body">
+              <div class="cn-helper-head">
+                <h3 id="protection-title">Protection</h3>
+                <span id="lock-status-text" class="cn-text-xs cn-text-muted">This note is not locked.</span>
+              </div>
+              <div class="cn-inline-actions cn-wrap-actions">
+                <button id="btn-lock-note" class="cn-btn cn-btn-primary cn-btn-sm" type="button">🔒 <span id="lock-btn-label">Lock</span></button>
+                <button id="btn-change-lock" class="cn-btn cn-btn-ghost cn-btn-sm" type="button"><span id="change-lock-label">Change Password / PIN</span></button>
+                <button id="btn-remove-lock" class="cn-btn cn-btn-ghost cn-btn-sm" type="button"><span id="remove-lock-label">Remove Lock</span></button>
+                <button id="btn-relock-note" class="cn-btn cn-btn-ghost cn-btn-sm" type="button"><span id="relock-label">Re-Lock Session</span></button>
+              </div>
+              <div id="note-source-meta" class="cn-note-source-meta cn-text-sm cn-text-muted"></div>
+            </div>
+          </section>
+        </div>
+
+        <div class="cn-editor-modebar">
+          <div class="cn-mode-tabs">
+            <button class="cn-mode-tab active" data-mode="split" type="button">Split View</button>
+            <button class="cn-mode-tab" data-mode="edit" type="button">Editor Only</button>
+            <button class="cn-mode-tab" data-mode="preview" type="button">Preview Only</button>
+          </div>
+          <button id="btn-paste" class="cn-btn cn-btn-ghost cn-btn-sm" type="button">📥 <span id="paste-label">Paste</span></button>
+        </div>
+
+        <div id="editor-container" class="cn-editor-container split-mode">
+          <div class="cn-editor-pane">
+            <textarea id="note-content" class="cn-note-textarea" placeholder="Write your note here...&#10;Supports Markdown: # Heading, **bold**, `code`, [link](url)" dir="auto"></textarea>
+          </div>
+          <div class="cn-preview-pane">
+            <div class="cn-preview-header">
+              <span id="preview-label">Preview</span>
+            </div>
+            <div id="note-preview" class="cn-markdown cn-preview-content" dir="auto"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="view-settings" class="cn-view cn-hidden">
+        <header class="cn-main-header">
+          <div>
+            <h1 class="cn-page-title" id="settings-title">Settings</h1>
+            <p class="cn-page-subtitle" id="settings-subtitle">Customize ClipNote</p>
+          </div>
+          <button id="btn-back-settings" class="cn-btn cn-btn-ghost cn-btn-sm" type="button">← <span id="back-label">Back</span></button>
+        </header>
+
+        <div class="cn-settings-grid">
+          <div class="cn-settings-card cn-card">
+            <div class="cn-card-body">
+              <h3 class="cn-settings-title" id="appearance-title">Appearance</h3>
+              <div class="cn-setting-row">
+                <label class="cn-toggle-label">
+                  <span id="dark-mode-label">Dark Mode</span>
+                  <input type="checkbox" id="setting-dark-mode" class="cn-toggle">
+                  <span class="cn-toggle-slider"></span>
+                </label>
+              </div>
+              <div class="cn-setting-row">
+                <label for="setting-theme" id="theme-label">Theme</label>
+                <select id="setting-theme" class="cn-input cn-select">
+                  <option value="blue">Blue</option>
+                  <option value="green">Green</option>
+                  <option value="purple">Purple</option>
+                  <option value="orange">Orange</option>
+                  <option value="dark-pro">Dark Pro</option>
+                </select>
+              </div>
+              <div class="cn-setting-row">
+                <label for="setting-font-size"><span id="font-size-label">Font Size</span> <span id="font-size-value">14px</span></label>
+                <input type="range" id="setting-font-size" class="cn-range" min="12" max="20" step="1">
+              </div>
+              <div class="cn-setting-row">
+                <label class="cn-toggle-label">
+                  <span id="animations-label">Animations</span>
+                  <input type="checkbox" id="setting-animations" class="cn-toggle">
+                  <span class="cn-toggle-slider"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="cn-settings-card cn-card">
+            <div class="cn-card-body">
+              <h3 class="cn-settings-title" id="editor-settings-title">Editor</h3>
+              <div class="cn-setting-row">
+                <label class="cn-toggle-label">
+                  <span id="autosave-label">Auto Save</span>
+                  <input type="checkbox" id="setting-auto-save" class="cn-toggle">
+                  <span class="cn-toggle-slider"></span>
+                </label>
+              </div>
+              <div class="cn-setting-row">
+                <div class="cn-setting-row-head">
+                  <label id="default-color-label">Default Color for New Notes</label>
+                  <span id="default-color-about-title" class="cn-inline-note">About this tab</span>
+                </div>
+                <p class="cn-text-xs cn-text-muted" id="default-color-subtitle">New notes will use this color by default.</p>
+                <p class="cn-text-xs cn-text-muted" id="default-color-about-text">This sets the color automatically when a new note is created in the manager or popup.</p>
+                <div id="setting-default-color" class="cn-color-options"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="cn-settings-card cn-card">
+            <div class="cn-card-body">
+              <h3 class="cn-settings-title" id="language-title">Language</h3>
+              <div class="cn-setting-row">
+                <label for="setting-language" id="language-select-label">Interface Language</label>
+                <select id="setting-language" class="cn-input cn-select">
+                  <option value="en">English</option>
+                  <option value="fa">فارسی</option>
+                </select>
+              </div>
+              <p class="cn-text-sm cn-text-muted" id="language-help">Texts and labels will switch to the selected language. Persian uses Vazirmatn and RTL layout.</p>
+            </div>
+          </div>
+
+          <div class="cn-settings-card cn-card">
+            <div class="cn-card-body">
+              <h3 class="cn-settings-title" id="data-title">Data</h3>
+              <div class="cn-setting-row cn-data-actions">
+                <button id="btn-export-json" class="cn-btn cn-btn-primary" type="button">Export JSON</button>
+                <button id="btn-export-txt" class="cn-btn cn-btn-ghost" type="button">Export TXT</button>
+                <label class="cn-btn cn-btn-ghost cn-file-label">
+                  <span id="import-json-label">Import JSON</span>
+                  <input type="file" id="btn-import-json" class="cn-hidden" accept=".json">
+                </label>
+                <button id="btn-clear-data" class="cn-btn cn-btn-danger" type="button"><span id="clear-data-label">Clear All Data</span></button>
+              </div>
+              <p class="cn-text-sm cn-text-muted" id="data-help">All data stays local on your device. No cloud, no server.</p>
+            </div>
+          </div>
+
+          <div class="cn-settings-card cn-card">
+            <div class="cn-card-body">
+              <h3 class="cn-settings-title" id="about-title">About</h3>
+              <p><strong>ClipNote</strong> v1.2.7</p>
+              <p class="cn-text-sm cn-text-muted">Created by Kourosh & Nova</p>
+              <p class="cn-text-sm cn-text-muted" id="about-desc">A fast, secure, and professional local notebook for Chrome.</p>
+              <p class="cn-text-sm cn-text-muted"><span id="total-notes-label">Total Notes</span>: <span id="settings-note-count">0</span></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div id="workspace-modal" class="cn-modal cn-hidden">
+    <div class="cn-modal-backdrop"></div>
+    <div class="cn-modal-content">
+      <h3 id="workspace-modal-title">Add Workspace</h3>
+      <input type="text" id="workspace-input" class="cn-input" placeholder="Workspace name">
+      <div class="cn-modal-actions">
+        <button id="btn-cancel-workspace" class="cn-btn cn-btn-ghost" type="button">Cancel</button>
+        <button id="btn-save-workspace" class="cn-btn cn-btn-primary" type="button">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="category-modal" class="cn-modal cn-hidden">
+    <div class="cn-modal-backdrop"></div>
+    <div class="cn-modal-content">
+      <h3 id="category-modal-title">Add Category</h3>
+      <input type="text" id="category-input" class="cn-input" placeholder="Category name">
+      <div class="cn-modal-actions">
+        <button id="btn-cancel-category" class="cn-btn cn-btn-ghost" type="button">Cancel</button>
+        <button id="btn-save-category" class="cn-btn cn-btn-primary" type="button">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="delete-modal" class="cn-modal cn-hidden">
+    <div class="cn-modal-backdrop"></div>
+    <div class="cn-modal-content cn-modal-small">
+      <h3 id="delete-modal-title">Delete Note?</h3>
+      <p class="cn-text-sm cn-text-secondary" id="delete-modal-text">This action cannot be undone.</p>
+      <div class="cn-modal-actions">
+        <button id="btn-cancel-delete" class="cn-btn cn-btn-ghost" type="button">Cancel</button>
+        <button id="btn-confirm-delete" class="cn-btn cn-btn-danger" type="button">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="lock-modal" class="cn-modal cn-hidden">
+    <div class="cn-modal-backdrop"></div>
+    <div class="cn-modal-content">
+      <h3 id="lock-modal-title">Lock Note</h3>
+      <div class="cn-setting-row">
+        <label for="lock-type" id="lock-type-label">Protection Type</label>
+        <select id="lock-type" class="cn-input cn-select">
+          <option value="password">Password</option>
+          <option value="pin">4-digit PIN</option>
+        </select>
+      </div>
+      <div class="cn-setting-row">
+        <label for="lock-secret" id="lock-secret-label">Password / PIN</label>
+        <div class="cn-password-row">
+          <input type="password" id="lock-secret" class="cn-input" placeholder="Enter password or 4-digit PIN">
+          <button id="btn-toggle-lock-secret" class="cn-btn cn-btn-ghost cn-btn-sm cn-password-toggle" type="button">👁</button>
+        </div>
+      </div>
+      <div class="cn-setting-row">
+        <label for="lock-confirm-secret" id="lock-confirm-label">Confirm</label>
+        <div class="cn-password-row">
+          <input type="password" id="lock-confirm-secret" class="cn-input" placeholder="Repeat password or PIN">
+          <button id="btn-toggle-lock-confirm-secret" class="cn-btn cn-btn-ghost cn-btn-sm cn-password-toggle" type="button">👁</button>
+        </div>
+      </div>
+      <div class="cn-modal-actions">
+        <button id="btn-cancel-lock" class="cn-btn cn-btn-ghost" type="button">Cancel</button>
+        <button id="btn-save-lock" class="cn-btn cn-btn-primary" type="button">Save Lock</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="unlock-modal" class="cn-modal cn-hidden">
+    <div class="cn-modal-backdrop"></div>
+    <div class="cn-modal-content cn-modal-small">
+      <h3 id="unlock-modal-title">Unlock Note</h3>
+      <p id="unlock-modal-text" class="cn-text-sm cn-text-muted">Enter the password or PIN to view this note.</p>
+      <div class="cn-password-row">
+        <input type="password" id="unlock-secret" class="cn-input" placeholder="Password or PIN">
+        <button id="btn-toggle-unlock-secret" class="cn-btn cn-btn-ghost cn-btn-sm cn-password-toggle" type="button">👁</button>
+      </div>
+      <div class="cn-modal-actions">
+        <button id="btn-cancel-unlock" class="cn-btn cn-btn-ghost" type="button">Cancel</button>
+        <button id="btn-confirm-unlock" class="cn-btn cn-btn-primary" type="button">Unlock</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="shared.js"></script>
+  <script src="options.js"></script>
+</body>
+</html>
