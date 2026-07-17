@@ -52,4 +52,6 @@ ClipNote یک افزونهٔ Google Chrome بر پایهٔ Manifest V3 است ک
 - هیچ سرور، API خارجی، آنالیتیکس یا ردیابی وجود ندارد.
 - رمزها و PINها به‌صورت plain text ذخیره نمی‌شوند.
 - قفل یادداشت‌ها با Web Crypto hash می‌شود.
+
+
 Made with ❤️ by Kourosh & Nova.
