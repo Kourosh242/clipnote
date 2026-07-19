@@ -2,25 +2,6 @@
 
 **نسخهٔ ۱.۲.۸** | ساخته‌شده توسط **Kourosh & Nova**
 
-ClipNote یک افزونهٔ Google Chrome بر پایهٔ Manifest V3 است که همه‌چیز را به‌صورت **۱۰۰٪ محلی** روی دستگاه شما نگه می‌دارد. این افزونه برای ذخیره، جستجو، دسته‌بندی، قفل‌گذاری و مدیریت حرفه‌ای یادداشت‌ها و متن‌های ذخیره‌شده طراحی شده است.
-
-## ویژگی‌های کلیدی
-
-- ✅ ذخیره و مدیریت یادداشت‌ها به‌صورت کاملاً محلی
-- 🌐 ذخیرهٔ سریع متن انتخاب‌شده از منوی راست‌کلیک با گزینهٔ **Save to ClipNote**
-- 🔒 قفل‌گذاری هر یادداشت با **Password** یا **4-digit PIN**
-- 👁 نمایش/عدم‌نمایش رمز هنگام وارد کردن یا باز کردن یادداشت
-- 🗂️ Workspace / Collections برای تفکیک یادداشت‌های پروژه‌های مختلف
-- 🏷️ برچسب‌های پیش‌فرض + برچسب‌های سفارشی نامحدود
-- 🤖 Smart Tag Suggestions در بخش مدیریت کامل
-- 🕒 Timeline View در نمای کامل مدیریت
-- 🇮🇷 پشتیبانی از **فارسی + RTL + فونت Vazirmatn**
-- 🇺🇸 رابط انگلیسی با چیدمان و فونت مناسب
-- ⚙️ بخش Language در Settings برای جابه‌جایی بین English و فارسی
-- 📥 Import/Export به فرمت JSON و TXT
-- 🧾 Markdown Preview با Split View
-- 🎨 Popup سبک، ساده، پایدار و هماهنگ با تم فعال
-
 ## تغییرات مهم نسخه ۱.۲.۸
 
 - بهبود پشتیبانی از زبان فارسی در صفحهٔ اصلی Manager
@@ -50,31 +31,5 @@ ClipNote یک افزونهٔ Google Chrome بر پایهٔ Manifest V3 است ک
 - رمزها و PINها به‌صورت plain text ذخیره نمی‌شوند.
 - قفل یادداشت‌ها با Web Crypto hash می‌شود.
 
-## ساختار فایل‌ها
-
-```text
-clipnote/
-├── manifest.json
-├── background.js
-├── shared.js
-├── shared.css
-├── popup.html
-├── popup.css
-├── popup.js
-├── options.html
-├── options.css
-├── options.js
-├── CHANGELOG.md
-├── icons/
-└── assets/
-```
-
-## خروجی آماده استفاده
-
-فایل نهایی قابل بارگذاری در Chrome:
-
-- `clipnote.zip`
-
----
 
 Made with ❤️ by Kourosh & Nova.
