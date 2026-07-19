@@ -1,0 +1,310 @@
+/**
+ * popup.css - Popup پیشرفته ClipNote با حفظ پایداری
+ */
+
+.cn-popup-body {
+  width: 390px;
+  min-width: 390px;
+  max-width: 390px;
+  height: 600px;
+  min-height: 600px;
+  max-height: 600px;
+  margin: 0;
+  overflow: hidden;
+  background: var(--cn-bg);
+  font-family: var(--cn-font-family-fa);
+}
+
+.cn-popup {
+  display: flex;
+  flex-direction: column;
+  width: 390px;
+  height: 600px;
+  overflow: hidden;
+}
+
+.cn-popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--cn-border);
+  background: var(--cn-surface);
+}
+
+.cn-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cn-logo-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+}
+
+.cn-popup-shell,
+.cn-quick-capture {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.cn-quick-save-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 12px 16px 0;
+  padding: 12px 14px;
+  border: 1px solid rgba(var(--cn-primary-rgb), 0.16);
+  border-radius: 16px;
+  background: var(--cn-primary-light);
+}
+
+.cn-quick-save-banner p {
+  margin: 4px 0 0;
+  font-size: 0.78rem;
+  color: var(--cn-text-secondary);
+}
+
+.cn-popup-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid var(--cn-border);
+  background: var(--cn-surface);
+}
+
+.cn-popup-toolbar-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+}
+
+.cn-popup-filters {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+}
+
+.cn-filter-btn {
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--cn-border);
+  background: var(--cn-surface);
+  color: var(--cn-text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.cn-filter-btn.active {
+  background: var(--cn-primary);
+  color: #fff;
+  border-color: var(--cn-primary);
+}
+
+.cn-popup-view-toggle {
+  flex-shrink: 0;
+}
+
+.cn-popup-content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 14px 16px;
+}
+
+.cn-popup-notes,
+.cn-popup-overview-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cn-popup-overview-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cn-popup-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 16px 14px;
+  border-top: 1px solid var(--cn-border);
+  background: var(--cn-surface);
+}
+
+.cn-popup-notes .cn-note-item {
+  padding: 14px;
+  border-radius: 18px;
+}
+
+.cn-popup-notes .cn-note-actions {
+  opacity: 1;
+}
+
+.cn-popup-notes .cn-note-title {
+  font-size: 0.92rem;
+}
+
+.cn-popup-notes .cn-note-preview {
+  font-size: 0.82rem;
+}
+
+.cn-empty {
+  padding: 48px 16px;
+}
+
+.cn-quick-capture {
+  padding: 14px 16px 16px;
+  gap: 12px;
+  overflow: hidden;
+}
+
+.cn-quick-capture-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-weight: 700;
+  color: var(--cn-text-secondary);
+}
+
+.cn-quick-capture-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 4px;
+  margin: -4px;
+}
+
+.cn-capture-textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.cn-popup-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.cn-popup-tags-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+}
+
+.cn-popup-helper-card .cn-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+}
+
+.cn-popup-checks {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.cn-quick-capture-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cn-popup .cn-input:focus,
+.cn-quick-capture .cn-input:focus,
+.cn-popup-note-modal-content .cn-input:focus {
+  box-shadow: 0 0 0 2px rgba(var(--cn-primary-rgb), 0.16);
+}
+
+.cn-popup-note-modal-content {
+  max-width: 430px;
+  max-height: min(92vh, 560px);
+  display: flex;
+  flex-direction: column;
+}
+
+.cn-popup-note-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cn-popup-note-modal-header h3 {
+  margin: 0 0 6px;
+}
+
+.cn-popup-note-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  min-height: 0;
+  margin-top: 12px;
+  padding-right: 2px;
+}
+
+.cn-popup-note-source {
+  margin: 0;
+}
+
+.cn-popup-editor-toggle {
+  align-self: flex-start;
+}
+
+.cn-popup-note-edit-content {
+  min-height: 180px;
+  resize: vertical;
+}
+
+.cn-popup-note-preview {
+  min-height: 180px;
+  max-height: 260px;
+  overflow-y: auto;
+  padding: 14px;
+  border: 1px solid var(--cn-border);
+  border-radius: 14px;
+  background: var(--cn-surface-2);
+}
+
+.cn-popup-note-modal-actions {
+  margin-top: 14px;
+}
+
+html[data-lang="fa"] .cn-popup-header,
+html[data-lang="fa"] .cn-popup-toolbar,
+html[data-lang="fa"] .cn-popup-content,
+html[data-lang="fa"] .cn-popup-footer,
+html[data-lang="fa"] .cn-quick-capture,
+html[data-lang="fa"] .cn-quick-capture-header,
+html[data-lang="fa"] .cn-quick-capture-actions,
+html[data-lang="fa"] .cn-popup-checks,
+html[data-lang="fa"] .cn-popup-note-modal-header,
+html[data-lang="fa"] .cn-popup-note-modal-actions,
+html[data-lang="fa"] .cn-popup-note-modal-body {
+  direction: rtl;
+}
+
+html[data-lang="fa"] .cn-header-actions,
+html[data-lang="fa"] .cn-popup-tags-row,
+html[data-lang="fa"] .cn-popup-toolbar-row {
+  direction: ltr;
+}

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ClipNote</title>
+  <link rel="stylesheet" href="shared.css">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body class="cn-popup-body">
+  <div class="cn-popup" id="popup-root">
+    <header class="cn-popup-header">
+      <div class="cn-logo">
+        <img src="icons/icon32.png" alt="" class="cn-logo-icon">
+        <span class="cn-logo-text">ClipNote</span>
+        <span id="popup-update-badge" class="cn-update-badge cn-hidden">New</span>
+      </div>
+      <div class="cn-header-actions">
+        <button id="btn-new-note" class="cn-btn cn-btn-primary cn-btn-sm" type="button">
+          <span>＋</span><span id="label-new-note">New</span>
+        </button>
+        <button id="btn-open-manager" class="cn-btn cn-btn-ghost cn-btn-icon" type="button" title="Open Manager">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+        </button>
+      </div>
+    </header>
+
+    <div id="quick-save-banner" class="cn-quick-save-banner cn-hidden">
+      <div>
+        <strong id="quick-save-banner-title">Quick Save</strong>
+        <p id="quick-save-banner-text">Saved from right click.</p>
+      </div>
+      <button id="btn-dismiss-quick-save" class="cn-action-btn" type="button" title="Dismiss">✕</button>
+    </div>
+
+    <div id="popup-update-banner" class="cn-quick-save-banner cn-hidden">
+      <div>
+        <strong id="popup-update-banner-title">New Version Available</strong>
+        <p id="popup-update-banner-text">A newer version is available on GitHub.</p>
+      </div>
+      <div class="cn-inline-actions">
+        <button id="btn-popup-check-updates" class="cn-btn cn-btn-primary cn-btn-sm" type="button">Update</button>
+        <button id="btn-dismiss-update-banner" class="cn-action-btn" type="button" title="Dismiss">✕</button>
+      </div>
+    </div>
+
+    <div id="popup-list-shell" class="cn-popup-shell">
+      <section class="cn-popup-toolbar">
+        <div class="cn-search-box">
+          <svg class="cn-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input type="text" id="popup-search" class="cn-input" placeholder="Search notes... (Ctrl+F)">
+        </div>
+        <div class="cn-popup-toolbar-row">
+          <select id="popup-workspace-filter" class="cn-input cn-select"></select>
+          <div class="cn-view-toggle cn-popup-view-toggle">
+            <button id="btn-popup-overview" class="cn-btn cn-btn-ghost cn-btn-sm active" type="button">Overview</button>
+            <button id="btn-popup-timeline" class="cn-btn cn-btn-ghost cn-btn-sm" type="button">Timeline</button>
+          </div>
+        </div>
+        <div class="cn-popup-filters">
+          <button id="btn-filter-all" class="cn-filter-btn active" type="button">All</button>
+          <button id="btn-filter-pinned" class="cn-filter-btn" type="button">Pinned</button>
+          <button id="btn-filter-favorites" class="cn-filter-btn" type="button">Favorites</button>
+        </div>
+      </section>
+
+      <main class="cn-popup-content">
+        <div id="popup-notes-list" class="cn-popup-notes"></div>
+        <div id="popup-empty" class="cn-empty cn-hidden">
+          <div class="cn-empty-icon">📝</div>
+          <p id="empty-title">No notes found</p>
+          <p id="empty-subtitle" class="cn-text-sm">Create your first note to get started</p>
+        </div>
+      </main>
+
+      <footer class="cn-popup-footer">
+        <span id="popup-count" class="cn-text-xs cn-text-muted">0 notes</span>
+        <div class="cn-inline-actions">
+          <button id="btn-popup-footer-updates" class="cn-btn cn-btn-ghost cn-btn-sm" type="button">Updates</button>
+          <button id="btn-settings" class="cn-btn cn-btn-ghost cn-btn-sm" type="button">Settings</button>
+        </div>
+      </footer>
+    </div>
+
+    <div id="quick-capture" class="cn-quick-capture cn-hidden">
+      <div class="cn-quick-capture-header">
+        <span id="quick-capture-title">Quick Note</span>
+        <button id="btn-cancel-capture" class="cn-action-btn danger" type="button" title="Close">✕</button>
+      </div>
+
+      <div class="cn-quick-capture-body">
+        <input type="text" id="capture-title" class="cn-input" placeholder="Title / Topic" dir="auto">
+        <textarea id="capture-content" class="cn-input cn-capture-textarea" placeholder="Write your note here..." dir="auto"></textarea>
+        <div class="cn-popup-grid-2">
+          <select id="capture-workspace" class="cn-input cn-select"></select>
+          <select id="capture-category" class="cn-input cn-select"></select>
+        </div>
+        <div class="cn-popup-tags-row">
+          <input type="text" id="capture-tags" class="cn-input" placeholder="python, api, md" list="popup-capture-tag-list" dir="auto">
+          <button id="btn-capture-add-tag" class="cn-btn cn-btn-ghost cn-btn-sm" type="button">+ Tag</button>
+        </div>
+        <datalist id="popup-capture-tag-list"></datalist>
+
+        <div class="cn-popup-helper-card cn-card">
+          <div class="cn-card-body">
+            <div class="cn-section-header" id="capture-quick-tags-title">Quick Tags</div>
+            <div id="capture-quick-tags" class="cn-chip-list cn-chip-list-compact"></div>
+          </div>
+        </div>
+
+        <div class="cn-popup-helper-card cn-card">
+          <div class="cn-card-body">
+            <div class="cn-section-header cn-section-header-inline">
+              <span id="capture-suggestions-title">Suggested Tags</span>
+              <div class="cn-inline-actions">
+                <button id="btn-capture-accept-all" class="cn-btn cn-btn-ghost cn-btn-sm" type="button">Accept All</button>
+              </div>
+            </div>
+            <div id="capture-suggestions" class="cn-suggestions-list cn-suggestions-list-compact"></div>
+          </div>
+        </div>
+
+        <div class="cn-popup-helper-card cn-card">
+          <div class="cn-card-body">
+            <div class="cn-section-header" id="capture-color-title">Color</div>
+            <div id="capture-color-options" class="cn-color-options"></div>
+            <div class="cn-popup-checks">
+              <label class="cn-check-label"><input id="capture-pin" type="checkbox"> <span id="capture-pin-label">Pin</span></label>
+              <label class="cn-check-label"><input id="capture-favorite" type="checkbox"> <span id="capture-favorite-label">Favorite</span></label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cn-quick-capture-actions">
+        <span id="capture-chars" class="cn-text-xs cn-text-muted">0 chars</span>
+        <div class="cn-inline-actions">
+          <button id="btn-save-capture" class="cn-btn cn-btn-primary cn-btn-sm" type="button">Save Note</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="popup-unlock-modal" class="cn-modal cn-hidden">
+    <div class="cn-modal-backdrop"></div>
+    <div class="cn-modal-content cn-modal-small">
+      <h3 id="popup-unlock-title">Unlock Note</h3>
+      <p id="popup-unlock-text" class="cn-text-sm cn-text-muted">Enter the password or PIN to unlock this note.</p>
+      <div class="cn-password-row">
+        <input type="password" id="popup-unlock-secret" class="cn-input" placeholder="Password or PIN">
+        <button id="btn-popup-toggle-secret" class="cn-btn cn-btn-ghost cn-btn-sm cn-password-toggle" type="button">👁</button>
+      </div>
+      <div class="cn-modal-actions">
+        <button id="btn-popup-cancel-unlock" class="cn-btn cn-btn-ghost" type="button">Cancel</button>
+        <button id="btn-popup-confirm-unlock" class="cn-btn cn-btn-primary" type="button">Unlock</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="popup-note-modal" class="cn-modal cn-hidden">
+    <div class="cn-modal-backdrop"></div>
+    <div class="cn-modal-content cn-popup-note-modal-content">
+      <div class="cn-popup-note-modal-header">
+        <div>
+          <h3 id="popup-note-title">Edit Note</h3>
+          <div id="popup-note-meta" class="cn-text-xs cn-text-muted"></div>
+        </div>
+        <button id="btn-popup-close-note-x" class="cn-action-btn" type="button">✕</button>
+      </div>
+
+      <div class="cn-popup-note-modal-body">
+        <input id="popup-note-edit-title" class="cn-input" type="text" placeholder="Title" dir="auto">
+        <div id="popup-note-source" class="cn-text-sm cn-text-muted cn-popup-note-source"></div>
+        <div class="cn-popup-grid-2">
+          <select id="popup-note-workspace" class="cn-input cn-select"></select>
+          <select id="popup-note-category" class="cn-input cn-select"></select>
+        </div>
+        <div class="cn-popup-tags-row">
+          <input type="text" id="popup-note-tags" class="cn-input" placeholder="python, api, md" list="popup-editor-tag-list" dir="auto">
+          <button id="btn-popup-note-add-tag" class="cn-btn cn-btn-ghost cn-btn-sm" type="button">+ Tag</button>
+        </div>
+        <datalist id="popup-editor-tag-list"></datalist>
+
+        <div class="cn-popup-helper-card cn-card">
+          <div class="cn-card-body">
+            <div class="cn-section-header" id="editor-quick-tags-title">Quick Tags</div>
+            <div id="popup-note-quick-tags" class="cn-chip-list cn-chip-list-compact"></div>
+          </div>
+        </div>
+
+        <div class="cn-popup-helper-card cn-card">
+          <div class="cn-card-body">
+            <div class="cn-section-header cn-section-header-inline">
+              <span id="editor-suggestions-title">Suggested Tags</span>
+              <div class="cn-inline-actions">
+                <button id="btn-popup-note-accept-all" class="cn-btn cn-btn-ghost cn-btn-sm" type="button">Accept All</button>
+              </div>
+            </div>
+            <div id="popup-note-suggestions" class="cn-suggestions-list cn-suggestions-list-compact"></div>
+          </div>
+        </div>
+
+        <div class="cn-popup-helper-card cn-card">
+          <div class="cn-card-body">
+            <div class="cn-section-header" id="editor-color-title">Color</div>
+            <div id="popup-note-color-options" class="cn-color-options"></div>
+            <div class="cn-popup-checks">
+              <label class="cn-check-label"><input id="popup-note-pin" type="checkbox"> <span id="popup-note-pin-label">Pin</span></label>
+              <label class="cn-check-label"><input id="popup-note-favorite" type="checkbox"> <span id="popup-note-favorite-label">Favorite</span></label>
+            </div>
+          </div>
+        </div>
+
+        <div class="cn-view-toggle cn-popup-editor-toggle">
+          <button id="btn-popup-mode-edit" class="cn-btn cn-btn-ghost cn-btn-sm active" type="button">Editor</button>
+          <button id="btn-popup-mode-preview" class="cn-btn cn-btn-ghost cn-btn-sm" type="button">Preview</button>
+        </div>
+
+        <textarea id="popup-note-edit-content" class="cn-input cn-popup-note-edit-content" placeholder="Write your note here..." dir="auto"></textarea>
+        <div id="popup-note-preview" class="cn-markdown cn-popup-note-preview cn-hidden" dir="auto"></div>
+      </div>
+
+      <div class="cn-modal-actions cn-popup-note-modal-actions">
+        <button id="btn-popup-close-note" class="cn-btn cn-btn-ghost" type="button">Close</button>
+        <button id="btn-popup-note-undo" class="cn-btn cn-btn-ghost" type="button">Undo</button>
+        <button id="btn-popup-copy-note" class="cn-btn cn-btn-ghost" type="button">Copy</button>
+        <button id="btn-popup-delete-note" class="cn-btn cn-btn-danger" type="button">Delete</button>
+        <button id="btn-popup-save-note" class="cn-btn cn-btn-primary" type="button">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="shared.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
