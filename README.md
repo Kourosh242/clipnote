@@ -56,26 +56,6 @@ ClipNote از نسخهٔ ۱.۳.۰ به بعد، به‌صورت **خودکار �
 
 این بررسی فقط **یک درخواست عمومی** به `api.github.com` ارسال می‌کند و هیچ یادداشت یا دادهٔ خصوصی کاربر ارسال نمی‌شود.
 
-### نحوهٔ انتشار نسخهٔ جدید (مهم)
-
-برای اینکه تشخیص نسخهٔ جدید درست کار کند، **تگ ریلیز باید به‌صورت `vX.Y.Z` باشد** (مثلاً `v1.4.0`):
-
-- ❌ تگ‌های غیر عددی مثل `new_ver1` یا `exention` توسط سیستم تشخیص نسخه نادیده گرفته می‌شوند.
-- ✅ تگ `v1.3.0` یا `1.3.0` درست خوانده می‌شود.
-- شمارهٔ `version` در `manifest.json` نیز باید با همان نسخه یکسان باشد.
-
-مراحل انتشار:
-
-```bash
-# ۱) آپدیت ورژن در manifest.json و مستندات
-# ۲) ساخت فایل zip:
-zip -r clipnote_vX.Y.Z.zip clipnote/
-
-# ۳) ساخت تگ و ریلیز:
-git tag vX.Y.Z
-git push origin vX.Y.Z
-gh release create vX.Y.Z clipnote_vX.Y.Z.zip --title "clipnote vX.Y.Z" --notes "توضیحات نسخه"
-```
 
 > توجه: این مکانیزم فقط **اطلاع‌رسانی و پیشنهاد دانلود** است، نه نصب خودکار. برای آپدیت بی‌صدا و خودکارِ واقعی باید افزونه در **Chrome Web Store** منتشر شود.
 
@@ -94,32 +74,6 @@ gh release create vX.Y.Z clipnote_vX.Y.Z.zip --title "clipnote vX.Y.Z" --notes "
 - هیچ سرور، API خارجی، آنالیتیکس یا ردیابی وجود ندارد.
 - رمزها و PINها به‌صورت plain text ذخیره نمی‌شوند.
 - قفل یادداشت‌ها با Web Crypto hash می‌شود.
-
-## ساختار فایل‌ها
-
-```text
-clipnote/
-├── manifest.json
-├── background.js
-├── shared.js
-├── shared.css
-├── popup.html
-├── popup.css
-├── popup.js
-├── options.html
-├── options.css
-├── options.js
-├── CHANGELOG.md
-├── icons/
-└── assets/
-```
-
-## خروجی آماده استفاده
-
-فایل نهایی قابل بارگذاری در Chrome:
-
-- `clipnote.zip`
-
----
+- 
 
 Made with ❤️ by Kourosh & Mehdi.
