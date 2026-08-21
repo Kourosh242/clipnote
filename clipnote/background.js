@@ -7,8 +7,19 @@ importScripts('shared.js');
 
 const CONTEXT_MENU_ID = 'clipnote-save-selection';
 
+const UPDATE_CHECK_ALARM = 'clipnote-update-check';
+const UPDATE_CHECK_FIRST_DELAY_MINUTES = 5; // first check shortly after install/startup
+const UPDATE_CHECK_PERIOD_MINUTES = 360; // then every 6 hours
+
 async function ensureBaseStorage() {
   await ClipNote.migrateStorageData();
+}
+
+function setupUpdateAlarm() {
+  chrome.alarms.create(UPDATE_CHECK_ALARM, {
+    delayInMinutes: UPDATE_CHECK_FIRST_DELAY_MINUTES,
+    periodInMinutes: UPDATE_CHECK_PERIOD_MINUTES
+  }, () => void chrome.runtime.lastError);
 }
 
 function createContextMenus() {
@@ -111,6 +122,7 @@ chrome.runtime.onInstalled.addListener(async (details) => {
 
     await ensureBaseStorage();
     createContextMenus();
+    setupUpdateAlarm();
     console.log('ClipNote installed/updated:', details.reason);
   } catch (error) {
     console.error('Install/update handling error:', error);
@@ -120,6 +132,14 @@ chrome.runtime.onInstalled.addListener(async (details) => {
 chrome.runtime.onStartup.addListener(async () => {
   await ensureBaseStorage();
   createContextMenus();
+  setupUpdateAlarm();
+});
+
+chrome.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name !== UPDATE_CHECK_ALARM) return;
+  ClipNote.checkForUpdates(false).catch(error => {
+    console.error('Update check failed:', error);
+  });
 });
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {

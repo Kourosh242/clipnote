@@ -77,7 +77,7 @@ const SMART_TAG_RULES = [
 const GITHUB_REPO_URL = 'https://github.com/Kourosh242/clipnote';
 const GITHUB_RELEASES_URL = `${GITHUB_REPO_URL}/releases/latest`;
 const GITHUB_API_LATEST_RELEASE_URL = 'https://api.github.com/repos/Kourosh242/clipnote/releases/latest';
-const GITHUB_API_TAGS_URL = 'https://api.github.com/repos/Kourosh242/clipnote/tags?per_page=1';
+const GITHUB_API_TAGS_URL = 'https://api.github.com/repos/Kourosh242/clipnote/tags?per_page=10';
 const UPDATE_CHECK_CACHE_MS = 1000 * 60 * 60 * 6;
 
 // ============== Generic Helpers ==============
@@ -138,7 +138,11 @@ function truncateText(text, max = 72) {
 }
 
 function normalizeVersionString(version = '') {
-  return String(version || '').trim().replace(/^v/i, '').split('-')[0];
+  const raw = String(version || '').trim();
+  // Extract the first semver-like "x.y[.z...]" token (requires at least one dot).
+  // This rejects non-numeric tags such as "new_ver1" or bare build numbers like "3".
+  const match = raw.match(/(\d+(?:\.\d+)+)/);
+  return match ? match[1] : '';
 }
 
 function compareVersions(a = '', b = '') {
@@ -172,18 +176,35 @@ async function fetchGithubJson(url) {
   return await response.json();
 }
 
+function pickHighestVersion(tags) {
+  let best = null;
+  (tags || []).forEach(tag => {
+    const name = tag && (tag.name || tag.tag_name);
+    const version = normalizeVersionString(name);
+    if (version && (!best || compareVersions(version, best.latestVersion) > 0)) {
+      best = { latestVersion: version, latestLabel: name };
+    }
+  });
+  return best;
+}
+
 async function fetchLatestGithubVersion() {
   try {
     const release = await fetchGithubJson(GITHUB_API_LATEST_RELEASE_URL);
-    if (release && (release.tag_name || release.name)) {
-      return {
-        ok: true,
-        latestVersion: release.tag_name || release.name,
-        latestLabel: release.name || release.tag_name,
-        url: release.html_url || GITHUB_RELEASES_URL,
-        publishedAt: release.published_at || null,
-        source: 'release'
-      };
+    if (release) {
+      const fromTag = normalizeVersionString(release.tag_name);
+      const fromName = normalizeVersionString(release.name);
+      const latestVersion = fromTag || fromName;
+      if (latestVersion) {
+        return {
+          ok: true,
+          latestVersion,
+          latestLabel: release.name || release.tag_name,
+          url: release.html_url || GITHUB_RELEASES_URL,
+          publishedAt: release.published_at || null,
+          source: 'release'
+        };
+      }
     }
   } catch (error) {
     // Fallback to tags below.
@@ -191,17 +212,22 @@ async function fetchLatestGithubVersion() {
 
   try {
     const tags = await fetchGithubJson(GITHUB_API_TAGS_URL);
-    if (Array.isArray(tags) && tags.length > 0) {
-      const firstTag = tags[0];
+    const best = pickHighestVersion(Array.isArray(tags) ? tags : []);
+    if (best) {
       return {
         ok: true,
-        latestVersion: firstTag.name,
-        latestLabel: firstTag.name,
+        latestVersion: best.latestVersion,
+        latestLabel: best.latestLabel,
         url: GITHUB_RELEASES_URL,
         publishedAt: null,
         source: 'tag'
       };
     }
+    return {
+      ok: false,
+      error: 'No valid version tag found.',
+      url: GITHUB_REPO_URL
+    };
   } catch (error) {
     return {
       ok: false,
@@ -269,7 +295,7 @@ async function checkForUpdates(force = false) {
     info.url = GITHUB_REPO_URL;
     info.source = remote.source || 'github';
     info.publishedAt = remote.publishedAt || null;
-    info.hasUpdate = compareVersions(info.latestVersion, currentVersion) > 0;
+    info.hasUpdate = info.latestVersion ? compareVersions(info.latestVersion, currentVersion) > 0 : false;
   } else {
     info.error = remote.error || 'Unable to check updates.';
   }

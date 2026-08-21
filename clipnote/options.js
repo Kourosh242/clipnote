@@ -541,6 +541,7 @@
     btnImportJson: document.getElementById('btn-import-json'),
     btnClearData: document.getElementById('btn-clear-data'),
     settingsNoteCount: document.getElementById('settings-note-count'),
+    aboutVersion: document.getElementById('about-version'),
 
     workspaceModal: document.getElementById('workspace-modal'),
     workspaceModalTitle: document.getElementById('workspace-modal-title'),
@@ -795,6 +796,9 @@
     document.getElementById('data-title').textContent = t('data');
     document.getElementById('data-help').textContent = t('dataHelp');
     document.getElementById('about-title').textContent = t('about');
+    if (els.aboutVersion) {
+      els.aboutVersion.textContent = 'v' + (chrome.runtime.getManifest().version || '1.3.0');
+    }
     document.getElementById('about-desc').textContent = t('aboutDesc');
     document.getElementById('total-notes-label').textContent = t('totalNotes');
     document.getElementById('import-json-label').textContent = t('importJson');

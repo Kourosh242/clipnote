@@ -1,5 +1,26 @@
 # CHANGELOG
 
+## 1.3.0 - 2026-08-21
+
+### Added
+- Automatic, periodic update checking via `chrome.alarms` (runs in the background every 6 hours, no need to open the extension).
+- Automatic update notification shown once per new version, with a click-through to the GitHub release page.
+- Robust version parsing that only accepts semantic version tags (e.g. `v1.3.0`) and ignores non-numeric tags such as `new_ver1`.
+- Tag fallback now scans multiple recent tags and picks the highest valid version.
+- Dynamic "About" version label in Settings (reads from `manifest.json`).
+
+### Changed
+- Bumped version from 1.2.9 to 1.3.0.
+- Renamed the distribution folder from `clipnote_v1.2.9` to `clipnote` (matches the documented structure).
+- Added `alarms` permission to the manifest.
+
+### Fixed
+- Fixed the update checker never detecting a new version because non-semver release tags (e.g. `new_ver1`) were parsed as version `0`.
+- Fixed update checks only running when the popup/settings were opened — now they also run automatically in the background.
+
+### For maintainers
+- Future release tags MUST use the `vX.Y.Z` format for the auto-update notification to work correctly.
+
 ## 1.2.9 - 2026-07-13
 
 ### Added
