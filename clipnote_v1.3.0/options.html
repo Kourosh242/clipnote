@@ -60,7 +60,7 @@
         <button id="btn-new-note" class="cn-btn cn-btn-primary cn-new-note-btn" type="button">
           <span>＋</span><span class="cn-btn-text" id="new-note-label">New Note</span>
         </button>
-        <button id="btn-settings-nav" class="cn-btn cn-btn-ghost cn-btn-sm" type="button">⚙️ <span id="settings-nav-label">Settings</span></button>
+        <button id="btn-settings-nav" class="cn-btn cn-btn-ghost cn-btn-sm" type="button">⚙️ <span id="settings-nav-label">Settings</span><span id="settings-update-badge" class="cn-update-badge cn-hidden">New</span></button>
       </div>
     </aside>
 
@@ -247,16 +247,11 @@
           <button id="btn-back-settings" class="cn-btn cn-btn-ghost cn-btn-sm" type="button">← <span id="back-label">Back</span></button>
         </header>
 
-        <section class="cn-version-status cn-card" aria-live="polite" aria-atomic="true">
-          <div class="cn-version-status-row">
-            <span class="cn-version-status-icon" aria-hidden="true">✓</span>
-            <div class="cn-version-status-copy">
-              <p id="version-status-label" class="cn-version-status-label">Version Status</p>
-              <p id="version-status-text" class="cn-version-status-text"><strong>You are up to date.</strong></p>
-            </div>
-            <span id="version-status-value" class="cn-version-status-value">v1.3.2</span>
+        <div class="cn-settings-tip cn-card">
+          <div class="cn-card-body">
+            <p id="updates-tip-text" class="cn-settings-tip-text">It is recommended to click for updates every 10 days to stay up to date. Thank you ❤️</p>
           </div>
-        </section>
+        </div>
 
         <div class="cn-settings-grid">
           <div class="cn-settings-card cn-card">
@@ -331,6 +326,18 @@
 
           <div class="cn-settings-card cn-card">
             <div class="cn-card-body">
+              <h3 class="cn-settings-title" id="updates-title">Check for Updates</h3>
+              <div class="cn-setting-row">
+                <p class="cn-text-sm cn-text-muted" id="updates-help">Open the GitHub page to download the newest version manually.</p>
+                <p class="cn-text-sm cn-text-secondary" id="updates-status">Checking latest version...</p>
+                <p class="cn-text-xs cn-text-muted" id="updates-privacy">Only a public version check is sent to GitHub. No notes or private user data are uploaded.</p>
+                <button id="btn-check-updates" class="cn-btn cn-btn-primary" type="button">Check for Updates</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="cn-settings-card cn-card">
+            <div class="cn-card-body">
               <h3 class="cn-settings-title" id="data-title">Data</h3>
               <div class="cn-setting-row cn-data-actions">
                 <button id="btn-export-json" class="cn-btn cn-btn-primary" type="button">Export JSON</button>
@@ -348,13 +355,8 @@
           <div class="cn-settings-card cn-card">
             <div class="cn-card-body">
               <h3 class="cn-settings-title" id="about-title">About</h3>
-              <p><strong>ClipNote</strong> <span id="about-version">v1.3.2</span></p>
-              <p class="cn-text-sm cn-text-muted">
-                <span id="about-created-prefix">Created by </span>
-                <a id="about-kourosh-link" href="https://github.com/Kourosh242" target="_blank" rel="noopener noreferrer">Kourosh</a>
-                <span id="about-authors-and"> &amp; </span>
-                <a id="about-mehdi-link" href="https://github.com/MR-SHARIFI-Dev" target="_blank" rel="noopener noreferrer">Mehdi</a>
-              </p>
+              <p><strong>ClipNote</strong> <span id="about-version">v1.3.0</span></p>
+              <p class="cn-text-sm cn-text-muted">Created by Kourosh & Mehdi</p>
               <p class="cn-text-sm cn-text-muted" id="about-desc">A fast, secure, and professional local notebook for Chrome.</p>
               <p class="cn-text-sm cn-text-muted"><span id="total-notes-label">Total Notes</span>: <span id="settings-note-count">0</span></p>
             </div>

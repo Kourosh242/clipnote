@@ -8,7 +8,7 @@
     DEFAULT_WORKSPACE_ID,
     NOTE_COLORS,
     getNotes,
-    updateNotes,
+    saveNotes,
     getSettings,
     saveSettings,
     getWorkspaces,
@@ -16,6 +16,9 @@
     getCustomTags,
     saveCustomTags,
     getLastQuickSave,
+    getUpdateInfo,
+    checkForUpdates,
+    GITHUB_REPO_URL,
     createNote,
     sortNotes,
     filterNotes,
@@ -46,6 +49,9 @@
       new: 'New', openManager: 'Open Manager', search: 'Search notes... (Ctrl+F)',
       allNotes: 'All Notes', settings: 'Settings', noNotes: 'No notes found', noNotesSub: 'Create your first note to get started',
       quickSave: 'Quick Save', savedTo: 'saved to', overview: 'Overview', timeline: 'Timeline',
+      updates: 'Check for Updates', updateNow: 'Update', newVersion: 'New Version Available', updatesChecking: 'Checking latest version...',
+      updatesCurrent: 'You already have the latest version.', updatesUnknown: 'Unable to verify the latest version right now.',
+      updatesPrivacy: 'Only a public version check is sent to GitHub. No notes or private user data are uploaded.', newBadge: 'New',
       all: 'All', pinned: 'Pinned', favorites: 'Favorites', quickNote: 'Quick Note',
       titlePlaceholder: 'Title / Topic', contentPlaceholder: 'Write your note here...', tagsPlaceholder: 'python, api, md',
       workspace: 'Workspace', category: 'Category', noCategory: 'No Category', tags: 'Tags', addTag: '+ Tag',
@@ -59,13 +65,15 @@
       unlockFirst: 'Unlock note first', invalidSecret: 'Invalid password or PIN', unlocked: 'Note unlocked',
       addTitleOrContent: 'Please enter a title or content', untitled: 'Untitled Note', note: 'note', notes: 'notes', chars: 'chars',
       previewHidden: '🔒 Preview hidden until unlocked', savedFromWeb: 'Saved from webpage', general: 'General', deleteConfirm: 'Delete this note?',
-      discardChanges: 'Discard unsaved changes?',
       noSuggestions: 'No suggestions yet.', noTagsYet: 'No tags yet.', customTagAdded: 'Custom tag added', enterTagName: 'Enter new tag name'
     },
     fa: {
       new: 'جدید', openManager: 'باز کردن مدیریت', search: 'جستجوی یادداشت‌ها... (Ctrl+F)',
       allNotes: 'همه یادداشت‌ها', settings: 'تنظیمات', noNotes: 'یادداشتی پیدا نشد', noNotesSub: 'اولین یادداشت خود را بسازید',
       quickSave: 'ذخیره سریع', savedTo: 'در این فضا ذخیره شد:', overview: 'نمای کلی', timeline: 'نمای زمانی',
+      updates: 'بررسی بروزرسانی جدید', updateNow: 'بروزرسانی', newVersion: 'نسخه جدید موجود است', updatesChecking: 'در حال بررسی آخرین نسخه...',
+      updatesCurrent: 'هم‌اکنون جدیدترین نسخه را دارید.', updatesUnknown: 'فعلاً امکان بررسی نسخه جدید وجود ندارد.',
+      updatesPrivacy: 'فقط یک درخواست عمومی برای بررسی نسخه به GitHub ارسال می‌شود و هیچ یادداشت یا دادهٔ خصوصی کاربر ارسال نمی‌شود.', newBadge: 'جدید',
       all: 'همه', pinned: 'پین‌شده', favorites: 'علاقه‌مندی‌ها', quickNote: 'یادداشت سریع',
       titlePlaceholder: 'عنوان / موضوع', contentPlaceholder: 'یادداشت خود را اینجا بنویسید...', tagsPlaceholder: 'python, api, md',
       workspace: 'فضای کاری', category: 'دسته‌بندی', noCategory: 'بدون دسته‌بندی', tags: 'برچسب‌ها', addTag: '+ برچسب',
@@ -79,7 +87,6 @@
       unlockFirst: 'ابتدا یادداشت را باز کنید', invalidSecret: 'رمز یا پین نادرست است', unlocked: 'یادداشت باز شد',
       addTitleOrContent: 'لطفاً عنوان یا محتوا وارد کنید', untitled: 'یادداشت بدون عنوان', note: 'یادداشت', notes: 'یادداشت', chars: 'کاراکتر',
       previewHidden: '🔒 پیش‌نمایش تا زمان باز شدن مخفی است', savedFromWeb: 'ذخیره‌شده از وب', general: 'عمومی', deleteConfirm: 'این یادداشت حذف شود؟',
-      discardChanges: 'تغییرات ذخیره‌نشده را نادیده بگیرم؟',
       noSuggestions: 'فعلاً پیشنهادی وجود ندارد.', noTagsYet: 'هنوز برچسبی وجود ندارد.', customTagAdded: 'برچسب سفارشی اضافه شد', enterTagName: 'نام برچسب جدید را وارد کنید'
     }
   };
@@ -127,11 +134,18 @@
     openManagerBtn: document.getElementById('btn-open-manager'),
     newNoteBtn: document.getElementById('btn-new-note'),
     newNoteLabel: document.getElementById('label-new-note'),
+    popupUpdateBadge: document.getElementById('popup-update-badge'),
 
     quickSaveBanner: document.getElementById('quick-save-banner'),
     quickSaveBannerTitle: document.getElementById('quick-save-banner-title'),
     quickSaveBannerText: document.getElementById('quick-save-banner-text'),
     btnDismissQuickSave: document.getElementById('btn-dismiss-quick-save'),
+    updateBanner: document.getElementById('popup-update-banner'),
+    updateBannerTitle: document.getElementById('popup-update-banner-title'),
+    updateBannerText: document.getElementById('popup-update-banner-text'),
+    btnPopupCheckUpdates: document.getElementById('btn-popup-check-updates'),
+    btnDismissUpdateBanner: document.getElementById('btn-dismiss-update-banner'),
+
     quickCaptureTitle: document.getElementById('quick-capture-title'),
     captureTitle: document.getElementById('capture-title'),
     captureContent: document.getElementById('capture-content'),
@@ -203,6 +217,7 @@
     btnCopyNote: document.getElementById('btn-popup-copy-note'),
     btnDeleteNote: document.getElementById('btn-popup-delete-note'),
     btnSaveNote: document.getElementById('btn-popup-save-note'),
+    btnFooterUpdates: document.getElementById('btn-popup-footer-updates')
   };
 
   function locale() {
@@ -250,6 +265,30 @@
     return labels[key] || (isFa() ? 'قدیمی‌تر' : 'Older');
   }
 
+  function getLocalizedUpdateStatus(info = null) {
+    if (!info) return t('updatesChecking');
+    if (info.hasUpdate) return `${t('newVersion')}: v${info.latestVersion}`;
+    if (info.error) return t('updatesUnknown');
+    return t('updatesCurrent');
+  }
+
+  function renderUpdateUI(info = null) {
+    const hasUpdate = !!(info && info.hasUpdate);
+    if (els.popupUpdateBadge) {
+      els.popupUpdateBadge.textContent = t('newBadge');
+      els.popupUpdateBadge.classList.toggle('cn-hidden', !hasUpdate);
+    }
+    if (els.updateBannerTitle) els.updateBannerTitle.textContent = t('newVersion');
+    if (els.updateBannerText) els.updateBannerText.textContent = getLocalizedUpdateStatus(info);
+    if (els.updateBanner) els.updateBanner.classList.toggle('cn-hidden', !hasUpdate);
+  }
+
+  async function openUpdatesPage(forceCheck = true) {
+    const info = forceCheck ? await checkForUpdates(true) : ((await getUpdateInfo()) || null);
+    renderUpdateUI(info);
+    chrome.tabs.create({ url: (info && info.url) ? info.url : GITHUB_REPO_URL });
+  }
+
   function applyLocale() {
     document.documentElement.lang = locale();
     document.documentElement.dir = isFa() ? 'rtl' : 'ltr';
@@ -264,9 +303,12 @@
     els.btnFilterPinned.textContent = t('pinned');
     els.btnFilterFavorites.textContent = t('favorites');
     els.settingsBtn.textContent = t('settings');
+    els.btnFooterUpdates.textContent = t('updates');
     els.emptyTitle.textContent = t('noNotes');
     els.emptySubtitle.textContent = t('noNotesSub');
     els.quickSaveBannerTitle.textContent = t('quickSave');
+    els.updateBannerTitle.textContent = t('newVersion');
+    els.btnPopupCheckUpdates.textContent = t('updateNow');
 
     els.quickCaptureTitle.textContent = t('quickNote');
     els.captureTitle.placeholder = t('titlePlaceholder');
@@ -328,10 +370,12 @@
     renderCaptureQuickTags();
     renderCaptureSuggestions();
     renderQuickSaveBanner();
+    renderUpdateUI(await getUpdateInfo());
     renderViewButtons();
     renderFilterButtons();
     renderNotes();
     setupEventListeners();
+    checkForUpdates(false).then(renderUpdateUI).catch(() => renderUpdateUI({ error: true }));
     chrome.storage.onChanged.addListener(handleStorageChanges);
   }
 
@@ -392,8 +436,13 @@
       chrome.tabs.create({ url: chrome.runtime.getURL('options.html?view=settings') });
       window.close();
     });
+    els.btnFooterUpdates.addEventListener('click', () => openUpdatesPage(true));
+    els.btnPopupCheckUpdates.addEventListener('click', () => openUpdatesPage(true));
     els.btnDismissQuickSave.addEventListener('click', () => {
       els.quickSaveBanner.classList.add('cn-hidden');
+    });
+    els.btnDismissUpdateBanner.addEventListener('click', () => {
+      els.updateBanner.classList.add('cn-hidden');
     });
 
     els.btnToggleUnlockSecret.addEventListener('click', () => {
@@ -427,8 +476,8 @@
     els.notePin.addEventListener('change', onPopupEditorInput);
     els.noteFavorite.addEventListener('change', onPopupEditorInput);
 
-    els.btnCloseNote.addEventListener('click', () => closeNoteModal());
-    els.btnCloseNoteX.addEventListener('click', () => closeNoteModal());
+    els.btnCloseNote.addEventListener('click', closeNoteModal);
+    els.btnCloseNoteX.addEventListener('click', closeNoteModal);
     els.btnStartEdit.addEventListener('click', () => setPopupNoteMode('edit'));
     els.btnNoteUndo.addEventListener('click', undoPopupNoteChange);
     els.btnCopyNote.addEventListener('click', () => {
@@ -440,13 +489,6 @@
     els.btnModePreview.addEventListener('click', () => setPopupEditorMode('preview'));
     els.btnNoteAddTag.addEventListener('click', () => addCustomTagFromPrompt('editor'));
     els.btnNoteAcceptAll.addEventListener('click', applyAllEditorSuggestions);
-    els.noteModal.addEventListener('click', (e) => {
-      const button = e.target.closest('.cn-copy-code-btn');
-      if (button) copyToClipboard(button.dataset.code || '', button);
-    });
-
-
-    window.addEventListener('pagehide', persistPopupDraft);
 
     document.addEventListener('keydown', (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f' && isListVisible()) {
@@ -484,7 +526,7 @@
 
   async function handleStorageChanges(changes, areaName) {
     if (areaName !== 'local') return;
-    const relevantKeys = [STORAGE_KEYS.NOTES, STORAGE_KEYS.SETTINGS, STORAGE_KEYS.WORKSPACES, STORAGE_KEYS.CATEGORIES, STORAGE_KEYS.CUSTOM_TAGS, STORAGE_KEYS.LAST_QUICK_SAVE];
+    const relevantKeys = [STORAGE_KEYS.NOTES, STORAGE_KEYS.SETTINGS, STORAGE_KEYS.WORKSPACES, STORAGE_KEYS.CATEGORIES, STORAGE_KEYS.CUSTOM_TAGS, STORAGE_KEYS.LAST_QUICK_SAVE, STORAGE_KEYS.UPDATE_INFO];
     if (!Object.keys(changes).some(key => relevantKeys.includes(key))) return;
 
     await refreshState();
@@ -497,6 +539,7 @@
     renderViewButtons();
     renderFilterButtons();
     renderQuickSaveBanner();
+    renderUpdateUI(await getUpdateInfo());
     renderCaptureQuickTags();
     renderCaptureSuggestions();
     renderNotes();
@@ -540,7 +583,7 @@
       });
       select.value = selected;
     };
-    fillSelect(els.captureCategory, els.captureCategory.value || '');
+    fillSelect(els.captureCategory, '');
     fillSelect(els.noteCategory, els.noteCategory.value || '');
   }
 
@@ -759,8 +802,9 @@
       isFavorite: els.captureFavorite.checked
     }, workspaces);
 
-    allNotes = await updateNotes(notes => [note, ...notes.filter(item => item.id !== note.id)]);
+    allNotes.unshift(note);
     await Promise.all([
+      saveNotes(allNotes),
       saveSettings({ ...settings, currentWorkspaceId: workspaceId }),
       mergeCustomTags(tags)
     ]);
@@ -889,47 +933,45 @@
 
     item.addEventListener('click', (e) => {
       if (e.target.closest('.cn-note-actions')) return;
-      if (isProtected(note) && !unlockedNotes.has(note.id)) return openUnlockModal(note, () => openNoteModal(note.id, 'view'));
+      if (noteLocked) return openUnlockModal(note, () => openNoteModal(note.id, 'view'));
       openNoteModal(note.id, 'view');
     });
 
     item.querySelector('[data-action="pin"]').addEventListener('click', async (e) => {
       e.stopPropagation();
-      if (isProtected(note) && !unlockedNotes.has(note.id)) return openUnlockModal(note, () => item.querySelector('[data-action="pin"]').click());
       note.isPinned = !note.isPinned;
       note.updatedAt = Date.now();
-      allNotes = await updateNotes(notes => notes.map(item => item.id === note.id ? { ...item, isPinned: note.isPinned, updatedAt: note.updatedAt } : item));
+      await saveNotes(allNotes);
       renderNotes();
       showToast(note.isPinned ? t('pinnedAdded') : t('pinnedRemoved'), 'success');
     });
 
     item.querySelector('[data-action="favorite"]').addEventListener('click', async (e) => {
       e.stopPropagation();
-      if (isProtected(note) && !unlockedNotes.has(note.id)) return openUnlockModal(note, () => item.querySelector('[data-action="favorite"]').click());
       note.isFavorite = !note.isFavorite;
       note.updatedAt = Date.now();
-      allNotes = await updateNotes(notes => notes.map(item => item.id === note.id ? { ...item, isFavorite: note.isFavorite, updatedAt: note.updatedAt } : item));
+      await saveNotes(allNotes);
       renderNotes();
       showToast(note.isFavorite ? t('favoriteAdded') : t('favoriteRemoved'), 'success');
     });
 
     item.querySelector('[data-action="copy"]').addEventListener('click', (e) => {
       e.stopPropagation();
-      if (isProtected(note) && !unlockedNotes.has(note.id)) return openUnlockModal(note, () => copyToClipboard(note.content || note.title || '', e.currentTarget));
+      if (noteLocked) return showToast(t('unlockFirst'), 'warning');
       copyToClipboard(note.content || note.title || '', e.currentTarget);
     });
 
     item.querySelector('[data-action="edit"]').addEventListener('click', (e) => {
       e.stopPropagation();
-      if (isProtected(note) && !unlockedNotes.has(note.id)) return openUnlockModal(note, () => openNoteModal(note.id, 'edit'));
+      if (noteLocked) return openUnlockModal(note, () => openNoteModal(note.id, 'edit'));
       openNoteModal(note.id, 'edit');
     });
 
     item.querySelector('[data-action="delete"]').addEventListener('click', async (e) => {
       e.stopPropagation();
-      if (isProtected(note) && !unlockedNotes.has(note.id)) return openUnlockModal(note, () => item.querySelector('[data-action="delete"]').click());
       if (!confirm(t('deleteConfirm'))) return;
-      allNotes = await updateNotes(notes => notes.filter(entry => entry.id !== note.id));
+      allNotes = allNotes.filter(entry => entry.id !== note.id);
+      await saveNotes(allNotes);
       renderNotes();
       showToast(t('deleted'), 'success');
     });
@@ -1086,7 +1128,7 @@
 
   function getEditorSuggestions() {
     const note = allNotes.find(entry => entry.id === currentViewingNoteId);
-    return suggestTags(`${els.noteEditTitle.value}\n${els.noteEditContent.value}`, parseTagsInput(els.noteTags.value), popupEditorIgnoredSuggestions);
+    return suggestTags(`${els.noteEditTitle.value}\n${els.noteEditContent.value}`, parseTagsInput(els.noteTags.value), note?.ignoredSuggestedTags || popupEditorIgnoredSuggestions);
   }
 
   function renderNoteSuggestions() {
@@ -1142,7 +1184,7 @@
 
   function openNoteModal(noteId, mode = 'view') {
     const note = allNotes.find(entry => entry.id === noteId);
-    if (!note) { if (!els.noteModal.classList.contains('cn-hidden')) closeNoteModal(true); return; }
+    if (!note) return;
     currentViewingNoteId = note.id;
     popupEditorIgnoredSuggestions = normalizeTags(note.ignoredSuggestedTags || []);
     const workspace = getNoteWorkspace(note, workspaces);
@@ -1176,22 +1218,7 @@
     els.noteModal.classList.remove('cn-hidden');
   }
 
-  function isPopupEditorDirty() {
-    return popupNoteMode === 'edit' && popupEditorHistory.length > 0 &&
-      JSON.stringify(getPopupEditorState()) !== JSON.stringify(popupEditorHistory[0]);
-  }
-
-  function persistPopupDraft() {
-    if (!currentViewingNoteId || !isPopupEditorDirty()) return;
-    const existing = allNotes.find(note => note.id === currentViewingNoteId);
-    if (!existing) return;
-    const state = getPopupEditorState();
-    const saved = { ...existing, ...state, ignoredSuggestedTags: popupEditorIgnoredSuggestions, updatedAt: Date.now() };
-    void updateNotes(notes => [saved, ...notes.filter(note => note.id !== saved.id)]);
-  }
-
-  function closeNoteModal(force = false) {
-    if (!force && isPopupEditorDirty() && !confirm(t('discardChanges'))) return;
+  function closeNoteModal() {
     currentViewingNoteId = null;
     popupEditorIgnoredSuggestions = [];
     popupEditorHistory = [];
@@ -1234,9 +1261,10 @@
     note.isPinned = next.isPinned;
     note.isFavorite = next.isFavorite;
     note.updatedAt = Date.now();
-    const saved = { ...note, ignoredSuggestedTags: popupEditorIgnoredSuggestions };
-    allNotes = await updateNotes(notes => [saved, ...notes.filter(item => item.id !== saved.id)]);
-    await mergeCustomTags(next.tags);
+    await Promise.all([
+      saveNotes(allNotes),
+      mergeCustomTags(next.tags)
+    ]);
     await refreshState();
     renderWorkspaceOptions();
     renderCategoryOptions();
@@ -1249,9 +1277,9 @@
   async function deleteCurrentPopupNote() {
     if (!currentViewingNoteId) return;
     if (!confirm(t('deleteConfirm'))) return;
-    const deletedId = currentViewingNoteId;
-    allNotes = await updateNotes(notes => notes.filter(note => note.id !== deletedId));
-    closeNoteModal(true);
+    allNotes = allNotes.filter(note => note.id !== currentViewingNoteId);
+    await saveNotes(allNotes);
+    closeNoteModal();
     renderNotes();
     showToast(t('deleted'), 'success');
   }
@@ -1261,8 +1289,5 @@
     window.close();
   }
 
-  init().catch(error => {
-    console.error('ClipNote initialization failed:', error);
-    try { showToast(error?.message || 'ClipNote could not start.', 'error'); } catch (_) {}
-  });
+  init();
 })();

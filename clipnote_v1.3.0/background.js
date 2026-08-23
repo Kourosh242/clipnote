@@ -72,8 +72,9 @@ async function saveSelectionToClipNote(info, tab) {
       }
     }, workspaces);
 
+    notes.unshift(note);
     await Promise.all([
-      ClipNote.updateNotes(current => [note, ...current.filter(item => item.id !== note.id)]),
+      ClipNote.saveNotes(notes),
       ClipNote.mergeCustomTags(tags),
       ClipNote.saveLastQuickSave({
         id: note.id,
@@ -95,9 +96,11 @@ async function saveSelectionToClipNote(info, tab) {
   } catch (error) {
     console.error('Quick save failed:', error);
     chrome.notifications.create(`clipnote_error_${Date.now()}`, {
-      type: 'basic', iconUrl: 'icons/icon128.png', title: 'ClipNote', message: 'Quick save failed.'
+      type: 'basic',
+      iconUrl: 'icons/icon128.png',
+      title: 'ClipNote',
+      message: 'Quick save failed.'
     }, () => void chrome.runtime.lastError);
-    throw error;
   }
 }
 
@@ -161,10 +164,9 @@ chrome.notifications.onClicked.addListener(async (notificationId) => {
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === 'open-manager') {
-    chrome.tabs.create({ url: chrome.runtime.getURL('options.html') })
-      .then(() => sendResponse({ success: true }))
-      .catch(error => sendResponse({ success: false, error: String(error) }));
-    return true;
+    chrome.tabs.create({ url: chrome.runtime.getURL('options.html') });
+    sendResponse({ success: true });
+    return false;
   }
 
   if (message.action === 'quick-save-selection' && message.selectionText) {

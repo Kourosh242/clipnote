@@ -13,6 +13,7 @@
       <div class="cn-logo">
         <img src="icons/icon32.png" alt="" class="cn-logo-icon">
         <span class="cn-logo-text">ClipNote</span>
+        <span id="popup-update-badge" class="cn-update-badge cn-hidden">New</span>
       </div>
       <div class="cn-header-actions">
         <button id="btn-new-note" class="cn-btn cn-btn-primary cn-btn-sm" type="button">
@@ -32,6 +33,16 @@
       <button id="btn-dismiss-quick-save" class="cn-action-btn" type="button" title="Dismiss">✕</button>
     </div>
 
+    <div id="popup-update-banner" class="cn-quick-save-banner cn-hidden">
+      <div>
+        <strong id="popup-update-banner-title">New Version Available</strong>
+        <p id="popup-update-banner-text">A newer version is available on GitHub.</p>
+      </div>
+      <div class="cn-inline-actions">
+        <button id="btn-popup-check-updates" class="cn-btn cn-btn-primary cn-btn-sm" type="button">Update</button>
+        <button id="btn-dismiss-update-banner" class="cn-action-btn" type="button" title="Dismiss">✕</button>
+      </div>
+    </div>
 
     <div id="popup-list-shell" class="cn-popup-shell">
       <section class="cn-popup-toolbar">
@@ -65,6 +76,7 @@
       <footer class="cn-popup-footer">
         <span id="popup-count" class="cn-text-xs cn-text-muted">0 notes</span>
         <div class="cn-inline-actions">
+          <button id="btn-popup-footer-updates" class="cn-btn cn-btn-ghost cn-btn-sm" type="button">Updates</button>
           <button id="btn-settings" class="cn-btn cn-btn-ghost cn-btn-sm" type="button">Settings</button>
         </div>
       </footer>

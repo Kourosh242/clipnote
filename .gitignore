@@ -1,6 +1,0 @@
-# Build / packaging artifacts
-*.zip
-
-# Python
-__pycache__/
-*.pyc

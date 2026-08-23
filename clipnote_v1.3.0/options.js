@@ -11,8 +11,7 @@
     DEFAULT_WORKSPACE_ID,
     NOTE_COLORS,
     getNotes,
-    updateNotes,
-    withStorageLock,
+    saveNotes,
     getSettings,
     saveSettings,
     getCategories,
@@ -21,6 +20,9 @@
     saveWorkspaces,
     getCustomTags,
     saveCustomTags,
+    getUpdateInfo,
+    checkForUpdates,
+    GITHUB_REPO_URL,
     createWorkspace,
     createNote,
     filterNotes,
@@ -47,9 +49,7 @@
     verifyRecoveryAnswer,
     getNoteWorkspace,
     truncateText,
-    escapeHtml,
-    migrateStorageData,
-    getUpdateInfo
+    migrateStorageData
   } = window.ClipNote;
 
   const I18N = {
@@ -130,10 +130,16 @@
       language: 'Language',
       languageSelect: 'Interface Language',
       languageHelp: 'Texts and labels will switch to the selected language. Persian uses Vazirmatn and RTL layout.',
-      versionStatus: 'Version Status',
-      upToDate: 'You are up to date.',
-      createdBy: 'Created by ',
-      authorsAnd: ' & ',
+      updates: 'Check for Updates',
+      updatesHelp: 'Open the GitHub page to download the newest version manually.',
+      updatesButton: 'Check for Updates',
+      updatesChecking: 'Checking latest version...',
+      updatesAvailable: 'New Version Available',
+      updatesCurrent: 'You already have the latest version.',
+      updatesUnknown: 'Unable to verify the latest version right now.',
+      updatesPrivacy: 'Only a public version check is sent to GitHub. No notes or private user data are uploaded.',
+      updatesTip: 'It is recommended to click for updates every 10 days to stay up to date. Thank you ❤️',
+      newBadge: 'New',
       data: 'Data',
       dataHelp: 'All data stays local on your device. No cloud, no server.',
       about: 'About',
@@ -309,10 +315,16 @@
       language: 'زبان',
       languageSelect: 'زبان رابط کاربری',
       languageHelp: 'متن‌ها و برچسب‌ها به زبان انتخابی نمایش داده می‌شوند. برای فارسی فونت وزیرمتن و چیدمان راست‌چین فعال می‌شود.',
-      versionStatus: 'وضعیت نسخه',
-      upToDate: 'شما به‌روز هستید.',
-      createdBy: 'ساخته‌شده توسط ',
-      authorsAnd: ' و ',
+      updates: 'بررسی بروزرسانی جدید',
+      updatesHelp: 'با کلیک روی این دکمه، صفحهٔ GitHub پروژه برای دریافت جدیدترین نسخه باز می‌شود.',
+      updatesButton: 'بررسی بروزرسانی جدید',
+      updatesChecking: 'در حال بررسی آخرین نسخه...',
+      updatesAvailable: 'نسخه جدید موجود است',
+      updatesCurrent: 'هم‌اکنون جدیدترین نسخه را دارید.',
+      updatesUnknown: 'فعلاً امکان بررسی نسخه جدید وجود ندارد.',
+      updatesPrivacy: 'فقط یک درخواست عمومی برای بررسی نسخه به GitHub ارسال می‌شود و هیچ یادداشت یا دادهٔ خصوصی کاربر ارسال نمی‌شود.',
+      updatesTip: 'توصیه می‌شود هر ۱۰ روز یک بار برای دریافت به‌روزرسانی‌های جدید، روی دکمه به‌روزرسانی کلیک کنید. با تشکر ❤️',
+      newBadge: 'جدید',
       data: 'داده‌ها',
       dataHelp: 'همه داده‌ها فقط روی دستگاه شما ذخیره می‌شوند. بدون سرور و بدون فضای ابری.',
       about: 'درباره',
@@ -456,6 +468,7 @@
     btnNewNote: document.getElementById('btn-new-note'),
     btnNewNoteHeader: document.getElementById('btn-new-note-header'),
     btnSettingsNav: document.getElementById('btn-settings-nav'),
+    settingsUpdateBadge: document.getElementById('settings-update-badge'),
 
     viewList: document.getElementById('view-list'),
     viewEditor: document.getElementById('view-editor'),
@@ -520,19 +533,15 @@
     settingAutoSave: document.getElementById('setting-auto-save'),
     settingDefaultColor: document.getElementById('setting-default-color'),
     settingLanguage: document.getElementById('setting-language'),
+    btnCheckUpdates: document.getElementById('btn-check-updates'),
+    updatesStatus: document.getElementById('updates-status'),
+    updatesPrivacy: document.getElementById('updates-privacy'),
     btnExportJson: document.getElementById('btn-export-json'),
     btnExportTxt: document.getElementById('btn-export-txt'),
     btnImportJson: document.getElementById('btn-import-json'),
     btnClearData: document.getElementById('btn-clear-data'),
     settingsNoteCount: document.getElementById('settings-note-count'),
-    versionStatusLabel: document.getElementById('version-status-label'),
-    versionStatusText: document.getElementById('version-status-text'),
-    versionStatusValue: document.getElementById('version-status-value'),
     aboutVersion: document.getElementById('about-version'),
-    aboutCreatedPrefix: document.getElementById('about-created-prefix'),
-    aboutKouroshLink: document.getElementById('about-kourosh-link'),
-    aboutAuthorsAnd: document.getElementById('about-authors-and'),
-    aboutMehdiLink: document.getElementById('about-mehdi-link'),
 
     workspaceModal: document.getElementById('workspace-modal'),
     workspaceModalTitle: document.getElementById('workspace-modal-title'),
@@ -623,6 +632,30 @@
     return workspace.name;
   }
 
+  function getLocalizedUpdateStatus(info = null) {
+    if (!info) return t('updatesChecking');
+    if (info.hasUpdate) {
+      return `${t('updatesAvailable')}: v${info.latestVersion}`;
+    }
+    if (info.error) return t('updatesUnknown');
+    return t('updatesCurrent');
+  }
+
+  function renderUpdateStatus(info = null) {
+    if (els.updatesStatus) {
+      els.updatesStatus.textContent = getLocalizedUpdateStatus(info);
+    }
+    if (els.settingsUpdateBadge) {
+      els.settingsUpdateBadge.classList.toggle('cn-hidden', !(info && info.hasUpdate));
+    }
+  }
+
+  async function openUpdatesPage(forceCheck = true) {
+    const info = forceCheck ? await checkForUpdates(true) : ((await getUpdateInfo()) || null);
+    renderUpdateStatus(info);
+    chrome.tabs.create({ url: (info && info.url) ? info.url : GITHUB_REPO_URL });
+  }
+
   function themeLabel(key) {
     return {
       blue: t('themeBlue'),
@@ -640,19 +673,11 @@
   async function init() {
     const migrated = await migrateStorageData();
     settings = migrated.settings;
-    els.sidebar.classList.toggle('collapsed', !!settings.sidebarCollapsed || window.matchMedia('(max-width: 760px)').matches);
     listMode = settings.fullViewMode === 'timeline' || settings.fullViewMode === 'normal'
       ? 'overview'
       : (settings.fullViewMode || 'overview');
 
     await refreshState();
-    const updateInfo = await getUpdateInfo();
-    if (els.versionStatusText) {
-      const status = updateInfo?.error ? (isFa() ? 'بررسی نسخه در دسترس نیست.' : 'Version check unavailable.')
-        : updateInfo?.hasUpdate ? (isFa() ? `نسخه ${updateInfo.latestVersion} در دسترس است.` : `Version ${updateInfo.latestVersion} is available.`)
-        : t('upToDate');
-      els.versionStatusText.textContent = status;
-    }
     currentScope = workspaces.some(workspace => workspace.id === settings.currentWorkspaceId)
       ? settings.currentWorkspaceId
       : 'all';
@@ -668,7 +693,9 @@
     renderTagSuggestionsDataList();
     updateCounts();
     applyListModeUI();
+    renderUpdateStatus(await getUpdateInfo());
     setupEventListeners();
+    checkForUpdates(false).then(renderUpdateStatus).catch(() => renderUpdateStatus({ error: true }));
 
     document.addEventListener('visibilitychange', async () => {
       if (document.hidden && currentView === 'edit' && isDirty) {
@@ -762,24 +789,15 @@
     document.getElementById('language-title').textContent = t('language');
     document.getElementById('language-select-label').textContent = t('languageSelect');
     document.getElementById('language-help').textContent = t('languageHelp');
-    if (els.versionStatusLabel) els.versionStatusLabel.textContent = t('versionStatus');
-    if (els.versionStatusText && !els.versionStatusText.textContent.trim()) els.versionStatusText.textContent = t('upToDate');
-    if (els.versionStatusValue) els.versionStatusValue.textContent = `v${chrome.runtime.getManifest().version || '1.3.2'}`;
+    document.getElementById('updates-title').textContent = t('updates');
+    document.getElementById('updates-help').textContent = t('updatesHelp');
+    document.getElementById('updates-privacy').textContent = t('updatesPrivacy');
+    document.getElementById('updates-tip-text').textContent = t('updatesTip');
     document.getElementById('data-title').textContent = t('data');
     document.getElementById('data-help').textContent = t('dataHelp');
     document.getElementById('about-title').textContent = t('about');
     if (els.aboutVersion) {
-      els.aboutVersion.textContent = 'v' + (chrome.runtime.getManifest().version || '1.3.2');
-    }
-    if (els.aboutCreatedPrefix) els.aboutCreatedPrefix.textContent = t('createdBy');
-    if (els.aboutAuthorsAnd) els.aboutAuthorsAnd.textContent = t('authorsAnd');
-    if (els.aboutKouroshLink) {
-      els.aboutKouroshLink.textContent = 'Kourosh';
-      els.aboutKouroshLink.href = 'https://github.com/Kourosh242';
-    }
-    if (els.aboutMehdiLink) {
-      els.aboutMehdiLink.textContent = 'Mehdi';
-      els.aboutMehdiLink.href = 'https://github.com/MR-SHARIFI-Dev';
+      els.aboutVersion.textContent = 'v' + (chrome.runtime.getManifest().version || '1.3.0');
     }
     document.getElementById('about-desc').textContent = t('aboutDesc');
     document.getElementById('total-notes-label').textContent = t('totalNotes');
@@ -815,6 +833,8 @@
     if (sortOptions[2]) sortOptions[2].textContent = t('titleAsc');
     if (sortOptions[3]) sortOptions[3].textContent = t('titleDesc');
     els.btnBackSettings.innerHTML = `← <span id="back-label">${t('back')}</span>`;
+    els.btnCheckUpdates.textContent = t('updatesButton');
+    if (els.settingsUpdateBadge) els.settingsUpdateBadge.textContent = t('newBadge');
     els.btnExportJson.textContent = t('exportJson');
     els.btnExportTxt.textContent = t('exportTxt');
     els.btnCancelWorkspace.textContent = t('cancel');
@@ -875,18 +895,18 @@
 
   async function handleStorageChanges(changes, areaName) {
     if (areaName !== 'local') return;
-    const keys = [STORAGE_KEYS.NOTES, STORAGE_KEYS.SETTINGS, STORAGE_KEYS.WORKSPACES, STORAGE_KEYS.CATEGORIES, STORAGE_KEYS.CUSTOM_TAGS];
+    const keys = [STORAGE_KEYS.NOTES, STORAGE_KEYS.SETTINGS, STORAGE_KEYS.WORKSPACES, STORAGE_KEYS.CATEGORIES, STORAGE_KEYS.CUSTOM_TAGS, STORAGE_KEYS.UPDATE_INFO];
     if (!Object.keys(changes).some(key => keys.includes(key))) return;
     if (currentView === 'edit' && isDirty) return;
 
     await refreshState();
     await applyTheme(settings);
     renderAllListState();
+    renderUpdateStatus(await getUpdateInfo());
 
     if (currentView === 'edit' && currentNoteId) {
       const note = findNote(currentNoteId);
       if (note) fillEditor(note);
-      else { currentNoteId = null; isDirty = false; showToast(t('noteNotFound'), 'warning'); await showView('list'); }
     }
     if (currentView === 'settings') loadSettingsUI();
   }
@@ -984,14 +1004,8 @@
     els.btnClearRecovery.addEventListener('click', clearRecoveryQuestion);
 
     els.btnBackSettings.addEventListener('click', () => showView('list'));
-    els.settingDarkMode.addEventListener('change', () => {
-      if (!els.settingDarkMode.checked && els.settingTheme.value === 'dark-pro') els.settingTheme.value = 'blue';
-      saveSettingsFromUI();
-    });
-    els.settingTheme.addEventListener('change', () => {
-      if (els.settingTheme.value === 'dark-pro') els.settingDarkMode.checked = true;
-      saveSettingsFromUI();
-    });
+    els.settingDarkMode.addEventListener('change', saveSettingsFromUI);
+    els.settingTheme.addEventListener('change', saveSettingsFromUI);
     els.settingFontSize.addEventListener('input', () => {
       els.fontSizeValue.textContent = `${els.settingFontSize.value}px`;
       saveSettingsFromUI();
@@ -999,6 +1013,7 @@
     els.settingAnimations.addEventListener('change', saveSettingsFromUI);
     els.settingAutoSave.addEventListener('change', saveSettingsFromUI);
     els.settingLanguage.addEventListener('change', saveSettingsFromUI);
+    els.btnCheckUpdates.addEventListener('click', () => openUpdatesPage(true));
     els.btnExportJson.addEventListener('click', exportToJson);
     els.btnExportTxt.addEventListener('click', exportToTxt);
     els.btnImportJson.addEventListener('change', handleImportFile);
@@ -1247,8 +1262,8 @@
         const confirmed = confirm(t('categoryDeleteConfirm', { name: category }));
         if (!confirmed) return;
         categories = categories.filter(item => item !== category);
-        allNotes = await updateNotes(notes => notes.map(note => note.category === category ? { ...note, category: '', updatedAt: Date.now() } : note));
-        await saveCategories(categories);
+        allNotes.forEach(note => { if (note.category === category) note.category = ''; });
+        await Promise.all([saveCategories(categories), saveNotes(allNotes)]);
         currentCategoryFilter = null;
         renderAllListState();
         showToast(t('categoryDeleted'), 'success');
@@ -1420,7 +1435,7 @@
       tags: currentTagFilter ? [currentTagFilter] : []
     }, workspaces);
     allNotes.unshift(note);
-    allNotes = await updateNotes(notes => [note, ...notes.filter(item => item.id !== note.id)]);
+    await saveNotes(allNotes);
     currentNoteId = note.id;
     unlockedNotes.add(note.id);
     isDirty = false;
@@ -1594,9 +1609,10 @@
       ignoredSuggestedTags: existing.ignoredSuggestedTags
     }, workspaces);
 
-    const savedNote = allNotes[index];
-    allNotes = await updateNotes(notes => [savedNote, ...notes.filter(note => note.id !== savedNote.id)]);
-    await mergeCustomTags(savedNote.tags);
+    await Promise.all([
+      saveNotes(allNotes),
+      mergeCustomTags(allNotes[index].tags)
+    ]);
 
     isDirty = false;
     customTags = await getCustomTags();
@@ -1632,7 +1648,8 @@
       createdAt: Date.now(),
       updatedAt: Date.now()
     }, workspaces);
-    allNotes = await updateNotes(notes => [duplicate, ...notes.filter(note => note.id !== duplicate.id)]);
+    allNotes.unshift(duplicate);
+    await saveNotes(allNotes);
     unlockedNotes.add(duplicate.id);
     currentNoteId = duplicate.id;
     updateCounts();
@@ -1641,8 +1658,8 @@
   }
 
   async function deleteCurrentNote() {
-    const deletedId = currentNoteId;
-    allNotes = await updateNotes(notes => notes.filter(note => note.id !== deletedId));
+    allNotes = allNotes.filter(note => note.id !== currentNoteId);
+    await saveNotes(allNotes);
     unlockedNotes.delete(currentNoteId);
     currentNoteId = null;
     isDirty = false;
@@ -2131,10 +2148,11 @@
   async function clearAllData() {
     if (!confirm(t('clearConfirm'))) return;
     await chrome.storage.local.set({
-      [STORAGE_KEYS.NOTES]: [], [STORAGE_KEYS.CATEGORIES]: DEFAULT_CATEGORIES,
-      [STORAGE_KEYS.WORKSPACES]: DEFAULT_WORKSPACES, [STORAGE_KEYS.CUSTOM_TAGS]: [],
-      [STORAGE_KEYS.SETTINGS]: DEFAULT_SETTINGS, [STORAGE_KEYS.LAST_QUICK_SAVE]: null,
-      [STORAGE_KEYS.UPDATE_INFO]: null, [STORAGE_KEYS.LAST_NOTIFIED_VERSION]: ''
+      [STORAGE_KEYS.NOTES]: [],
+      [STORAGE_KEYS.CATEGORIES]: DEFAULT_CATEGORIES,
+      [STORAGE_KEYS.WORKSPACES]: DEFAULT_WORKSPACES,
+      [STORAGE_KEYS.CUSTOM_TAGS]: [],
+      [STORAGE_KEYS.SETTINGS]: DEFAULT_SETTINGS
     });
     allNotes = [];
     categories = [...DEFAULT_CATEGORIES];
@@ -2211,12 +2229,13 @@
     if (!confirmed) return;
 
     workspaces = workspaces.filter(item => item.id !== workspaceId);
-    allNotes = await updateNotes(notes => notes.map(note => note.workspaceId === workspaceId ? { ...note, workspaceId: fallback.id, updatedAt: Date.now() } : note));
+    allNotes = allNotes.map(note => note.workspaceId === workspaceId ? { ...note, workspaceId: fallback.id, updatedAt: Date.now() } : note);
     if (settings.currentWorkspaceId === workspaceId) settings.currentWorkspaceId = fallback.id;
     if (currentScope === workspaceId) currentScope = 'all';
 
     await Promise.all([
       saveWorkspaces(workspaces),
+      saveNotes(allNotes),
       saveSettings({ ...settings })
     ]);
     renderAllListState();
@@ -2240,11 +2259,12 @@
   async function saveCategoryFromModal() {
     const name = els.categoryInput.value.trim();
     if (!name) return showToast(t('categoryRequired'), 'error');
-    if (categories.some(item => item.toLocaleLowerCase() === name.toLocaleLowerCase() && item !== editingCategory)) return showToast(t('categoryExists'), 'error');
+    if (categories.includes(name) && name !== editingCategory) return showToast(t('categoryExists'), 'error');
     if (editingCategory) {
       const index = categories.indexOf(editingCategory);
       if (index !== -1) categories[index] = name;
-      allNotes = await updateNotes(notes => notes.map(note => note.category === editingCategory ? { ...note, category: name, updatedAt: Date.now() } : note));
+      allNotes.forEach(note => { if (note.category === editingCategory) note.category = name; });
+      await saveNotes(allNotes);
       if (currentCategoryFilter === editingCategory) currentCategoryFilter = name;
       showToast(t('categoryUpdated'), 'success');
     } else {
@@ -2256,8 +2276,5 @@
     renderAllListState();
   }
 
-  init().catch(error => {
-    console.error('ClipNote initialization failed:', error);
-    try { showToast(error?.message || 'ClipNote could not start.', 'error'); } catch (_) {}
-  });
+  init();
 })();
