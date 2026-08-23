@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ClipNote Privacy</title>
+  <link rel="icon" href="assets/icons/icon32.png">
+  <link rel="stylesheet" href="assets/css/site.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap nav">
+      <a class="brand" href="./"><img src="assets/icons/icon128.png" alt="">ClipNote</a>
+      <div class="lang-switch">
+        <a class="active" href="privacy.html">EN</a>
+        <a href="fa/privacy.html">فارسی</a>
+      </div>
+    </div>
+  </header>
+  <main class="wrap wiki-article" style="margin:40px auto 80px;max-width:800px">
+    <h1>Privacy</h1>
+    <p>ClipNote is a local-first Chrome extension. We do not operate a ClipNote server and we do not collect accounts, analytics, or advertising identifiers.</p>
+    <h2>What stays on your device</h2>
+    <ul>
+      <li>Notes, titles, tags, categories, workspaces, colors, pin/favorite flags</li>
+      <li>Settings including language, theme, and font size</li>
+      <li>Hashed note passwords / PINs and optional recovery answers</li>
+      <li>Source page title and URL when you use Quick Save</li>
+    </ul>
+    <h2>What leaves your device</h2>
+    <p>Only if you (or the background alarm) check for updates: a public request to GitHub’s release/tag API. The request does not include note content.</p>
+    <h2>Permissions</h2>
+    <p><code>storage</code>, <code>clipboardRead</code>, <code>clipboardWrite</code>, <code>activeTab</code>, <code>contextMenus</code>, <code>notifications</code>, and <code>alarms</code> are used for local features. Host access is limited to GitHub for version checks.</p>
+    <p><a href="./">Back to home</a></p>
+  </main>
+</body>
+</html>

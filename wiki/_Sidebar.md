@@ -1,0 +1,21 @@
+**English**
+- [Home](Home)
+- [Installation](Installation)
+- [Quick Start](Quick-Start)
+- [Features](Features)
+- [Security](Security)
+- [Shortcuts](Keyboard-Shortcuts)
+- [Privacy](Privacy)
+- [FAQ](FAQ)
+- [Changelog](Changelog)
+
+**فارسی**
+- [خانه](خانه)
+- [نصب](نصب)
+- [شروع سریع](شروع-سریع)
+- [امکانات](امکانات)
+- [امنیت](امنیت)
+- [میانبرها](میانبرها)
+- [حریم خصوصی](حریم-خصوصی)
+- [پرسش‌ها](پرسش‌ها)
+- [تغییرات](تغییرات)

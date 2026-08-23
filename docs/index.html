@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ClipNote — Private clipboard notebook for Chrome</title>
+  <meta name="description" content="ClipNote is a fast, local-first Chrome extension for notes, clipboard snippets, workspaces, Markdown, and locked secrets. English and Persian.">
+  <meta name="theme-color" content="#2563eb">
+  <link rel="icon" href="assets/icons/icon32.png">
+  <link rel="apple-touch-icon" href="assets/icons/icon128.png">
+  <meta property="og:title" content="ClipNote — Clipboard Notebook">
+  <meta property="og:description" content="A modern, private notebook for Chrome. Save selections, write Markdown, lock notes, stay bilingual.">
+  <meta property="og:image" content="https://kourosh242.github.io/clipnote/assets/images/og.png">
+  <meta property="og:url" content="https://kourosh242.github.io/clipnote/">
+  <meta property="og:type" content="website">
+  <link rel="alternate" hreflang="en" href="https://kourosh242.github.io/clipnote/">
+  <link rel="alternate" hreflang="fa" href="https://kourosh242.github.io/clipnote/fa/">
+  <link rel="stylesheet" href="assets/css/site.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap nav">
+      <a class="brand" href="./">
+        <img src="assets/icons/icon128.png" alt="">
+        ClipNote
+      </a>
+      <button class="menu-btn" type="button" data-menu aria-label="Open menu">☰</button>
+      <nav class="nav-links" data-nav>
+        <a href="#features">Features</a>
+        <a href="#install">Install</a>
+        <a href="wiki/">Wiki</a>
+        <a href="https://github.com/Kourosh242/clipnote/releases/latest">Download</a>
+        <a href="https://github.com/Kourosh242/clipnote">GitHub</a>
+      </nav>
+      <div class="lang-switch">
+        <a class="active" href="./">EN</a>
+        <a href="fa/">فارسی</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="wrap hero">
+      <div>
+        <span class="kicker">v1.3.0 · Chrome · Local-first</span>
+        <h1>Your clipboard, turned into a private notebook.</h1>
+        <p class="lead">ClipNote captures ideas, code, passwords, and web selections in a fast bilingual notebook that never leaves your browser. Workspaces, Markdown, smart tags, and note locks — all offline.</p>
+        <div class="actions">
+          <a class="btn btn-primary" href="https://github.com/Kourosh242/clipnote/releases/download/v1.3.0/clipnote_1.3.0.zip">Download v1.3.0</a>
+          <a class="btn btn-ghost" href="wiki/">Open the wiki</a>
+        </div>
+        <div class="meta-row">
+          <span>Created by Kourosh &amp; Mehdi</span>
+          <span>English + فارسی with Vazirmatn</span>
+          <span>No cloud. No account.</span>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <img class="shot-main" src="assets/images/hero-manager.png" alt="ClipNote manager with workspaces and colorful notes">
+        <img class="shot-pop" src="assets/images/hero-popup.png" alt="ClipNote popup with pinned, locked, and Persian notes">
+      </div>
+    </section>
+
+    <section class="wrap section" id="features">
+      <div class="section-head">
+        <h2>Everything you clip, organized.</h2>
+        <p>A full notebook lives in the toolbar popup and a larger manager page — same data, same language, same privacy model.</p>
+      </div>
+      <div class="grid-3">
+        <article class="card">
+          <div class="icon-pill">📋</div>
+          <h3>Quick Save</h3>
+          <p>Select text on any page, right-click, and send it to ClipNote with the page title and URL attached.</p>
+        </article>
+        <article class="card">
+          <div class="icon-pill">🗂️</div>
+          <h3>Workspaces</h3>
+          <p>Split Work, Personal, and side projects. Filter notes by workspace, category, tag, pin, or favorite.</p>
+        </article>
+        <article class="card">
+          <div class="icon-pill">✨</div>
+          <h3>Smart tags</h3>
+          <p>Python, CSS, Git, Docker, JSON, Markdown and more are suggested automatically as you type.</p>
+        </article>
+        <article class="card">
+          <div class="icon-pill">📝</div>
+          <h3>Markdown</h3>
+          <p>Headings, lists, tables, images, links, and copyable code blocks with split / editor / preview modes.</p>
+        </article>
+        <article class="card">
+          <div class="icon-pill">🔒</div>
+          <h3>Note locks</h3>
+          <p>Protect a note with a password or 4-digit PIN. Optional recovery question. Secrets stay hashed locally.</p>
+        </article>
+        <article class="card">
+          <div class="icon-pill">🌐</div>
+          <h3>Bilingual UI</h3>
+          <p>Switch English or فارسی instantly. Persian uses Vazirmatn and a full RTL layout in popup and manager.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="wrap section" id="install">
+      <div class="section-head">
+        <h2>Install in one minute</h2>
+        <p>ClipNote is a Manifest V3 Chrome extension. Load it unpacked from the release zip — no store account required.</p>
+      </div>
+      <div class="grid-2 steps">
+        <article class="card step">
+          <h3>Download the zip</h3>
+          <p>Get <a href="https://github.com/Kourosh242/clipnote/releases/latest">clipnote_1.3.0.zip</a> from GitHub Releases and extract the <code>clipnote_v1.3.0</code> folder.</p>
+        </article>
+        <article class="card step">
+          <h3>Open extensions</h3>
+          <p>In Chrome go to <code>chrome://extensions</code> and turn on <strong>Developer mode</strong> in the top-right corner.</p>
+        </article>
+        <article class="card step">
+          <h3>Load unpacked</h3>
+          <p>Click <strong>Load unpacked</strong> and select the extracted folder that contains <code>manifest.json</code>.</p>
+        </article>
+        <article class="card step">
+          <h3>Start clipping</h3>
+          <p>Pin the icon, press <span class="kbd">Ctrl</span>+<span class="kbd">Shift</span>+<span class="kbd">N</span>, and write your first note. Switch language in Settings.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="wrap section">
+      <div class="grid-2">
+        <div class="shot-frame">
+          <img src="assets/images/hero-manager.png" alt="Full manager view">
+        </div>
+        <div>
+          <div class="section-head">
+            <h2>A manager when you need room.</h2>
+            <p>The options page is a complete notebook: sidebar workspaces, timeline grouping, auto-save, undo, paste from clipboard, and theme controls.</p>
+          </div>
+          <div class="card">
+            <h3>Shortcuts</h3>
+            <p style="margin-bottom:12px">They work in both the popup and the manager.</p>
+            <div class="table-wrap">
+              <table>
+                <tr><th>Action</th><th>Windows / Linux</th><th>macOS</th></tr>
+                <tr><td>Open popup</td><td><span class="kbd">Ctrl</span>+<span class="kbd">Shift</span>+<span class="kbd">N</span></td><td><span class="kbd">⌘</span>+<span class="kbd">Shift</span>+<span class="kbd">N</span></td></tr>
+                <tr><td>New note</td><td><span class="kbd">Ctrl</span>+<span class="kbd">N</span></td><td><span class="kbd">⌘</span>+<span class="kbd">N</span></td></tr>
+                <tr><td>Save</td><td><span class="kbd">Ctrl</span>+<span class="kbd">S</span></td><td><span class="kbd">⌘</span>+<span class="kbd">S</span></td></tr>
+                <tr><td>Search</td><td><span class="kbd">Ctrl</span>+<span class="kbd">F</span></td><td><span class="kbd">⌘</span>+<span class="kbd">F</span></td></tr>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="wrap section">
+      <div class="grid-2">
+        <div>
+          <div class="section-head">
+            <h2>Private by design</h2>
+            <p>Notes live in <code>chrome.storage.local</code>. There is no ClipNote server. GitHub is contacted only when you check for a newer version.</p>
+          </div>
+          <div class="card">
+            <p>Passwords and PINs are stored as PBKDF2-SHA256 hashes with a random salt. Locked notes hide their preview until you unlock them in the current session.</p>
+          </div>
+        </div>
+        <img src="assets/images/feature-secure.png" alt="Shielded notes with a gold lock" style="border-radius:28px;box-shadow:var(--shadow)">
+      </div>
+    </section>
+
+    <section class="wrap section faq">
+      <div class="section-head">
+        <h2>Questions</h2>
+      </div>
+      <details open>
+        <summary>Does ClipNote upload my notes?</summary>
+        <p>No. Notes, tags, workspaces, and settings stay on this device. Update checks only read the public GitHub release API.</p>
+      </details>
+      <details>
+        <summary>Can I use Persian and English together?</summary>
+        <p>Yes. The interface language is a setting. Note titles and bodies use automatic direction, so mixed English and فارسی text stay readable.</p>
+      </details>
+      <details>
+        <summary>How do I move data to another computer?</summary>
+        <p>Settings → Export JSON, then Import JSON on the other browser. TXT export is also available for a readable backup.</p>
+      </details>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer-grid">
+      <div>
+        <strong>ClipNote</strong><br>
+        A local clipboard notebook by Kourosh &amp; Mehdi.
+      </div>
+      <div>
+        <a href="wiki/">Wiki</a> ·
+        <a href="privacy.html">Privacy</a> ·
+        <a href="https://github.com/Kourosh242/clipnote">Source</a> ·
+        <a href="https://github.com/Kourosh242/clipnote/releases">Releases</a>
+      </div>
+    </div>
+  </footer>
+  <script src="assets/js/site.js"></script>
+</body>
+</html>
