@@ -17,6 +17,7 @@
 - نسخهٔ Manifest و پوشهٔ سورس از `1.3.0` به `1.3.1` ارتقا یافت.
 - کنترل‌ها و متن راهنمای بررسی دستی به‌روزرسانی از رابط کاربری حذف شدند؛ به‌روزرسانی خودکار پس‌زمینه و اعلان‌های Chrome حفظ شده‌اند.
 - مستندات فارسی و انگلیسی، راهنمای نصب و لینک ویکی با ریلیز جدید همگام شدند.
+- فایل ZIP از شاخهٔ `main` حذف شد؛ دانلودها اکنون فقط به Asset رسمی GitHub Releases اشاره می‌کنند و راهنمای پشتیبان‌گیری JSON پیش از به‌روزرسانی اضافه شد.
 
 #### رفع‌شده
 - Settings دیگر کاربر را به بررسی دستی دوره‌ای دعوت نمی‌کند و وضعیت نسخه را شفاف نشان می‌دهد.
@@ -35,6 +36,7 @@
 - Bumped the Manifest version and source directory from `1.3.0` to `1.3.1`.
 - Removed manual update-check controls and guidance from the UI while keeping background automatic update notifications.
 - Synchronized the Persian and English documentation, installation guide, and wiki links with the new release.
+- Removed the ZIP from the `main` branch; downloads now use the official GitHub Release asset only, with JSON backup guidance before updating.
 
 #### Fixed
 - Settings no longer asks users to perform periodic manual checks and now presents a clear version status.
