@@ -79,10 +79,12 @@ const GITHUB_RELEASES_URL = `${GITHUB_REPO_URL}/releases/latest`;
 const GITHUB_API_LATEST_RELEASE_URL = 'https://api.github.com/repos/Kourosh242/clipnote/releases/latest';
 const GITHUB_API_TAGS_URL = 'https://api.github.com/repos/Kourosh242/clipnote/tags?per_page=10';
 const UPDATE_CHECK_CACHE_MS = 1000 * 60 * 60 * 6;
+const MAX_IMPORT_BYTES = 8 * 1024 * 1024;
+const STORAGE_LOCK_NAME = 'clipnote-storage-write';
 
 // ============== Generic Helpers ==============
 function generateId(prefix = 'id') {
-  return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+  return `${prefix}_${Date.now()}_${crypto.randomUUID ? crypto.randomUUID() : bytesToBase64(crypto.getRandomValues(new Uint8Array(16))).replace(/[^a-z0-9]/gi, '')}`;
 }
 
 function escapeHtml(text) {
@@ -128,7 +130,9 @@ function getWorkspaceMap(workspaces) {
 
 function ensureWorkspaceId(workspaceId, workspaces) {
   const existingIds = new Set((workspaces || []).map(workspace => workspace.id));
-  return existingIds.has(workspaceId) ? workspaceId : DEFAULT_WORKSPACE_ID;
+  if (existingIds.has(workspaceId)) return workspaceId;
+  if (existingIds.has(DEFAULT_WORKSPACE_ID)) return DEFAULT_WORKSPACE_ID;
+  return (workspaces || [])[0]?.id || DEFAULT_WORKSPACE_ID;
 }
 
 function truncateText(text, max = 72) {
@@ -141,8 +145,8 @@ function normalizeVersionString(version = '') {
   const raw = String(version || '').trim();
   // Extract the first semver-like "x.y[.z...]" token (requires at least one dot).
   // This rejects non-numeric tags such as "new_ver1" or bare build numbers like "3".
-  const match = raw.match(/(\d+(?:\.\d+)+)/);
-  return match ? match[1] : '';
+  const match = raw.match(/^v?(\d+)\.(\d+)\.(\d+)(?:[-+][0-9A-Za-z.-]+)?$/);
+  return match ? `${match[1]}.${match[2]}.${match[3]}` : '';
 }
 
 function compareVersions(a = '', b = '') {
@@ -180,6 +184,7 @@ function pickHighestVersion(tags) {
   let best = null;
   (tags || []).forEach(tag => {
     const name = tag && (tag.name || tag.tag_name);
+    if (typeof name !== 'string' || !/^v?\d+\.\d+\.\d+$/.test(name.trim())) return;
     const version = normalizeVersionString(name);
     if (version && (!best || compareVersions(version, best.latestVersion) > 0)) {
       best = { latestVersion: version, latestLabel: name };
@@ -251,13 +256,13 @@ async function notifyUpdateIfNeeded(info) {
     const lastNotifiedVersion = await getStorage(STORAGE_KEYS.LAST_NOTIFIED_VERSION, '');
     if (lastNotifiedVersion === info.latestVersion) return; // already notified for this version
 
-    chrome.notifications.create(`clipnote_update_${info.latestVersion}`, {
-      type: 'basic',
-      iconUrl: 'icons/icon128.png',
-      title: 'ClipNote',
-      message: `New version v${info.latestLabel || info.latestVersion} is available. Click to view the release.`
-    }, () => void chrome.runtime.lastError);
-
+    const label = String(info.latestLabel || info.latestVersion).replace(/^v/i, '');
+    await new Promise((resolve, reject) => {
+      chrome.notifications.create(`clipnote_update_${info.latestVersion}`, {
+        type: 'basic', iconUrl: 'icons/icon128.png', title: 'ClipNote',
+        message: `New version v${label} is available. Click to view the release.`
+      }, () => chrome.runtime.lastError ? reject(new Error(chrome.runtime.lastError.message)) : resolve());
+    });
     await setStorage(STORAGE_KEYS.LAST_NOTIFIED_VERSION, info.latestVersion);
   } catch (error) {
     console.error('Update notification failed:', error);
@@ -269,7 +274,8 @@ async function checkForUpdates(force = false) {
   const cached = await getUpdateInfo();
   const now = Date.now();
 
-  if (!force && cached && cached.currentVersion === currentVersion && (now - (cached.checkedAt || 0)) < UPDATE_CHECK_CACHE_MS) {
+  const cacheAge = cached ? now - Number(cached.checkedAt || 0) : Infinity;
+  if (!force && cached && cached.currentVersion === currentVersion && cacheAge >= 0 && cacheAge < UPDATE_CHECK_CACHE_MS) {
     await notifyUpdateIfNeeded(cached);
     return cached;
   }
@@ -317,13 +323,25 @@ async function getStorage(key, defaultValue = null) {
 }
 
 async function setStorage(key, value) {
-  try {
-    await chrome.storage.local.set({ [key]: value });
-    return true;
-  } catch (e) {
-    console.error('Storage write error:', e);
-    return false;
+  await chrome.storage.local.set({ [key]: value });
+  return true;
+}
+
+async function withStorageLock(callback) {
+  if (globalThis.navigator?.locks?.request) {
+    return await navigator.locks.request(STORAGE_LOCK_NAME, callback);
   }
+  return await callback();
+}
+
+async function updateNotes(mutator) {
+  return await withStorageLock(async () => {
+    const current = await getStorage(STORAGE_KEYS.NOTES, []);
+    const notes = Array.isArray(current) ? current : [];
+    const next = await mutator([...notes]);
+    await setStorage(STORAGE_KEYS.NOTES, Array.isArray(next) ? next : notes);
+    return Array.isArray(next) ? next : notes;
+  });
 }
 
 async function getNotes() {
@@ -386,6 +404,7 @@ async function saveUpdateInfo(info) {
 
 // ============== Note / Workspace Helpers ==============
 function createWorkspace(data = {}) {
+  data = data && typeof data === 'object' ? data : {};
   return {
     id: data.id || generateId('ws'),
     name: normalizeText(data.name) || 'Workspace',
@@ -394,6 +413,7 @@ function createWorkspace(data = {}) {
 }
 
 function createNote(data = {}, workspaces = DEFAULT_WORKSPACES) {
+  data = data && typeof data === 'object' ? data : {};
   const now = Date.now();
   const workspaceId = ensureWorkspaceId(data.workspaceId || DEFAULT_WORKSPACE_ID, workspaces);
   const rawTitle = normalizeText(data.title);
@@ -504,7 +524,7 @@ function getTimelineBucket(timestamp, nowTs = Date.now()) {
   const targetDay = startOfDay(noteDate).getTime();
   const diffDays = Math.floor((today - targetDay) / 86400000);
 
-  if (diffDays === 0) return 'today';
+  if (diffDays <= 0) return 'today';
   if (diffDays === 1) return 'yesterday';
   if (diffDays < 7) return 'this_week';
   if (noteDate.getFullYear() === now.getFullYear() && noteDate.getMonth() === now.getMonth()) {
@@ -599,21 +619,26 @@ function linkifyUrls(text) {
 }
 
 // ============== Markdown Parser ==============
+function sanitizeMarkdownUrl(url, image = false) {
+  const value = String(url || '').trim().replace(/&amp;/g, '&');
+  if (image) return /^(https?:|data:image\/)/i.test(value) ? escapeHtml(value) : '';
+  return /^(https?:|mailto:)/i.test(value) ? escapeHtml(value) : '';
+}
+
 function parseMarkdown(text) {
   if (!text) return '';
 
-  let html = escapeHtml(text);
   const codeBlocks = [];
-  const placeholder = (index) => `\n<!--CNCB${index}-->\n`;
-
-  html = html.replace(/```([\w]*)\n?([\s\S]*?)```/g, (match, lang, code) => {
-    const language = lang ? escapeHtml(lang) : '';
+  const placeholder = (index) => `\nCNCODEBLOCK${index}PLACEHOLDER\n`;
+  let source = String(text).replace(/```([\w+-]*)\n?([\s\S]*?)```/g, (match, lang, code) => {
     const codeContent = code.replace(/^\n|\n$/g, '');
-    const blockHtml = `<div class="cn-code-block"><div class="cn-code-header"><span class="cn-code-lang">${language || 'code'}</span><button class="cn-copy-code-btn" data-code="${escapeHtml(codeContent).replace(/"/g, '&quot;')}">Copy</button></div><pre><code>${escapeHtml(codeContent)}</code></pre></div>`;
-    const index = codeBlocks.push(blockHtml) - 1;
-    return placeholder(index);
+    const language = escapeHtml(lang || 'code');
+    const encoded = escapeHtml(codeContent);
+    const block = `<div class="cn-code-block"><div class="cn-code-header"><span class="cn-code-lang">${language}</span><button class="cn-copy-code-btn" data-code="${encoded}">Copy</button></div><pre><code>${encoded}</code></pre></div>`;
+    return placeholder(codeBlocks.push(block) - 1);
   });
 
+  let html = escapeHtml(source);
   html = html.replace(/`([^`]+)`/g, '<code class="cn-inline-code">$1</code>');
   html = html.replace(/^###### (.*$)/gim, '<h6>$1</h6>');
   html = html.replace(/^##### (.*$)/gim, '<h5>$1</h5>');
@@ -627,29 +652,26 @@ function parseMarkdown(text) {
   html = html.replace(/__(.+?)__/g, '<strong>$1</strong>');
   html = html.replace(/_(.+?)_/g, '<em>$1</em>');
   html = html.replace(/~~(.+?)~~/g, '<del>$1</del>');
-  html = html.replace(/^> (.*$)/gim, '<blockquote>$1</blockquote>');
+  html = html.replace(/^&gt; (.*$)/gim, '<blockquote>$1</blockquote>');
   html = html.replace(/^---+$/gim, '<hr>');
-  html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" class="cn-md-image" loading="lazy">');
-  html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="cn-link">$1</a>');
+  html = html.replace(/!\[([^\]]*)\]\(((?:[^()]|\([^()]*\))+?)\)/g, (match, alt, url) => {
+    const safe = sanitizeMarkdownUrl(url, true);
+    return safe ? `<img src="${safe}" alt="${alt}" class="cn-md-image" loading="lazy">` : alt;
+  });
+  html = html.replace(/\[([^\]]+)\]\(((?:[^()]|\([^()]*\))+?)\)/g, (match, label, url) => {
+    const safe = sanitizeMarkdownUrl(url, false);
+    return safe ? `<a href="${safe}" target="_blank" rel="noopener noreferrer" class="cn-link">${label}</a>` : label;
+  });
   html = parseTables(html);
   html = parseLists(html);
 
-  codeBlocks.forEach((block, index) => {
-    html = html.replace(placeholder(index), block);
-  });
-
-  html = html.split(/\n\n+/).map(block => {
+  codeBlocks.forEach((block, index) => { html = html.replace(escapeHtml(placeholder(index)).trim(), block); });
+  return html.split(/\n\n+/).map(block => {
     block = block.trim();
     if (!block) return '';
-    if (block.startsWith('<h') || block.startsWith('<ul') || block.startsWith('<ol') ||
-        block.startsWith('<blockquote') || block.startsWith('<div') ||
-        block.startsWith('<hr') || block.startsWith('<table')) {
-      return block;
-    }
+    if (/^<(h\d|ul|ol|blockquote|div|hr|table)/.test(block)) return block;
     return `<p>${block.replace(/\n/g, '<br>')}</p>`;
   }).join('\n');
-
-  return html;
 }
 
 function parseTables(html) {
@@ -706,56 +728,47 @@ function buildTable(lines) {
 
 function parseLists(html) {
   const lines = html.split('\n');
-  const result = [];
-  const listStack = [];
+  const output = [];
+  const matchItem = line => {
+    const match = line.match(/^(\s*)(?:(- |\* )|(\d+\. ))(.*)$/);
+    return match ? { indent: match[1].replace(/\t/g, '  ').length, ordered: !!match[3], content: match[4] } : null;
+  };
 
-  function closeLists() {
-    let out = '';
-    while (listStack.length > 0) {
-      const item = listStack.pop();
-      out += item.ordered ? '</ol>' : '</ul>';
-    }
-    return out;
-  }
-
-  for (const line of lines) {
-    const unordered = line.match(/^(\s*)[-*]\s+(.*)$/);
-    const ordered = line.match(/^(\s*)\d+\.\s+(.*)$/);
-
-    if (unordered || ordered) {
-      const match = unordered || ordered;
-      const indent = match[1].length;
-      const content = match[2];
-      const orderedList = !!ordered;
-
-      if (listStack.length === 0) {
-        listStack.push({ indent, ordered: orderedList });
-        result.push(orderedList ? '<ol>' : '<ul>');
-      } else {
-        const top = listStack[listStack.length - 1];
-        if (indent > top.indent) {
-          listStack.push({ indent, ordered: orderedList });
-          result.push(orderedList ? '<ol>' : '<ul>');
-        } else if (indent < top.indent || orderedList !== top.ordered) {
-          while (listStack.length > 0 && (listStack[listStack.length - 1].indent > indent || listStack[listStack.length - 1].ordered !== orderedList)) {
-            const item = listStack.pop();
-            result.push(item.ordered ? '</ol>' : '</ul>');
-          }
-          if (listStack.length === 0 || listStack[listStack.length - 1].indent < indent) {
-            listStack.push({ indent, ordered: orderedList });
-            result.push(orderedList ? '<ol>' : '<ul>');
-          }
-        }
+  function renderLevel(items, start, indent, ordered) {
+    let result = ordered ? '<ol>' : '<ul>';
+    let index = start;
+    while (index < items.length) {
+      const item = items[index];
+      if (item.indent < indent || (item.indent === indent && item.ordered !== ordered)) break;
+      if (item.indent > indent) break;
+      result += `<li>${item.content}`;
+      index += 1;
+      while (index < items.length && items[index].indent > indent) {
+        const child = renderLevel(items, index, items[index].indent, items[index].ordered);
+        result += child.html;
+        index = child.index;
       }
-      result.push(`<li>${content}</li>`);
-    } else {
-      if (listStack.length > 0) result.push(closeLists());
-      result.push(line);
+      result += '</li>';
     }
+    result += ordered ? '</ol>' : '</ul>';
+    return { html: result, index };
   }
 
-  if (listStack.length > 0) result.push(closeLists());
-  return result.join('\n');
+  for (let index = 0; index < lines.length;) {
+    if (!matchItem(lines[index])) { output.push(lines[index]); index += 1; continue; }
+    const run = [];
+    while (index < lines.length) {
+      const item = matchItem(lines[index]);
+      if (!item) break;
+      run.push(item); index += 1;
+    }
+    let cursor = 0;
+    while (cursor < run.length) {
+      const rendered = renderLevel(run, cursor, run[cursor].indent, run[cursor].ordered);
+      output.push(rendered.html); cursor = rendered.index;
+    }
+  }
+  return output.join('\n');
 }
 
 // ============== Clipboard Helpers ==============
@@ -1008,11 +1021,13 @@ async function exportToTxt() {
 }
 
 async function importFromJson(file) {
+  if (!file || file.size > MAX_IMPORT_BYTES) { showToast('Backup file is too large', 'error'); return false; }
   return new Promise((resolve) => {
     const reader = new FileReader();
     reader.onload = async (e) => {
       try {
         const data = JSON.parse(e.target.result);
+        if (![1, 2, 3].includes(Number(data.version || 1))) throw new Error('Unsupported backup version');
         if (!data.notes || !Array.isArray(data.notes)) {
           showToast('Invalid backup file', 'error');
           resolve(false);
@@ -1057,6 +1072,8 @@ async function importFromJson(file) {
         resolve(false);
       }
     };
+    reader.onerror = () => { showToast('Import Failed', 'error'); resolve(false); };
+    reader.onabort = () => resolve(false);
     reader.readAsText(file);
   });
 }
@@ -1192,19 +1209,20 @@ async function migrateStorageData() {
   let changed = false;
 
   const workspaces = Array.isArray(rawWorkspaces) && rawWorkspaces.length
-    ? rawWorkspaces.map(createWorkspace)
+    ? [...new Map(rawWorkspaces.filter(item => item && typeof item === 'object').map(item => { const workspace = createWorkspace(item); return [workspace.id, workspace]; })).values()]
     : DEFAULT_WORKSPACES.map(createWorkspace);
 
-  if (!Array.isArray(rawWorkspaces) || !rawWorkspaces.length) changed = true;
+  if (!Array.isArray(rawWorkspaces) || !rawWorkspaces.length || JSON.stringify(workspaces) !== JSON.stringify(rawWorkspaces)) changed = true;
 
   const workspaceIds = new Set(workspaces.map(workspace => workspace.id));
   if (!workspaceIds.has(DEFAULT_WORKSPACE_ID)) {
     workspaces.unshift(createWorkspace(DEFAULT_WORKSPACES[0]));
+    workspaceIds.add(DEFAULT_WORKSPACE_ID);
     changed = true;
   }
 
   const notes = Array.isArray(rawNotes)
-    ? rawNotes.map(note => {
+    ? [...new Map(rawNotes.filter(note => note && typeof note === 'object').map(note => [note.id || generateId('note'), note])).values()].map(note => {
         const migrated = createNote(note, workspaces);
         if (!workspaceIds.has(migrated.workspaceId)) {
           migrated.workspaceId = DEFAULT_WORKSPACE_ID;
@@ -1263,6 +1281,8 @@ const ClipNote = {
   SMART_TAG_RULES,
   getStorage,
   setStorage,
+  withStorageLock,
+  updateNotes,
   getNotes,
   saveNotes,
   getSettings,

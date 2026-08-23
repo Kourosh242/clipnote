@@ -2,6 +2,42 @@
 
 📚 ویکی آنلاین: [kourosh242.github.io/clipnote](https://kourosh242.github.io/clipnote/)
 
+## 1.3.2 - 2026-08-23
+
+### فارسی
+
+#### رفع‌شده
+- مقاوم‌سازی ذخیره‌سازی هم‌زمان یادداشت‌ها با Web Locks و merge آخرین داده‌ها.
+- مدیریت صریح خطاهای Storage، Import و FileReader و جلوگیری از پیام موفقیت اشتباه.
+- اعتبارسنجی نسخه و اندازهٔ فایل پشتیبان و پاک‌سازی داده‌های خراب و شناسه‌های تکراری در مهاجرت.
+- اصلاح Markdown شامل code block، لینک‌های امن، URLهای دارای پرانتز، فهرست‌های تو‌در‌تو و کپی کد در Popup.
+- اصلاح از دست رفتن state در Popup، پیشنهادهای نادیده‌گرفته‌شده، دسته‌بندی Quick Capture و Noteهای حذف‌شده در context دیگر.
+- اصلاح بررسی نسخه، SemVer، prereleaseها، cache زمانی و اعلان‌های ناموفق.
+- بازگردانی وضعیت Sidebar و پاک‌سازی کامل همهٔ کلیدها در Clear All Data.
+- کاهش permissionهای غیرضروری و تعیین حداقل Chrome 111.
+- اصلاح دسترسی Responsive به Settings، Category و Tag بدون تغییر زبان بصری رابط.
+
+#### تغییرکرده
+- نسخهٔ افزونه و پوشهٔ سورس به `1.3.2` ارتقا یافت.
+- مستندات امنیت، محدودیت قفل محلی، Backup و Import/Export شفاف‌تر شدند.
+
+### English
+
+#### Fixed
+- Hardened concurrent note writes with Web Locks and latest-state merging.
+- Added explicit Storage, import, and FileReader failure handling.
+- Added backup version/size validation and migration cleanup for malformed or duplicate records.
+- Fixed Markdown code blocks, safe links, parenthesized URLs, nested lists, and popup code copying.
+- Fixed popup state loss, ignored suggestions, Quick Capture category resets, and externally deleted notes.
+- Fixed update parsing, prerelease filtering, clock-skewed cache entries, and failed-notification bookkeeping.
+- Restored persisted sidebar state and made Clear All Data clear every ClipNote key.
+- Reduced unnecessary permissions and set Chrome 111 as the supported minimum.
+- Restored responsive access to Settings, Categories, and Tags without redesigning the visual theme.
+
+#### Changed
+- Bumped the extension and source directory to `1.3.2`.
+- Clarified security, local-lock limitations, backups, and supported import/export formats.
+
 ## 1.3.1 - 2026-08-23
 
 ### فارسی

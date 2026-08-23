@@ -1,7 +1,7 @@
 # ClipNote Wiki / ویکی ClipNote
 
 > **راهنمای کامل و دو‌زبانه:** [kourosh242.github.io/clipnote](https://kourosh242.github.io/clipnote/)<br>
-> **دانلود رسمی:** [GitHub Releases](https://github.com/Kourosh242/clipnote/releases) · [فایل نصب v1.3.1](https://github.com/Kourosh242/clipnote/releases/download/v1.3.1/clipnote-v1.3.1.zip)
+> **دانلود رسمی:** [GitHub Releases](https://github.com/Kourosh242/clipnote/releases) · [فایل نصب v1.3.2](https://github.com/Kourosh242/clipnote/releases/download/v1.3.2/clipnote-v1.3.2.zip)
 
 این صفحه، نسخهٔ Markdown راهنمای رسمی است. برای نسخهٔ خواناتر و کامل‌تر، از [ویکی آنلاین](https://kourosh242.github.io/clipnote/) استفاده کنید.
 
@@ -15,9 +15,9 @@
 2. از بخش **Import / Export** گزینهٔ **Export JSON** را بزنید.
 3. فایل JSON را در جای امن نگه دارید. پس از نصب در صورت نیاز با **Import JSON** آن را بازگردانید؛ داده‌ها با اطلاعات فعلی ادغام می‌شوند.
 
-### ۲. نصب نسخهٔ 1.3.1
+### ۲. نصب نسخهٔ 1.3.2
 
-1. [`clipnote-v1.3.1.zip`](https://github.com/Kourosh242/clipnote/releases/download/v1.3.1/clipnote-v1.3.1.zip) را از ریلیز دانلود و استخراج کنید.
+1. [`clipnote-v1.3.2.zip`](https://github.com/Kourosh242/clipnote/releases/download/v1.3.2/clipnote-v1.3.2.zip) را از ریلیز دانلود و استخراج کنید.
 2. `chrome://extensions/` را باز و **Developer mode** را فعال کنید.
 3. **Load unpacked** را بزنید.
 4. پوشهٔ استخراج‌شدهٔ `clipnote` را انتخاب کنید؛ `manifest.json` باید مستقیماً در آن باشد.
@@ -36,6 +36,8 @@
 
 ## حریم خصوصی
 
+> **محدودیت قفل:** Password/PIN فقط دسترسی در رابط ClipNote را محدود می‌کند و رمزنگاری محتوای ذخیره‌شده نیست. خروجی JSON/TXT نیز ممکن است متن یادداشت قفل‌شده را شامل شود؛ Backup را محرمانه نگه دارید.
+
 یادداشت‌ها در `chrome.storage.local` باقی می‌مانند و ارسال نمی‌شوند. افزونه فقط متادیتای عمومی ریلیز GitHub را برای اعلان نسخهٔ جدید می‌خواند.
 
 ## پیوندهای مرتبط
@@ -51,7 +53,7 @@
 ## English quick reference
 
 **Full bilingual guide:** [kourosh242.github.io/clipnote](https://kourosh242.github.io/clipnote/)<br>
-**Official download:** [GitHub Releases](https://github.com/Kourosh242/clipnote/releases) · [v1.3.1 installer](https://github.com/Kourosh242/clipnote/releases/download/v1.3.1/clipnote-v1.3.1.zip)
+**Official download:** [GitHub Releases](https://github.com/Kourosh242/clipnote/releases) · [v1.3.2 installer](https://github.com/Kourosh242/clipnote/releases/download/v1.3.2/clipnote-v1.3.2.zip)
 
 ### Back up first
 

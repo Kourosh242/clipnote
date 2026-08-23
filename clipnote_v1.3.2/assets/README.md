@@ -1,6 +1,6 @@
 # ClipNote local assets
 
-These assets are bundled with ClipNote 1.3.1 so the extension works offline, including its Persian interface.
+These assets are bundled with ClipNote 1.3.2 so the extension works offline, including its Persian interface.
 
 ## Included fonts
 

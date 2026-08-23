@@ -11,7 +11,8 @@
     DEFAULT_WORKSPACE_ID,
     NOTE_COLORS,
     getNotes,
-    saveNotes,
+    updateNotes,
+    withStorageLock,
     getSettings,
     saveSettings,
     getCategories,
@@ -46,7 +47,9 @@
     verifyRecoveryAnswer,
     getNoteWorkspace,
     truncateText,
-    migrateStorageData
+    escapeHtml,
+    migrateStorageData,
+    getUpdateInfo
   } = window.ClipNote;
 
   const I18N = {
@@ -637,11 +640,19 @@
   async function init() {
     const migrated = await migrateStorageData();
     settings = migrated.settings;
+    els.sidebar.classList.toggle('collapsed', !!settings.sidebarCollapsed || window.matchMedia('(max-width: 760px)').matches);
     listMode = settings.fullViewMode === 'timeline' || settings.fullViewMode === 'normal'
       ? 'overview'
       : (settings.fullViewMode || 'overview');
 
     await refreshState();
+    const updateInfo = await getUpdateInfo();
+    if (els.versionStatusText) {
+      const status = updateInfo?.error ? (isFa() ? 'بررسی نسخه در دسترس نیست.' : 'Version check unavailable.')
+        : updateInfo?.hasUpdate ? (isFa() ? `نسخه ${updateInfo.latestVersion} در دسترس است.` : `Version ${updateInfo.latestVersion} is available.`)
+        : t('upToDate');
+      els.versionStatusText.textContent = status;
+    }
     currentScope = workspaces.some(workspace => workspace.id === settings.currentWorkspaceId)
       ? settings.currentWorkspaceId
       : 'all';
@@ -752,13 +763,13 @@
     document.getElementById('language-select-label').textContent = t('languageSelect');
     document.getElementById('language-help').textContent = t('languageHelp');
     if (els.versionStatusLabel) els.versionStatusLabel.textContent = t('versionStatus');
-    if (els.versionStatusText) els.versionStatusText.innerHTML = `<strong>${t('upToDate')}</strong>`;
-    if (els.versionStatusValue) els.versionStatusValue.textContent = `v${chrome.runtime.getManifest().version || '1.3.1'}`;
+    if (els.versionStatusText && !els.versionStatusText.textContent.trim()) els.versionStatusText.textContent = t('upToDate');
+    if (els.versionStatusValue) els.versionStatusValue.textContent = `v${chrome.runtime.getManifest().version || '1.3.2'}`;
     document.getElementById('data-title').textContent = t('data');
     document.getElementById('data-help').textContent = t('dataHelp');
     document.getElementById('about-title').textContent = t('about');
     if (els.aboutVersion) {
-      els.aboutVersion.textContent = 'v' + (chrome.runtime.getManifest().version || '1.3.1');
+      els.aboutVersion.textContent = 'v' + (chrome.runtime.getManifest().version || '1.3.2');
     }
     if (els.aboutCreatedPrefix) els.aboutCreatedPrefix.textContent = t('createdBy');
     if (els.aboutAuthorsAnd) els.aboutAuthorsAnd.textContent = t('authorsAnd');
@@ -875,6 +886,7 @@
     if (currentView === 'edit' && currentNoteId) {
       const note = findNote(currentNoteId);
       if (note) fillEditor(note);
+      else { currentNoteId = null; isDirty = false; showToast(t('noteNotFound'), 'warning'); await showView('list'); }
     }
     if (currentView === 'settings') loadSettingsUI();
   }
@@ -972,8 +984,14 @@
     els.btnClearRecovery.addEventListener('click', clearRecoveryQuestion);
 
     els.btnBackSettings.addEventListener('click', () => showView('list'));
-    els.settingDarkMode.addEventListener('change', saveSettingsFromUI);
-    els.settingTheme.addEventListener('change', saveSettingsFromUI);
+    els.settingDarkMode.addEventListener('change', () => {
+      if (!els.settingDarkMode.checked && els.settingTheme.value === 'dark-pro') els.settingTheme.value = 'blue';
+      saveSettingsFromUI();
+    });
+    els.settingTheme.addEventListener('change', () => {
+      if (els.settingTheme.value === 'dark-pro') els.settingDarkMode.checked = true;
+      saveSettingsFromUI();
+    });
     els.settingFontSize.addEventListener('input', () => {
       els.fontSizeValue.textContent = `${els.settingFontSize.value}px`;
       saveSettingsFromUI();
@@ -1229,8 +1247,8 @@
         const confirmed = confirm(t('categoryDeleteConfirm', { name: category }));
         if (!confirmed) return;
         categories = categories.filter(item => item !== category);
-        allNotes.forEach(note => { if (note.category === category) note.category = ''; });
-        await Promise.all([saveCategories(categories), saveNotes(allNotes)]);
+        allNotes = await updateNotes(notes => notes.map(note => note.category === category ? { ...note, category: '', updatedAt: Date.now() } : note));
+        await saveCategories(categories);
         currentCategoryFilter = null;
         renderAllListState();
         showToast(t('categoryDeleted'), 'success');
@@ -1402,7 +1420,7 @@
       tags: currentTagFilter ? [currentTagFilter] : []
     }, workspaces);
     allNotes.unshift(note);
-    await saveNotes(allNotes);
+    allNotes = await updateNotes(notes => [note, ...notes.filter(item => item.id !== note.id)]);
     currentNoteId = note.id;
     unlockedNotes.add(note.id);
     isDirty = false;
@@ -1576,10 +1594,9 @@
       ignoredSuggestedTags: existing.ignoredSuggestedTags
     }, workspaces);
 
-    await Promise.all([
-      saveNotes(allNotes),
-      mergeCustomTags(allNotes[index].tags)
-    ]);
+    const savedNote = allNotes[index];
+    allNotes = await updateNotes(notes => [savedNote, ...notes.filter(note => note.id !== savedNote.id)]);
+    await mergeCustomTags(savedNote.tags);
 
     isDirty = false;
     customTags = await getCustomTags();
@@ -1615,8 +1632,7 @@
       createdAt: Date.now(),
       updatedAt: Date.now()
     }, workspaces);
-    allNotes.unshift(duplicate);
-    await saveNotes(allNotes);
+    allNotes = await updateNotes(notes => [duplicate, ...notes.filter(note => note.id !== duplicate.id)]);
     unlockedNotes.add(duplicate.id);
     currentNoteId = duplicate.id;
     updateCounts();
@@ -1625,8 +1641,8 @@
   }
 
   async function deleteCurrentNote() {
-    allNotes = allNotes.filter(note => note.id !== currentNoteId);
-    await saveNotes(allNotes);
+    const deletedId = currentNoteId;
+    allNotes = await updateNotes(notes => notes.filter(note => note.id !== deletedId));
     unlockedNotes.delete(currentNoteId);
     currentNoteId = null;
     isDirty = false;
@@ -2115,11 +2131,10 @@
   async function clearAllData() {
     if (!confirm(t('clearConfirm'))) return;
     await chrome.storage.local.set({
-      [STORAGE_KEYS.NOTES]: [],
-      [STORAGE_KEYS.CATEGORIES]: DEFAULT_CATEGORIES,
-      [STORAGE_KEYS.WORKSPACES]: DEFAULT_WORKSPACES,
-      [STORAGE_KEYS.CUSTOM_TAGS]: [],
-      [STORAGE_KEYS.SETTINGS]: DEFAULT_SETTINGS
+      [STORAGE_KEYS.NOTES]: [], [STORAGE_KEYS.CATEGORIES]: DEFAULT_CATEGORIES,
+      [STORAGE_KEYS.WORKSPACES]: DEFAULT_WORKSPACES, [STORAGE_KEYS.CUSTOM_TAGS]: [],
+      [STORAGE_KEYS.SETTINGS]: DEFAULT_SETTINGS, [STORAGE_KEYS.LAST_QUICK_SAVE]: null,
+      [STORAGE_KEYS.UPDATE_INFO]: null, [STORAGE_KEYS.LAST_NOTIFIED_VERSION]: ''
     });
     allNotes = [];
     categories = [...DEFAULT_CATEGORIES];
@@ -2196,13 +2211,12 @@
     if (!confirmed) return;
 
     workspaces = workspaces.filter(item => item.id !== workspaceId);
-    allNotes = allNotes.map(note => note.workspaceId === workspaceId ? { ...note, workspaceId: fallback.id, updatedAt: Date.now() } : note);
+    allNotes = await updateNotes(notes => notes.map(note => note.workspaceId === workspaceId ? { ...note, workspaceId: fallback.id, updatedAt: Date.now() } : note));
     if (settings.currentWorkspaceId === workspaceId) settings.currentWorkspaceId = fallback.id;
     if (currentScope === workspaceId) currentScope = 'all';
 
     await Promise.all([
       saveWorkspaces(workspaces),
-      saveNotes(allNotes),
       saveSettings({ ...settings })
     ]);
     renderAllListState();
@@ -2226,12 +2240,11 @@
   async function saveCategoryFromModal() {
     const name = els.categoryInput.value.trim();
     if (!name) return showToast(t('categoryRequired'), 'error');
-    if (categories.includes(name) && name !== editingCategory) return showToast(t('categoryExists'), 'error');
+    if (categories.some(item => item.toLocaleLowerCase() === name.toLocaleLowerCase() && item !== editingCategory)) return showToast(t('categoryExists'), 'error');
     if (editingCategory) {
       const index = categories.indexOf(editingCategory);
       if (index !== -1) categories[index] = name;
-      allNotes.forEach(note => { if (note.category === editingCategory) note.category = name; });
-      await saveNotes(allNotes);
+      allNotes = await updateNotes(notes => notes.map(note => note.category === editingCategory ? { ...note, category: name, updatedAt: Date.now() } : note));
       if (currentCategoryFilter === editingCategory) currentCategoryFilter = name;
       showToast(t('categoryUpdated'), 'success');
     } else {
@@ -2243,5 +2256,8 @@
     renderAllListState();
   }
 
-  init();
+  init().catch(error => {
+    console.error('ClipNote initialization failed:', error);
+    try { showToast(error?.message || 'ClipNote could not start.', 'error'); } catch (_) {}
+  });
 })();

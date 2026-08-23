@@ -871,24 +871,19 @@ html[data-lang="fa"] .cn-version-status-row {
     width: 64px;
   }
 
-  .cn-sidebar .cn-logo-text,
-  .cn-sidebar .cn-nav-text,
-  .cn-sidebar .cn-section-title,
-  .cn-sidebar .cn-nav-count,
-  .cn-sidebar .cn-add-btn .cn-btn-text,
-  .cn-sidebar-search,
-  .cn-workspaces-list,
-  .cn-categories-list,
-  .cn-tags-list,
-  .cn-new-note-btn .cn-btn-text,
-  .cn-sidebar-footer button:last-child {
-    display: none;
+  .cn-sidebar:not(.collapsed) {
+    position: fixed;
+    inset-block: 0;
+    inset-inline-start: 0;
+    width: min(260px, 85vw);
+    z-index: 1000;
+    box-shadow: var(--cn-shadow-lg);
+    overflow-y: auto;
   }
 
-  .cn-new-note-btn {
-    padding: 0;
-    width: 36px;
-    height: 36px;
+  html[data-lang="fa"] .cn-sidebar:not(.collapsed) {
+    inset-inline-start: auto;
+    inset-inline-end: 0;
   }
 
   .cn-editor-toolbar {

@@ -1204,3 +1204,8 @@ code, pre, .cn-code-block, .cn-inline-code {
 
 .cn-pin-btn.active { color: var(--cn-warning); background: rgba(var(--cn-warning-rgb), 0.12); }
 .cn-fav-btn.active { color: var(--cn-warning); background: rgba(var(--cn-warning-rgb), 0.12); }
+
+/* Preserve the chosen accent while dark mode is active. */
+[data-dark="true"][data-theme="green"] { --cn-primary: #4ade80; --cn-primary-rgb: 74, 222, 128; --cn-primary-hover: #22c55e; --cn-primary-light: #14532d; }
+[data-dark="true"][data-theme="purple"] { --cn-primary: #c084fc; --cn-primary-rgb: 192, 132, 252; --cn-primary-hover: #a855f7; --cn-primary-light: #581c87; }
+[data-dark="true"][data-theme="orange"] { --cn-primary: #fb923c; --cn-primary-rgb: 251, 146, 60; --cn-primary-hover: #f97316; --cn-primary-light: #7c2d12; }
