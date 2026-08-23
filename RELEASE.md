@@ -7,8 +7,8 @@
 ## فارسی — ClipNote v1.3.2
 
 ### 📦 دانلود
-- **فایل نصب:** [`clipnote-v1.3.2.zip`](https://github.com/Kourosh242/clipnote/releases/download/v1.3.2/clipnote-v1.3.2.zip) — 218KB، شامل پوشه `clipnote` با `manifest.json`
-- **Checksum SHA256:** `ef1d92552a21fea4653b2529dd16ef1461ebb3f418e9ab78467b985b167013ca` (فایل `clipnote-v1.3.2.zip.sha256`)
+- **فایل نصب:** [`clipnote-v1.3.2.zip`](https://github.com/Kourosh242/clipnote/releases/download/v1.3.2/clipnote-v1.3.2.zip) — شامل پوشه `clipnote` با `manifest.json`
+- **Checksum SHA256:** `c4f2425140b883ee6c967d9e2434bf1af6297121afdf514b5ec3f53735dcef2b` (فایل `clipnote-v1.3.2.zip.sha256` — بعد از بسته‌بندی نهایی تولید می‌شود، مقدار ممکن است با هر build کمی تغییر کند به خاطر timestamp)
 - **ویکی آنلاین:** https://kourosh242.github.io/clipnote/
 
 ### ⚠️ قبل از نصب: پشتیبان بگیرید
@@ -60,8 +60,8 @@
 ## English — ClipNote v1.3.2
 
 ### 📦 Download
-- **Installer:** [`clipnote-v1.3.2.zip`](https://github.com/Kourosh242/clipnote/releases/download/v1.3.2/clipnote-v1.3.2.zip) — 218KB, contains `clipnote/` with `manifest.json`
-- **SHA256:** `ef1d92552a21fea4653b2529dd16ef1461ebb3f418e9ab78467b985b167013ca`
+- **Installer:** [`clipnote-v1.3.2.zip`](https://github.com/Kourosh242/clipnote/releases/download/v1.3.2/clipnote-v1.3.2.zip) — contains `clipnote/` with `manifest.json`
+- **SHA256:** `c4f2425140b883ee6c967d9e2434bf1af6297121afdf514b5ec3f53735dcef2b` (generated at build time, may vary slightly due to zip timestamps)
 - **Wiki:** https://kourosh242.github.io/clipnote/
 
 ### ⚠️ Back up first
