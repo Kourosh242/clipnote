@@ -695,6 +695,16 @@ html[data-lang="fa"] .cn-sidebar.collapsed .cn-sidebar-header {
   white-space: nowrap;
 }
 
+html[data-lang="fa"] .cn-version-status,
+html[data-lang="fa"] .cn-version-status-row {
+  direction: rtl;
+  text-align: right;
+}
+
+.cn-settings-card a {
+  font-weight: 700;
+}
+
 .cn-settings-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
