@@ -10,7 +10,7 @@ ClipNote یک افزونهٔ Manifest V3 برای Google Chrome است که یا
 
 ### شروع سریع
 
-1. [فایل ZIP نسخهٔ 1.3.1 را دانلود کنید](https://github.com/Kourosh242/clipnote/releases/download/v1.3.1/clipnote-v1.3.1.zip).
+1. [فایل ZIP نسخهٔ 1.3.1 را دانلود کنید](https://github.com/Kourosh242/clipnote/raw/main/release/clipnote-v1.3.1.zip).
 2. فایل را استخراج کنید.
 3. در `chrome://extensions/` گزینهٔ **Developer mode** را روشن کنید.
 4. روی **Load unpacked** کلیک کنید و پوشه‌ای را انتخاب کنید که `manifest.json` مستقیماً داخل آن است.
@@ -38,6 +38,6 @@ ClipNote یک افزونهٔ Manifest V3 برای Google Chrome است که یا
 
 The complete bilingual wiki is available at **[kourosh242.github.io/clipnote](https://kourosh242.github.io/clipnote/)**.
 
-ClipNote 1.3.1 is a local-first Manifest V3 Chrome extension. Download the [release ZIP](https://github.com/Kourosh242/clipnote/releases/download/v1.3.1/clipnote-v1.3.1.zip), extract it, enable **Developer mode** at `chrome://extensions/`, and choose **Load unpacked**.
+ClipNote 1.3.1 is a local-first Manifest V3 Chrome extension. Download the [release ZIP](https://github.com/Kourosh242/clipnote/raw/main/release/clipnote-v1.3.1.zip), extract it, enable **Developer mode** at `chrome://extensions/`, and choose **Load unpacked**.
 
 See [README.md](README.md) for the complete feature list and [CHANGELOG.md](CHANGELOG.md) for the release history.
