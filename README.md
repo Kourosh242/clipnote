@@ -7,7 +7,7 @@
 
 > 📚 **[ورود به ویکی آنلاین ClipNote](https://kourosh242.github.io/clipnote/)** — راهنمای کامل، نصب، حریم خصوصی و امکانات پروژه را در یک صفحه ببینید.
 >
-> 📦 **[دانلود ClipNote v1.3.1](https://github.com/Kourosh242/clipnote/releases/download/v1.3.1/clipnote-v1.3.1.zip)** · [مشاهدهٔ ریلیز](https://github.com/Kourosh242/clipnote/releases/tag/v1.3.1)
+> 📦 **[دانلود ClipNote v1.3.1](https://github.com/Kourosh242/clipnote/raw/main/release/clipnote-v1.3.1.zip)** · [مشاهدهٔ ریلیز](https://github.com/Kourosh242/clipnote/releases/tag/v1.3.1)
 
 ClipNote یک افزونهٔ Google Chrome بر پایهٔ Manifest V3 است که یادداشت‌ها و متن‌های ذخیره‌شده را سریع، امن و کاملاً محلی مدیریت می‌کند. داده‌های شخصی در `chrome.storage.local` دستگاه شما باقی می‌مانند.
 
@@ -49,7 +49,7 @@ ClipNote یک افزونهٔ Google Chrome بر پایهٔ Manifest V3 است ک
 
 ### روش سریع با فایل ریلیز
 
-1. فایل [`clipnote-v1.3.1.zip`](https://github.com/Kourosh242/clipnote/releases/download/v1.3.1/clipnote-v1.3.1.zip) را دانلود و استخراج کنید.
+1. فایل [`clipnote-v1.3.1.zip`](https://github.com/Kourosh242/clipnote/raw/main/release/clipnote-v1.3.1.zip) را دانلود و استخراج کنید.
 2. وارد `chrome://extensions/` شوید.
 3. گزینهٔ **Developer mode** را فعال کنید.
 4. روی **Load unpacked** کلیک کنید.
@@ -94,7 +94,7 @@ ClipNote یک افزونهٔ Google Chrome بر پایهٔ Manifest V3 است ک
 
 **Version 1.3.1** · built by [**Kourosh**](https://github.com/Kourosh242) and [**Mehdi**](https://github.com/MR-SHARIFI-Dev)
 
-📚 **[Open the ClipNote online wiki](https://kourosh242.github.io/clipnote/)** · 📦 **[Download ClipNote v1.3.1](https://github.com/Kourosh242/clipnote/releases/download/v1.3.1/clipnote-v1.3.1.zip)** · [View the release](https://github.com/Kourosh242/clipnote/releases/tag/v1.3.1)
+📚 **[Open the ClipNote online wiki](https://kourosh242.github.io/clipnote/)** · 📦 **[Download ClipNote v1.3.1](https://github.com/Kourosh242/clipnote/raw/main/release/clipnote-v1.3.1.zip)** · [View the release](https://github.com/Kourosh242/clipnote/releases/tag/v1.3.1)
 
 ClipNote is a Manifest V3 Google Chrome extension for capturing, organizing, searching, protecting, and managing notes locally.
 
