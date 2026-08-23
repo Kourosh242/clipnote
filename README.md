@@ -106,7 +106,7 @@ ClipNote is a Manifest V3 Google Chrome extension for capturing, organizing, sea
 - Kept background automatic update notifications, so users do not need to open Settings to trigger a check.
 - Linked the Kourosh and Mehdi names in Settings to their GitHub profiles.
 - Added a responsive bilingual GitHub Pages wiki with the bundled Vazirmatn font.
-- Added the ready-to-install `clipnote-v1.3.1.zip` release asset.
+- Added the ready-to-install `clipnote-v1.3.1.zip` release package.
 
 ### Install
 
