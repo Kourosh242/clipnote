@@ -46,7 +46,10 @@ ClipNote یک افزونهٔ Google Chrome بر پایهٔ Manifest V3 است ک
 
 - 📚 [ویکی آنلاین — راهنمای کامل و دو‌زبانه](https://kourosh242.github.io/clipnote/)
 - 📦 [آخرین ریلیزها و فایل‌های نصب](https://github.com/Kourosh242/clipnote/releases)
-- 📝 [راهنمای Markdown ویکی در مخزن](WIKI.md)
+- 📝 [ویکی Markdown در مخزن](WIKI.md) — راهنمای کامل فارسی + English quick ref
+- 📖 [راهنمای نصب فارسی کامل](INSTALL_FA.md) — مرحله به مرحله با عیب‌یابی
+- 📰 [یادداشت انتشار فارسی v1.3.2](RELEASE_NOTES_v1.3.2_FA.md)
+- 📰 [Release notes English v1.3.2](RELEASE_NOTES_v1.3.2_EN.md)
 - 📋 [تاریخچهٔ تغییرات](CHANGELOG.md)
 - 🐛 [گزارش مشکل یا پیشنهاد](https://github.com/Kourosh242/clipnote/issues)
 

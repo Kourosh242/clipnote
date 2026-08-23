@@ -59,6 +59,7 @@
       unlockFirst: 'Unlock note first', invalidSecret: 'Invalid password or PIN', unlocked: 'Note unlocked',
       addTitleOrContent: 'Please enter a title or content', untitled: 'Untitled Note', note: 'note', notes: 'notes', chars: 'chars',
       previewHidden: '🔒 Preview hidden until unlocked', savedFromWeb: 'Saved from webpage', general: 'General', deleteConfirm: 'Delete this note?',
+      discardChanges: 'Discard unsaved changes?',
       noSuggestions: 'No suggestions yet.', noTagsYet: 'No tags yet.', customTagAdded: 'Custom tag added', enterTagName: 'Enter new tag name'
     },
     fa: {
@@ -78,6 +79,7 @@
       unlockFirst: 'ابتدا یادداشت را باز کنید', invalidSecret: 'رمز یا پین نادرست است', unlocked: 'یادداشت باز شد',
       addTitleOrContent: 'لطفاً عنوان یا محتوا وارد کنید', untitled: 'یادداشت بدون عنوان', note: 'یادداشت', notes: 'یادداشت', chars: 'کاراکتر',
       previewHidden: '🔒 پیش‌نمایش تا زمان باز شدن مخفی است', savedFromWeb: 'ذخیره‌شده از وب', general: 'عمومی', deleteConfirm: 'این یادداشت حذف شود؟',
+      discardChanges: 'تغییرات ذخیره‌نشده را نادیده بگیرم؟',
       noSuggestions: 'فعلاً پیشنهادی وجود ندارد.', noTagsYet: 'هنوز برچسبی وجود ندارد.', customTagAdded: 'برچسب سفارشی اضافه شد', enterTagName: 'نام برچسب جدید را وارد کنید'
     }
   };
