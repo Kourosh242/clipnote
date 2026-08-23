@@ -1,5 +1,45 @@
 # CHANGELOG
 
+📚 ویکی آنلاین: [kourosh242.github.io/clipnote](https://kourosh242.github.io/clipnote/)
+
+## 1.3.1 - 2026-08-23
+
+### فارسی
+
+#### اضافه‌شده
+- نمایش کارت **وضعیت نسخه** در Settings با نسخهٔ فعلی `v1.3.1`.
+- نمایش متن **شما به‌روز هستید.** به‌صورت بولد برای نسخهٔ فعلی.
+- ویکی آنلاین دو‌زبانه و واکنش‌گرا با GitHub Pages و فونت محلی Vazirmatn.
+- لینک مستقیم نام‌های Kourosh و Mehdi به پروفایل GitHub آن‌ها در Settings.
+- فایل توزیع آمادهٔ نصب `clipnote-v1.3.1.zip` در ریلیز.
+
+#### تغییرکرده
+- نسخهٔ Manifest و پوشهٔ سورس از `1.3.0` به `1.3.1` ارتقا یافت.
+- کنترل‌ها و متن راهنمای بررسی دستی به‌روزرسانی از رابط کاربری حذف شدند؛ به‌روزرسانی خودکار پس‌زمینه و اعلان‌های Chrome حفظ شده‌اند.
+- مستندات فارسی و انگلیسی، راهنمای نصب و لینک ویکی با ریلیز جدید همگام شدند.
+
+#### رفع‌شده
+- Settings دیگر کاربر را به بررسی دستی دوره‌ای دعوت نمی‌کند و وضعیت نسخه را شفاف نشان می‌دهد.
+- نام سازندگان در بخش About قابل کلیک و به مقصد درست هدایت می‌شود.
+
+### English
+
+#### Added
+- A **Version Status** card in Settings showing the current `v1.3.1` release.
+- A bold **You are up to date.** message for the current release.
+- A responsive bilingual GitHub Pages wiki using the bundled Vazirmatn font.
+- Direct GitHub profile links for Kourosh and Mehdi in Settings.
+- The ready-to-install `clipnote-v1.3.1.zip` release asset.
+
+#### Changed
+- Bumped the Manifest version and source directory from `1.3.0` to `1.3.1`.
+- Removed manual update-check controls and guidance from the UI while keeping background automatic update notifications.
+- Synchronized the Persian and English documentation, installation guide, and wiki links with the new release.
+
+#### Fixed
+- Settings no longer asks users to perform periodic manual checks and now presents a clear version status.
+- Creator names in About are clickable and point to the correct GitHub profiles.
+
 ## 1.3.0 - 2026-08-21
 
 ### Added
@@ -24,8 +64,8 @@
 ## 1.2.9 - 2026-07-13
 
 ### Added
-- Added a settings section for checking updates.
-- Added a button that opens the GitHub project page for manual updating.
+- Added the original settings update-information section (removed from the current UI in 1.3.1).
+- Added a GitHub project link for obtaining releases manually.
 - Added update-available indicators in popup/settings/menu when a newer version is detected.
 - Added more manager-level features into popup where practical.
 - Added popup editing tools such as workspace, category, tags, quick tags, suggestions, color, pin/favorite, preview mode, and popup-side undo.

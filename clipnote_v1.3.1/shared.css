@@ -701,20 +701,6 @@ code, pre, .cn-code-block, .cn-inline-code {
   padding: 16px;
 }
 
-.cn-update-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin-inline-start: 8px;
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: var(--cn-warning);
-  color: #ffffff;
-  font-size: 0.72rem;
-  font-weight: 700;
-  line-height: 1.2;
-}
-
 /* ============== Shared Modal ============== */
 .cn-modal {
   position: fixed;

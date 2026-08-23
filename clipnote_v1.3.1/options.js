@@ -20,9 +20,6 @@
     saveWorkspaces,
     getCustomTags,
     saveCustomTags,
-    getUpdateInfo,
-    checkForUpdates,
-    GITHUB_REPO_URL,
     createWorkspace,
     createNote,
     filterNotes,
@@ -130,16 +127,10 @@
       language: 'Language',
       languageSelect: 'Interface Language',
       languageHelp: 'Texts and labels will switch to the selected language. Persian uses Vazirmatn and RTL layout.',
-      updates: 'Check for Updates',
-      updatesHelp: 'Open the GitHub page to download the newest version manually.',
-      updatesButton: 'Check for Updates',
-      updatesChecking: 'Checking latest version...',
-      updatesAvailable: 'New Version Available',
-      updatesCurrent: 'You already have the latest version.',
-      updatesUnknown: 'Unable to verify the latest version right now.',
-      updatesPrivacy: 'Only a public version check is sent to GitHub. No notes or private user data are uploaded.',
-      updatesTip: 'It is recommended to click for updates every 10 days to stay up to date. Thank you ❤️',
-      newBadge: 'New',
+      versionStatus: 'Version Status',
+      upToDate: 'You are up to date.',
+      createdBy: 'Created by ',
+      authorsAnd: ' & ',
       data: 'Data',
       dataHelp: 'All data stays local on your device. No cloud, no server.',
       about: 'About',
@@ -315,16 +306,10 @@
       language: 'زبان',
       languageSelect: 'زبان رابط کاربری',
       languageHelp: 'متن‌ها و برچسب‌ها به زبان انتخابی نمایش داده می‌شوند. برای فارسی فونت وزیرمتن و چیدمان راست‌چین فعال می‌شود.',
-      updates: 'بررسی بروزرسانی جدید',
-      updatesHelp: 'با کلیک روی این دکمه، صفحهٔ GitHub پروژه برای دریافت جدیدترین نسخه باز می‌شود.',
-      updatesButton: 'بررسی بروزرسانی جدید',
-      updatesChecking: 'در حال بررسی آخرین نسخه...',
-      updatesAvailable: 'نسخه جدید موجود است',
-      updatesCurrent: 'هم‌اکنون جدیدترین نسخه را دارید.',
-      updatesUnknown: 'فعلاً امکان بررسی نسخه جدید وجود ندارد.',
-      updatesPrivacy: 'فقط یک درخواست عمومی برای بررسی نسخه به GitHub ارسال می‌شود و هیچ یادداشت یا دادهٔ خصوصی کاربر ارسال نمی‌شود.',
-      updatesTip: 'توصیه می‌شود هر ۱۰ روز یک بار برای دریافت به‌روزرسانی‌های جدید، روی دکمه به‌روزرسانی کلیک کنید. با تشکر ❤️',
-      newBadge: 'جدید',
+      versionStatus: 'وضعیت نسخه',
+      upToDate: 'شما به‌روز هستید.',
+      createdBy: 'ساخته‌شده توسط ',
+      authorsAnd: ' و ',
       data: 'داده‌ها',
       dataHelp: 'همه داده‌ها فقط روی دستگاه شما ذخیره می‌شوند. بدون سرور و بدون فضای ابری.',
       about: 'درباره',
@@ -468,7 +453,6 @@
     btnNewNote: document.getElementById('btn-new-note'),
     btnNewNoteHeader: document.getElementById('btn-new-note-header'),
     btnSettingsNav: document.getElementById('btn-settings-nav'),
-    settingsUpdateBadge: document.getElementById('settings-update-badge'),
 
     viewList: document.getElementById('view-list'),
     viewEditor: document.getElementById('view-editor'),
@@ -533,15 +517,19 @@
     settingAutoSave: document.getElementById('setting-auto-save'),
     settingDefaultColor: document.getElementById('setting-default-color'),
     settingLanguage: document.getElementById('setting-language'),
-    btnCheckUpdates: document.getElementById('btn-check-updates'),
-    updatesStatus: document.getElementById('updates-status'),
-    updatesPrivacy: document.getElementById('updates-privacy'),
     btnExportJson: document.getElementById('btn-export-json'),
     btnExportTxt: document.getElementById('btn-export-txt'),
     btnImportJson: document.getElementById('btn-import-json'),
     btnClearData: document.getElementById('btn-clear-data'),
     settingsNoteCount: document.getElementById('settings-note-count'),
+    versionStatusLabel: document.getElementById('version-status-label'),
+    versionStatusText: document.getElementById('version-status-text'),
+    versionStatusValue: document.getElementById('version-status-value'),
     aboutVersion: document.getElementById('about-version'),
+    aboutCreatedPrefix: document.getElementById('about-created-prefix'),
+    aboutKouroshLink: document.getElementById('about-kourosh-link'),
+    aboutAuthorsAnd: document.getElementById('about-authors-and'),
+    aboutMehdiLink: document.getElementById('about-mehdi-link'),
 
     workspaceModal: document.getElementById('workspace-modal'),
     workspaceModalTitle: document.getElementById('workspace-modal-title'),
@@ -632,30 +620,6 @@
     return workspace.name;
   }
 
-  function getLocalizedUpdateStatus(info = null) {
-    if (!info) return t('updatesChecking');
-    if (info.hasUpdate) {
-      return `${t('updatesAvailable')}: v${info.latestVersion}`;
-    }
-    if (info.error) return t('updatesUnknown');
-    return t('updatesCurrent');
-  }
-
-  function renderUpdateStatus(info = null) {
-    if (els.updatesStatus) {
-      els.updatesStatus.textContent = getLocalizedUpdateStatus(info);
-    }
-    if (els.settingsUpdateBadge) {
-      els.settingsUpdateBadge.classList.toggle('cn-hidden', !(info && info.hasUpdate));
-    }
-  }
-
-  async function openUpdatesPage(forceCheck = true) {
-    const info = forceCheck ? await checkForUpdates(true) : ((await getUpdateInfo()) || null);
-    renderUpdateStatus(info);
-    chrome.tabs.create({ url: (info && info.url) ? info.url : GITHUB_REPO_URL });
-  }
-
   function themeLabel(key) {
     return {
       blue: t('themeBlue'),
@@ -693,9 +657,7 @@
     renderTagSuggestionsDataList();
     updateCounts();
     applyListModeUI();
-    renderUpdateStatus(await getUpdateInfo());
     setupEventListeners();
-    checkForUpdates(false).then(renderUpdateStatus).catch(() => renderUpdateStatus({ error: true }));
 
     document.addEventListener('visibilitychange', async () => {
       if (document.hidden && currentView === 'edit' && isDirty) {
@@ -789,15 +751,24 @@
     document.getElementById('language-title').textContent = t('language');
     document.getElementById('language-select-label').textContent = t('languageSelect');
     document.getElementById('language-help').textContent = t('languageHelp');
-    document.getElementById('updates-title').textContent = t('updates');
-    document.getElementById('updates-help').textContent = t('updatesHelp');
-    document.getElementById('updates-privacy').textContent = t('updatesPrivacy');
-    document.getElementById('updates-tip-text').textContent = t('updatesTip');
+    if (els.versionStatusLabel) els.versionStatusLabel.textContent = t('versionStatus');
+    if (els.versionStatusText) els.versionStatusText.innerHTML = `<strong>${t('upToDate')}</strong>`;
+    if (els.versionStatusValue) els.versionStatusValue.textContent = `v${chrome.runtime.getManifest().version || '1.3.1'}`;
     document.getElementById('data-title').textContent = t('data');
     document.getElementById('data-help').textContent = t('dataHelp');
     document.getElementById('about-title').textContent = t('about');
     if (els.aboutVersion) {
-      els.aboutVersion.textContent = 'v' + (chrome.runtime.getManifest().version || '1.3.0');
+      els.aboutVersion.textContent = 'v' + (chrome.runtime.getManifest().version || '1.3.1');
+    }
+    if (els.aboutCreatedPrefix) els.aboutCreatedPrefix.textContent = t('createdBy');
+    if (els.aboutAuthorsAnd) els.aboutAuthorsAnd.textContent = t('authorsAnd');
+    if (els.aboutKouroshLink) {
+      els.aboutKouroshLink.textContent = 'Kourosh';
+      els.aboutKouroshLink.href = 'https://github.com/Kourosh242';
+    }
+    if (els.aboutMehdiLink) {
+      els.aboutMehdiLink.textContent = 'Mehdi';
+      els.aboutMehdiLink.href = 'https://github.com/MR-SHARIFI-Dev';
     }
     document.getElementById('about-desc').textContent = t('aboutDesc');
     document.getElementById('total-notes-label').textContent = t('totalNotes');
@@ -833,8 +804,6 @@
     if (sortOptions[2]) sortOptions[2].textContent = t('titleAsc');
     if (sortOptions[3]) sortOptions[3].textContent = t('titleDesc');
     els.btnBackSettings.innerHTML = `← <span id="back-label">${t('back')}</span>`;
-    els.btnCheckUpdates.textContent = t('updatesButton');
-    if (els.settingsUpdateBadge) els.settingsUpdateBadge.textContent = t('newBadge');
     els.btnExportJson.textContent = t('exportJson');
     els.btnExportTxt.textContent = t('exportTxt');
     els.btnCancelWorkspace.textContent = t('cancel');
@@ -895,14 +864,13 @@
 
   async function handleStorageChanges(changes, areaName) {
     if (areaName !== 'local') return;
-    const keys = [STORAGE_KEYS.NOTES, STORAGE_KEYS.SETTINGS, STORAGE_KEYS.WORKSPACES, STORAGE_KEYS.CATEGORIES, STORAGE_KEYS.CUSTOM_TAGS, STORAGE_KEYS.UPDATE_INFO];
+    const keys = [STORAGE_KEYS.NOTES, STORAGE_KEYS.SETTINGS, STORAGE_KEYS.WORKSPACES, STORAGE_KEYS.CATEGORIES, STORAGE_KEYS.CUSTOM_TAGS];
     if (!Object.keys(changes).some(key => keys.includes(key))) return;
     if (currentView === 'edit' && isDirty) return;
 
     await refreshState();
     await applyTheme(settings);
     renderAllListState();
-    renderUpdateStatus(await getUpdateInfo());
 
     if (currentView === 'edit' && currentNoteId) {
       const note = findNote(currentNoteId);
@@ -1013,7 +981,6 @@
     els.settingAnimations.addEventListener('change', saveSettingsFromUI);
     els.settingAutoSave.addEventListener('change', saveSettingsFromUI);
     els.settingLanguage.addEventListener('change', saveSettingsFromUI);
-    els.btnCheckUpdates.addEventListener('click', () => openUpdatesPage(true));
     els.btnExportJson.addEventListener('click', exportToJson);
     els.btnExportTxt.addEventListener('click', exportToTxt);
     els.btnImportJson.addEventListener('change', handleImportFile);
