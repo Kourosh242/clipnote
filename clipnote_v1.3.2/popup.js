@@ -8,7 +8,7 @@
     DEFAULT_WORKSPACE_ID,
     NOTE_COLORS,
     getNotes,
-    saveNotes,
+    updateNotes,
     getSettings,
     saveSettings,
     getWorkspaces,
@@ -425,8 +425,8 @@
     els.notePin.addEventListener('change', onPopupEditorInput);
     els.noteFavorite.addEventListener('change', onPopupEditorInput);
 
-    els.btnCloseNote.addEventListener('click', closeNoteModal);
-    els.btnCloseNoteX.addEventListener('click', closeNoteModal);
+    els.btnCloseNote.addEventListener('click', () => closeNoteModal());
+    els.btnCloseNoteX.addEventListener('click', () => closeNoteModal());
     els.btnStartEdit.addEventListener('click', () => setPopupNoteMode('edit'));
     els.btnNoteUndo.addEventListener('click', undoPopupNoteChange);
     els.btnCopyNote.addEventListener('click', () => {
@@ -438,6 +438,13 @@
     els.btnModePreview.addEventListener('click', () => setPopupEditorMode('preview'));
     els.btnNoteAddTag.addEventListener('click', () => addCustomTagFromPrompt('editor'));
     els.btnNoteAcceptAll.addEventListener('click', applyAllEditorSuggestions);
+    els.noteModal.addEventListener('click', (e) => {
+      const button = e.target.closest('.cn-copy-code-btn');
+      if (button) copyToClipboard(button.dataset.code || '', button);
+    });
+
+
+    window.addEventListener('pagehide', persistPopupDraft);
 
     document.addEventListener('keydown', (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f' && isListVisible()) {
@@ -531,7 +538,7 @@
       });
       select.value = selected;
     };
-    fillSelect(els.captureCategory, '');
+    fillSelect(els.captureCategory, els.captureCategory.value || '');
     fillSelect(els.noteCategory, els.noteCategory.value || '');
   }
 
@@ -750,9 +757,8 @@
       isFavorite: els.captureFavorite.checked
     }, workspaces);
 
-    allNotes.unshift(note);
+    allNotes = await updateNotes(notes => [note, ...notes.filter(item => item.id !== note.id)]);
     await Promise.all([
-      saveNotes(allNotes),
       saveSettings({ ...settings, currentWorkspaceId: workspaceId }),
       mergeCustomTags(tags)
     ]);
@@ -881,45 +887,47 @@
 
     item.addEventListener('click', (e) => {
       if (e.target.closest('.cn-note-actions')) return;
-      if (noteLocked) return openUnlockModal(note, () => openNoteModal(note.id, 'view'));
+      if (isProtected(note) && !unlockedNotes.has(note.id)) return openUnlockModal(note, () => openNoteModal(note.id, 'view'));
       openNoteModal(note.id, 'view');
     });
 
     item.querySelector('[data-action="pin"]').addEventListener('click', async (e) => {
       e.stopPropagation();
+      if (isProtected(note) && !unlockedNotes.has(note.id)) return openUnlockModal(note, () => item.querySelector('[data-action="pin"]').click());
       note.isPinned = !note.isPinned;
       note.updatedAt = Date.now();
-      await saveNotes(allNotes);
+      allNotes = await updateNotes(notes => notes.map(item => item.id === note.id ? { ...item, isPinned: note.isPinned, updatedAt: note.updatedAt } : item));
       renderNotes();
       showToast(note.isPinned ? t('pinnedAdded') : t('pinnedRemoved'), 'success');
     });
 
     item.querySelector('[data-action="favorite"]').addEventListener('click', async (e) => {
       e.stopPropagation();
+      if (isProtected(note) && !unlockedNotes.has(note.id)) return openUnlockModal(note, () => item.querySelector('[data-action="favorite"]').click());
       note.isFavorite = !note.isFavorite;
       note.updatedAt = Date.now();
-      await saveNotes(allNotes);
+      allNotes = await updateNotes(notes => notes.map(item => item.id === note.id ? { ...item, isFavorite: note.isFavorite, updatedAt: note.updatedAt } : item));
       renderNotes();
       showToast(note.isFavorite ? t('favoriteAdded') : t('favoriteRemoved'), 'success');
     });
 
     item.querySelector('[data-action="copy"]').addEventListener('click', (e) => {
       e.stopPropagation();
-      if (noteLocked) return showToast(t('unlockFirst'), 'warning');
+      if (isProtected(note) && !unlockedNotes.has(note.id)) return openUnlockModal(note, () => copyToClipboard(note.content || note.title || '', e.currentTarget));
       copyToClipboard(note.content || note.title || '', e.currentTarget);
     });
 
     item.querySelector('[data-action="edit"]').addEventListener('click', (e) => {
       e.stopPropagation();
-      if (noteLocked) return openUnlockModal(note, () => openNoteModal(note.id, 'edit'));
+      if (isProtected(note) && !unlockedNotes.has(note.id)) return openUnlockModal(note, () => openNoteModal(note.id, 'edit'));
       openNoteModal(note.id, 'edit');
     });
 
     item.querySelector('[data-action="delete"]').addEventListener('click', async (e) => {
       e.stopPropagation();
+      if (isProtected(note) && !unlockedNotes.has(note.id)) return openUnlockModal(note, () => item.querySelector('[data-action="delete"]').click());
       if (!confirm(t('deleteConfirm'))) return;
-      allNotes = allNotes.filter(entry => entry.id !== note.id);
-      await saveNotes(allNotes);
+      allNotes = await updateNotes(notes => notes.filter(entry => entry.id !== note.id));
       renderNotes();
       showToast(t('deleted'), 'success');
     });
@@ -1076,7 +1084,7 @@
 
   function getEditorSuggestions() {
     const note = allNotes.find(entry => entry.id === currentViewingNoteId);
-    return suggestTags(`${els.noteEditTitle.value}\n${els.noteEditContent.value}`, parseTagsInput(els.noteTags.value), note?.ignoredSuggestedTags || popupEditorIgnoredSuggestions);
+    return suggestTags(`${els.noteEditTitle.value}\n${els.noteEditContent.value}`, parseTagsInput(els.noteTags.value), popupEditorIgnoredSuggestions);
   }
 
   function renderNoteSuggestions() {
@@ -1132,7 +1140,7 @@
 
   function openNoteModal(noteId, mode = 'view') {
     const note = allNotes.find(entry => entry.id === noteId);
-    if (!note) return;
+    if (!note) { if (!els.noteModal.classList.contains('cn-hidden')) closeNoteModal(true); return; }
     currentViewingNoteId = note.id;
     popupEditorIgnoredSuggestions = normalizeTags(note.ignoredSuggestedTags || []);
     const workspace = getNoteWorkspace(note, workspaces);
@@ -1166,7 +1174,22 @@
     els.noteModal.classList.remove('cn-hidden');
   }
 
-  function closeNoteModal() {
+  function isPopupEditorDirty() {
+    return popupNoteMode === 'edit' && popupEditorHistory.length > 0 &&
+      JSON.stringify(getPopupEditorState()) !== JSON.stringify(popupEditorHistory[0]);
+  }
+
+  function persistPopupDraft() {
+    if (!currentViewingNoteId || !isPopupEditorDirty()) return;
+    const existing = allNotes.find(note => note.id === currentViewingNoteId);
+    if (!existing) return;
+    const state = getPopupEditorState();
+    const saved = { ...existing, ...state, ignoredSuggestedTags: popupEditorIgnoredSuggestions, updatedAt: Date.now() };
+    void updateNotes(notes => [saved, ...notes.filter(note => note.id !== saved.id)]);
+  }
+
+  function closeNoteModal(force = false) {
+    if (!force && isPopupEditorDirty() && !confirm(t('discardChanges'))) return;
     currentViewingNoteId = null;
     popupEditorIgnoredSuggestions = [];
     popupEditorHistory = [];
@@ -1209,10 +1232,9 @@
     note.isPinned = next.isPinned;
     note.isFavorite = next.isFavorite;
     note.updatedAt = Date.now();
-    await Promise.all([
-      saveNotes(allNotes),
-      mergeCustomTags(next.tags)
-    ]);
+    const saved = { ...note, ignoredSuggestedTags: popupEditorIgnoredSuggestions };
+    allNotes = await updateNotes(notes => [saved, ...notes.filter(item => item.id !== saved.id)]);
+    await mergeCustomTags(next.tags);
     await refreshState();
     renderWorkspaceOptions();
     renderCategoryOptions();
@@ -1225,9 +1247,9 @@
   async function deleteCurrentPopupNote() {
     if (!currentViewingNoteId) return;
     if (!confirm(t('deleteConfirm'))) return;
-    allNotes = allNotes.filter(note => note.id !== currentViewingNoteId);
-    await saveNotes(allNotes);
-    closeNoteModal();
+    const deletedId = currentViewingNoteId;
+    allNotes = await updateNotes(notes => notes.filter(note => note.id !== deletedId));
+    closeNoteModal(true);
     renderNotes();
     showToast(t('deleted'), 'success');
   }
@@ -1237,5 +1259,8 @@
     window.close();
   }
 
-  init();
+  init().catch(error => {
+    console.error('ClipNote initialization failed:', error);
+    try { showToast(error?.message || 'ClipNote could not start.', 'error'); } catch (_) {}
+  });
 })();
