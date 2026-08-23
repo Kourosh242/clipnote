@@ -1,43 +1,64 @@
-# ClipNote Wiki
+# ClipNote Wiki / ویکی ClipNote
 
-> ویکی رسمی و تصویری پروژه در **[kourosh242.github.io/clipnote](https://kourosh242.github.io/clipnote/)** در دسترس است.
+> **راهنمای کامل و دو‌زبانه:** [kourosh242.github.io/clipnote](https://kourosh242.github.io/clipnote/)<br>
+> **دانلود رسمی:** [GitHub Releases](https://github.com/Kourosh242/clipnote/releases) · [فایل نصب v1.3.1](https://github.com/Kourosh242/clipnote/releases/download/v1.3.1/clipnote-v1.3.1.zip)
 
-این فایل نمای سریع و Markdown ویکی است. برای راهنمای کامل، نصب مرحله‌به‌مرحله، امکانات، حریم خصوصی و معرفی سازندگان، وارد وب‌سایت ویکی شوید.
+این صفحه، نسخهٔ Markdown راهنمای رسمی است. برای نسخهٔ خواناتر و کامل‌تر، از [ویکی آنلاین](https://kourosh242.github.io/clipnote/) استفاده کنید.
 
-## ClipNote 1.3.1
+## شروع سریع
 
-ClipNote یک افزونهٔ Manifest V3 برای Google Chrome است که یادداشت‌ها را کاملاً محلی مدیریت می‌کند.
+### ۱. پیش از به‌روزرسانی پشتیبان بگیرید
 
-### شروع سریع
+یادداشت‌ها در `chrome.storage.local` دستگاه شما هستند. قبل از نصب مجدد یا به‌روزرسانی:
 
-1. [فایل ZIP نسخهٔ 1.3.1 را دانلود کنید](https://github.com/Kourosh242/clipnote/raw/main/release/clipnote-v1.3.1.zip).
-2. فایل را استخراج کنید.
-3. در `chrome://extensions/` گزینهٔ **Developer mode** را روشن کنید.
-4. روی **Load unpacked** کلیک کنید و پوشه‌ای را انتخاب کنید که `manifest.json` مستقیماً داخل آن است.
+1. در افزونه به **Settings / تنظیمات** بروید.
+2. از بخش **Import / Export** گزینهٔ **Export JSON** را بزنید.
+3. فایل JSON را در جای امن نگه دارید. پس از نصب در صورت نیاز با **Import JSON** آن را بازگردانید؛ داده‌ها با اطلاعات فعلی ادغام می‌شوند.
 
-### امکانات
+### ۲. نصب نسخهٔ 1.3.1
+
+1. [`clipnote-v1.3.1.zip`](https://github.com/Kourosh242/clipnote/releases/download/v1.3.1/clipnote-v1.3.1.zip) را از ریلیز دانلود و استخراج کنید.
+2. `chrome://extensions/` را باز و **Developer mode** را فعال کنید.
+3. **Load unpacked** را بزنید.
+4. پوشهٔ استخراج‌شدهٔ `clipnote` را انتخاب کنید؛ `manifest.json` باید مستقیماً در آن باشد.
+5. هنگام به‌روزرسانی، بعد از جایگزینی پوشه روی **Reload** کلیک کنید.
+
+> فایل ZIP فقط در بخش Releases منتشر می‌شود و در شاخهٔ `main` قرار ندارد.
+
+## امکانات
 
 - ذخیرهٔ متن انتخاب‌شده از منوی راست‌کلیک
 - فضاهای کاری، دسته‌بندی‌ها، برچسب‌ها و پیشنهادهای هوشمند
 - قفل یادداشت با Password یا PIN چهاررقمی
 - Markdown Preview و Split View
 - تم تاریک، اندازهٔ فونت، ذخیرهٔ خودکار و رابط فارسی RTL با Vazirmatn
-- خروجی و ورود JSON/TXT
-- اعلان به‌روزرسانی خودکار در پس‌زمینه
+- خروجی و ورود JSON/TXT و اعلان به‌روزرسانی خودکار در پس‌زمینه
 
-### حریم خصوصی
+## حریم خصوصی
 
-یادداشت‌ها در `chrome.storage.local` باقی می‌مانند. فقط متادیتای عمومی ریلیز GitHub برای اعلان نسخهٔ جدید خوانده می‌شود و محتوای خصوصی یادداشت‌ها ارسال نمی‌شود.
+یادداشت‌ها در `chrome.storage.local` باقی می‌مانند و ارسال نمی‌شوند. افزونه فقط متادیتای عمومی ریلیز GitHub را برای اعلان نسخهٔ جدید می‌خواند.
 
-### سازندگان
+## پیوندهای مرتبط
 
-- [Kourosh](https://github.com/Kourosh242)
-- [Mehdi](https://github.com/MR-SHARIFI-Dev)
+- [README](README.md) — معرفی و دستورالعمل کوتاه
+- [CHANGELOG](CHANGELOG.md) — تاریخچهٔ نسخه‌ها
+- [Online Wiki](https://kourosh242.github.io/clipnote/) — راهنمای کامل
+- [Releases](https://github.com/Kourosh242/clipnote/releases) — فایل‌های نصب
+- [Issues](https://github.com/Kourosh242/clipnote/issues) — گزارش مشکل
+
+---
 
 ## English quick reference
 
-The complete bilingual wiki is available at **[kourosh242.github.io/clipnote](https://kourosh242.github.io/clipnote/)**.
+**Full bilingual guide:** [kourosh242.github.io/clipnote](https://kourosh242.github.io/clipnote/)<br>
+**Official download:** [GitHub Releases](https://github.com/Kourosh242/clipnote/releases) · [v1.3.1 installer](https://github.com/Kourosh242/clipnote/releases/download/v1.3.1/clipnote-v1.3.1.zip)
 
-ClipNote 1.3.1 is a local-first Manifest V3 Chrome extension. Download the [release ZIP](https://github.com/Kourosh242/clipnote/raw/main/release/clipnote-v1.3.1.zip), extract it, enable **Developer mode** at `chrome://extensions/`, and choose **Load unpacked**.
+### Back up first
 
-See [README.md](README.md) for the complete feature list and [CHANGELOG.md](CHANGELOG.md) for the release history.
+Notes are stored in `chrome.storage.local` on your device. Before reinstalling or updating, open **Settings → Import / Export**, choose **Export JSON**, and keep the backup somewhere safe. Restore it later with **Import JSON** if necessary; imports merge with existing data.
+
+### Install
+
+Download and extract the release ZIP, open `chrome://extensions/`, enable **Developer mode**, choose **Load unpacked**, and select the extracted `clipnote` folder containing `manifest.json`. When updating, back up first and click **Reload** after replacing the folder.
+
+The ZIP is available only as a GitHub Release asset, not on the `main` branch. See [README.md](README.md), [CHANGELOG.md](CHANGELOG.md), and the [online wiki](https://kourosh242.github.io/clipnote/) for more.
