@@ -16,6 +16,7 @@
 - بازگردانی وضعیت Sidebar و پاک‌سازی کامل همهٔ کلیدها در Clear All Data.
 - کاهش permissionهای غیرضروری و تعیین حداقل Chrome 111.
 - اصلاح دسترسی Responsive به Settings، Category و Tag بدون تغییر زبان بصری رابط.
+- افزودن ترجمهٔ فارسی `discardChanges` و رفع نمایش کلید خام در دیالوگ بستن یادداشت در Popup.
 
 #### تغییرکرده
 - نسخهٔ افزونه و پوشهٔ سورس به `1.3.2` ارتقا یافت.
@@ -33,6 +34,7 @@
 - Restored persisted sidebar state and made Clear All Data clear every ClipNote key.
 - Reduced unnecessary permissions and set Chrome 111 as the supported minimum.
 - Restored responsive access to Settings, Categories, and Tags without redesigning the visual theme.
+- Added missing Persian translation for `discardChanges` to prevent raw key display in popup close dialog.
 
 #### Changed
 - Bumped the extension and source directory to `1.3.2`.
