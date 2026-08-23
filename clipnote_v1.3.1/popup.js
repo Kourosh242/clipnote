@@ -16,9 +16,6 @@
     getCustomTags,
     saveCustomTags,
     getLastQuickSave,
-    getUpdateInfo,
-    checkForUpdates,
-    GITHUB_REPO_URL,
     createNote,
     sortNotes,
     filterNotes,
@@ -49,9 +46,6 @@
       new: 'New', openManager: 'Open Manager', search: 'Search notes... (Ctrl+F)',
       allNotes: 'All Notes', settings: 'Settings', noNotes: 'No notes found', noNotesSub: 'Create your first note to get started',
       quickSave: 'Quick Save', savedTo: 'saved to', overview: 'Overview', timeline: 'Timeline',
-      updates: 'Check for Updates', updateNow: 'Update', newVersion: 'New Version Available', updatesChecking: 'Checking latest version...',
-      updatesCurrent: 'You already have the latest version.', updatesUnknown: 'Unable to verify the latest version right now.',
-      updatesPrivacy: 'Only a public version check is sent to GitHub. No notes or private user data are uploaded.', newBadge: 'New',
       all: 'All', pinned: 'Pinned', favorites: 'Favorites', quickNote: 'Quick Note',
       titlePlaceholder: 'Title / Topic', contentPlaceholder: 'Write your note here...', tagsPlaceholder: 'python, api, md',
       workspace: 'Workspace', category: 'Category', noCategory: 'No Category', tags: 'Tags', addTag: '+ Tag',
@@ -71,9 +65,6 @@
       new: 'جدید', openManager: 'باز کردن مدیریت', search: 'جستجوی یادداشت‌ها... (Ctrl+F)',
       allNotes: 'همه یادداشت‌ها', settings: 'تنظیمات', noNotes: 'یادداشتی پیدا نشد', noNotesSub: 'اولین یادداشت خود را بسازید',
       quickSave: 'ذخیره سریع', savedTo: 'در این فضا ذخیره شد:', overview: 'نمای کلی', timeline: 'نمای زمانی',
-      updates: 'بررسی بروزرسانی جدید', updateNow: 'بروزرسانی', newVersion: 'نسخه جدید موجود است', updatesChecking: 'در حال بررسی آخرین نسخه...',
-      updatesCurrent: 'هم‌اکنون جدیدترین نسخه را دارید.', updatesUnknown: 'فعلاً امکان بررسی نسخه جدید وجود ندارد.',
-      updatesPrivacy: 'فقط یک درخواست عمومی برای بررسی نسخه به GitHub ارسال می‌شود و هیچ یادداشت یا دادهٔ خصوصی کاربر ارسال نمی‌شود.', newBadge: 'جدید',
       all: 'همه', pinned: 'پین‌شده', favorites: 'علاقه‌مندی‌ها', quickNote: 'یادداشت سریع',
       titlePlaceholder: 'عنوان / موضوع', contentPlaceholder: 'یادداشت خود را اینجا بنویسید...', tagsPlaceholder: 'python, api, md',
       workspace: 'فضای کاری', category: 'دسته‌بندی', noCategory: 'بدون دسته‌بندی', tags: 'برچسب‌ها', addTag: '+ برچسب',
@@ -134,18 +125,11 @@
     openManagerBtn: document.getElementById('btn-open-manager'),
     newNoteBtn: document.getElementById('btn-new-note'),
     newNoteLabel: document.getElementById('label-new-note'),
-    popupUpdateBadge: document.getElementById('popup-update-badge'),
 
     quickSaveBanner: document.getElementById('quick-save-banner'),
     quickSaveBannerTitle: document.getElementById('quick-save-banner-title'),
     quickSaveBannerText: document.getElementById('quick-save-banner-text'),
     btnDismissQuickSave: document.getElementById('btn-dismiss-quick-save'),
-    updateBanner: document.getElementById('popup-update-banner'),
-    updateBannerTitle: document.getElementById('popup-update-banner-title'),
-    updateBannerText: document.getElementById('popup-update-banner-text'),
-    btnPopupCheckUpdates: document.getElementById('btn-popup-check-updates'),
-    btnDismissUpdateBanner: document.getElementById('btn-dismiss-update-banner'),
-
     quickCaptureTitle: document.getElementById('quick-capture-title'),
     captureTitle: document.getElementById('capture-title'),
     captureContent: document.getElementById('capture-content'),
@@ -217,7 +201,6 @@
     btnCopyNote: document.getElementById('btn-popup-copy-note'),
     btnDeleteNote: document.getElementById('btn-popup-delete-note'),
     btnSaveNote: document.getElementById('btn-popup-save-note'),
-    btnFooterUpdates: document.getElementById('btn-popup-footer-updates')
   };
 
   function locale() {
@@ -265,30 +248,6 @@
     return labels[key] || (isFa() ? 'قدیمی‌تر' : 'Older');
   }
 
-  function getLocalizedUpdateStatus(info = null) {
-    if (!info) return t('updatesChecking');
-    if (info.hasUpdate) return `${t('newVersion')}: v${info.latestVersion}`;
-    if (info.error) return t('updatesUnknown');
-    return t('updatesCurrent');
-  }
-
-  function renderUpdateUI(info = null) {
-    const hasUpdate = !!(info && info.hasUpdate);
-    if (els.popupUpdateBadge) {
-      els.popupUpdateBadge.textContent = t('newBadge');
-      els.popupUpdateBadge.classList.toggle('cn-hidden', !hasUpdate);
-    }
-    if (els.updateBannerTitle) els.updateBannerTitle.textContent = t('newVersion');
-    if (els.updateBannerText) els.updateBannerText.textContent = getLocalizedUpdateStatus(info);
-    if (els.updateBanner) els.updateBanner.classList.toggle('cn-hidden', !hasUpdate);
-  }
-
-  async function openUpdatesPage(forceCheck = true) {
-    const info = forceCheck ? await checkForUpdates(true) : ((await getUpdateInfo()) || null);
-    renderUpdateUI(info);
-    chrome.tabs.create({ url: (info && info.url) ? info.url : GITHUB_REPO_URL });
-  }
-
   function applyLocale() {
     document.documentElement.lang = locale();
     document.documentElement.dir = isFa() ? 'rtl' : 'ltr';
@@ -303,12 +262,9 @@
     els.btnFilterPinned.textContent = t('pinned');
     els.btnFilterFavorites.textContent = t('favorites');
     els.settingsBtn.textContent = t('settings');
-    els.btnFooterUpdates.textContent = t('updates');
     els.emptyTitle.textContent = t('noNotes');
     els.emptySubtitle.textContent = t('noNotesSub');
     els.quickSaveBannerTitle.textContent = t('quickSave');
-    els.updateBannerTitle.textContent = t('newVersion');
-    els.btnPopupCheckUpdates.textContent = t('updateNow');
 
     els.quickCaptureTitle.textContent = t('quickNote');
     els.captureTitle.placeholder = t('titlePlaceholder');
@@ -370,12 +326,10 @@
     renderCaptureQuickTags();
     renderCaptureSuggestions();
     renderQuickSaveBanner();
-    renderUpdateUI(await getUpdateInfo());
     renderViewButtons();
     renderFilterButtons();
     renderNotes();
     setupEventListeners();
-    checkForUpdates(false).then(renderUpdateUI).catch(() => renderUpdateUI({ error: true }));
     chrome.storage.onChanged.addListener(handleStorageChanges);
   }
 
@@ -436,13 +390,8 @@
       chrome.tabs.create({ url: chrome.runtime.getURL('options.html?view=settings') });
       window.close();
     });
-    els.btnFooterUpdates.addEventListener('click', () => openUpdatesPage(true));
-    els.btnPopupCheckUpdates.addEventListener('click', () => openUpdatesPage(true));
     els.btnDismissQuickSave.addEventListener('click', () => {
       els.quickSaveBanner.classList.add('cn-hidden');
-    });
-    els.btnDismissUpdateBanner.addEventListener('click', () => {
-      els.updateBanner.classList.add('cn-hidden');
     });
 
     els.btnToggleUnlockSecret.addEventListener('click', () => {
@@ -526,7 +475,7 @@
 
   async function handleStorageChanges(changes, areaName) {
     if (areaName !== 'local') return;
-    const relevantKeys = [STORAGE_KEYS.NOTES, STORAGE_KEYS.SETTINGS, STORAGE_KEYS.WORKSPACES, STORAGE_KEYS.CATEGORIES, STORAGE_KEYS.CUSTOM_TAGS, STORAGE_KEYS.LAST_QUICK_SAVE, STORAGE_KEYS.UPDATE_INFO];
+    const relevantKeys = [STORAGE_KEYS.NOTES, STORAGE_KEYS.SETTINGS, STORAGE_KEYS.WORKSPACES, STORAGE_KEYS.CATEGORIES, STORAGE_KEYS.CUSTOM_TAGS, STORAGE_KEYS.LAST_QUICK_SAVE];
     if (!Object.keys(changes).some(key => relevantKeys.includes(key))) return;
 
     await refreshState();
@@ -539,7 +488,6 @@
     renderViewButtons();
     renderFilterButtons();
     renderQuickSaveBanner();
-    renderUpdateUI(await getUpdateInfo());
     renderCaptureQuickTags();
     renderCaptureSuggestions();
     renderNotes();

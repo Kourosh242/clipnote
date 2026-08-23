@@ -1,79 +1,121 @@
-# ClipNote - دفترچه یادداشت کلیپ‌بورد
+# ClipNote — دفترچه یادداشت کلیپ‌بورد
 
-**نسخهٔ ۱.۳.۰** | ساخته‌شده توسط **Kourosh & Mehdi**
+[![نسخه](https://img.shields.io/github/v/release/Kourosh242/clipnote?display_name=tag&sort=semver)](https://github.com/Kourosh242/clipnote/releases/latest)
+[![License](https://img.shields.io/github/license/Kourosh242/clipnote)](https://github.com/Kourosh242/clipnote)
 
-ClipNote یک افزونهٔ Google Chrome بر پایهٔ Manifest V3 است که همه‌چیز را به‌صورت **۱۰۰٪ محلی** روی دستگاه شما نگه می‌دارد. این افزونه برای ذخیره، جستجو، دسته‌بندی، قفل‌گذاری و مدیریت حرفه‌ای یادداشت‌ها و متن‌های ذخیره‌شده طراحی شده است.
+**نسخهٔ ۱.۳.۱** | ساخته‌شده توسط [**Kourosh**](https://github.com/Kourosh242) و [**Mehdi**](https://github.com/MR-SHARIFI-Dev)
 
-## ویژگی‌های کلیدی
+> 📚 **[ورود به ویکی آنلاین ClipNote](https://kourosh242.github.io/clipnote/)** — راهنمای کامل، نصب، حریم خصوصی و امکانات پروژه را در یک صفحه ببینید.
+>
+> 📦 **[دانلود ClipNote v1.3.1](https://github.com/Kourosh242/clipnote/releases/download/v1.3.1/clipnote-v1.3.1.zip)** · [مشاهدهٔ ریلیز](https://github.com/Kourosh242/clipnote/releases/tag/v1.3.1)
+
+ClipNote یک افزونهٔ Google Chrome بر پایهٔ Manifest V3 است که یادداشت‌ها و متن‌های ذخیره‌شده را سریع، امن و کاملاً محلی مدیریت می‌کند. داده‌های شخصی در `chrome.storage.local` دستگاه شما باقی می‌مانند.
+
+## امکانات اصلی
 
 - ✅ ذخیره و مدیریت یادداشت‌ها به‌صورت کاملاً محلی
-- 🌐 ذخیرهٔ سریع متن انتخاب‌شده از منوی راست‌کلیک با گزینهٔ **Save to ClipNote**
-- 🔒 قفل‌گذاری هر یادداشت با **Password** یا **4-digit PIN**
-- 👁 نمایش/عدم‌نمایش رمز هنگام وارد کردن یا باز کردن یادداشت
-- 🗂️ Workspace / Collections برای تفکیک یادداشت‌های پروژه‌های مختلف
-- 🏷️ برچسب‌های پیش‌فرض + برچسب‌های سفارشی نامحدود
-- 🤖 Smart Tag Suggestions در بخش مدیریت کامل
-- 🕒 Timeline View در نمای کامل مدیریت
-- 🇮🇷 پشتیبانی از **فارسی + RTL + فونت Vazirmatn**
-- 🇺🇸 رابط انگلیسی با چیدمان و فونت مناسب
-- ⚙️ بخش Language در Settings برای جابه‌جایی بین English و فارسی
-- 📥 Import/Export به فرمت JSON و TXT
-- 🧾 Markdown Preview با Split View
-- 🎨 Popup سبک، ساده، پایدار و هماهنگ با تم فعال
+- 🌐 ذخیرهٔ سریع متن انتخاب‌شده با گزینهٔ **Save to ClipNote** در منوی راست‌کلیک
+- 🔒 قفل‌گذاری هر یادداشت با **Password** یا **PIN چهاررقمی**
+- 👁 نمایش یا مخفی‌کردن رمز هنگام قفل‌گذاری و بازکردن یادداشت
+- 🗂️ فضاهای کاری برای جداسازی پروژه‌ها و مجموعه‌ها
+- 🏷️ برچسب‌های پیش‌فرض، سفارشی و پیشنهادهای هوشمند
+- 🕒 نمای کلی و Timeline برای مرور سریع یادداشت‌ها
+- 🇮🇷 پشتیبانی کامل از **فارسی، RTL و فونت Vazirmatn** به‌صورت آفلاین
+- 🇺🇸 رابط انگلیسی با چیدمان مناسب
+- ⚙️ تنظیمات حرفه‌ای برای تم، اندازهٔ فونت، ذخیرهٔ خودکار و زبان
+- 📥 ورود و خروجی گرفتن از داده‌ها با فرمت JSON و TXT
+- 🧾 پیش‌نمایش Markdown با حالت Split View
+- 🎨 Popup سبک و سریع با ابزارهای مدیریت یادداشت
 
-## تغییرات مهم نسخه ۱.۳.۰
+## تغییرات نسخهٔ ۱.۳.۱
 
-- 🔄 **بررسی خودکار و دوره‌ای بروزرسانی** با `chrome.alarms` — دیگر لازم نیست کاربر افزونه را باز کند تا نسخهٔ جدید را متوجه شود
-- 🔔 **نوتیفیکیشن خودکار** هنگام انتشار نسخهٔ جدید در GitHub Releases (یک بار برای هر نسخه)
-- 🛠️ **مقایسهٔ نسخهٔ مقاوم‌تر** — تگ‌های غیر عددی مثل `new_ver1` دیگر باعث تشخیص اشتباه «نسخه جدید» نمی‌شوند و فقط تگ‌های نسخه‌ای معتبر (مثل `v1.3.0`) خوانده می‌شوند
-- 🏷️ تگ ریلیزهای آینده باید به‌صورت `vX.Y.Z` باشند تا سیستم بروزرسانی درست کار کند
+- 🔢 نسخهٔ افزونه و فایل توزیع به **1.3.1** ارتقا پیدا کرد.
+- ✅ بخش بررسی دستی نسخه از رابط کاربری حذف شد؛ به‌جای آن در Settings یک کارت **وضعیت نسخه / Version Status** نمایش داده می‌شود.
+- **متن «شما به‌روز هستید / You are up to date» در وضعیت نسخه به‌صورت بولد نمایش داده می‌شود.**
+- 🔄 به‌روزرسانی خودکار پس‌زمینه و اعلان انتشار نسخهٔ جدید حفظ شده است؛ دیگر نیازی به بازکردن صفحهٔ تنظیمات برای بررسی نیست.
+- 👤 نام‌های Kourosh و Mehdi در Settings به پروفایل GitHub آن‌ها لینک شده‌اند.
+- 📚 یک ویکی دو‌زبانه و واکنش‌گرا با GitHub Pages و فونت محلی Vazirmatn اضافه شد.
+- 📦 فایل ZIP آمادهٔ نصب در ریلیز v1.3.1 قرار گرفته است.
 
-## تغییرات مهم نسخه ۱.۲.۹
+## سیستم به‌روزرسانی خودکار
 
-- بهبود پشتیبانی از زبان فارسی در صفحهٔ اصلی Manager و Popup
-- ترجمهٔ درست‌تر برچسب‌های زمانی مثل **Today / Yesterday / This Week / This Month / Older** در زبان فارسی
-- محلی‌سازی بهتر بعضی گزینه‌های رابط مثل **Last Updated** و گزینه‌های مرتب‌سازی
-- اضافه شدن بخش **بررسی بروزرسانی جدید / Check for Updates** در Settings
-- اضافه شدن نمایش **نسخه جدید موجود است / New Version Available** در Popup و بخش تنظیمات در صورت وجود نسخه جدید
-- اضافه شدن متن راهنمای بروزرسانی در بالای تنظیمات
-- با کلیک روی دکمهٔ بروزرسانی، صفحهٔ GitHub پروژه باز می‌شود:
-  - `https://github.com/Kourosh242/clipnote`
-- امکانات مهم ساخته‌شده تا حد ممکن به Popup هم اضافه شدند تا تجربهٔ کاربر کامل‌تر شود
-- اضافه شدن بازیابی رمز با سوال و جواب برای یادداشت‌های قفل‌شده
-- رمز عبور در حالت Password می‌تواند کوتاه‌تر از ۴ کاراکتر هم باشد و خطای قبلی حذف شده است
-- اصلاح بومی‌سازی پنجره باز کردن یادداشت تا دکمه‌های «لغو» و «باز کردن» در زبان فارسی کاملاً فارسی نمایش داده شوند
-- اگر کاربر وارد حالت بازیابی رمز شده باشد و جواب سوال را وارد کند، با زدن دکمه «باز کردن» هم یادداشت باز می‌شود
-- حفظ کامل نام Workspace ها، دسته‌ها و هر چیزی که خود کاربر نوشته است
-- بررسی نسخه فقط با یک درخواست عمومی به GitHub انجام می‌شود و هیچ یادداشت یا دادهٔ خصوصی کاربر ارسال نمی‌شود
+از نسخهٔ ۱.۳.۰ به بعد، Service Worker افزونه به‌صورت دوره‌ای اطلاعات عمومی آخرین ریلیز GitHub را دریافت می‌کند. اگر نسخهٔ جدیدی منتشر شده باشد، Chrome یک اعلان نمایش می‌دهد و با کلیک روی آن صفحهٔ همان ریلیز باز می‌شود.
 
-## بروزرسانی خودکار (Auto-Update Check)
+- این فرایند در پس‌زمینه انجام می‌شود و دکمهٔ بررسی دستی در رابط کاربری وجود ندارد.
+- فقط اطلاعات عمومی نسخه از GitHub خوانده می‌شود؛ هیچ یادداشت یا دادهٔ خصوصی ارسال نمی‌شود.
+- محدودیت Chrome Web Store باعث می‌شود نصب نهایی نسخهٔ جدید با دانلود ریلیز و Reload کردن افزونه انجام شود.
 
-ClipNote از نسخهٔ ۱.۳.۰ به بعد، به‌صورت **خودکار و دوره‌ای** (هر ۶ ساعت یک‌بار) آخرین ریلیز مخزن GitHub را چک می‌کند. اگر نسخهٔ جدیدتری موجود باشد:
+## نصب ClipNote v1.3.1 در Chrome
 
-1. یک **نوتیفیکیشن** در Chrome نمایش داده می‌شود («نسخهٔ جدید موجود است»).
-2. با کلیک روی نوتیفیکیشن، صفحهٔ ریلیز در GitHub باز می‌شود تا کاربر نسخهٔ جدید را دانلود کند.
-3. همین وضعیت در **Popup** (Badge «جدید» + بنر) و **Settings** (بخش Check for Updates) هم نمایش داده می‌شود.
+### روش سریع با فایل ریلیز
 
-این بررسی فقط **یک درخواست عمومی** به `api.github.com` ارسال می‌کند و هیچ یادداشت یا دادهٔ خصوصی کاربر ارسال نمی‌شود.
-
-
-> توجه: این مکانیزم فقط **اطلاع‌رسانی و پیشنهاد دانلود** است، نه نصب خودکار. برای آپدیت بی‌صدا و خودکارِ واقعی باید افزونه در **Chrome Web Store** منتشر شود.
-
-## نصب در Chrome
-
-1. فایل `clipnote.zip` را استخراج کنید.
+1. فایل [`clipnote-v1.3.1.zip`](https://github.com/Kourosh242/clipnote/releases/download/v1.3.1/clipnote-v1.3.1.zip) را دانلود و استخراج کنید.
 2. وارد `chrome://extensions/` شوید.
-3. **Developer mode** را فعال کنید.
+3. گزینهٔ **Developer mode** را فعال کنید.
 4. روی **Load unpacked** کلیک کنید.
-5. پوشهٔ `clipnote` را انتخاب کنید.
-6. بعد از هر آپدیت روی **Reload** افزونه بزنید تا نسخهٔ جدید Popup و فایل‌ها بارگذاری شوند.
+5. پوشهٔ استخراج‌شدهٔ `clipnote` را انتخاب کنید؛ فایل `manifest.json` باید مستقیماً داخل همین پوشه باشد.
+6. برای نصب نسخهٔ جدید روی افزونه، پس از جایگزینی پوشه روی **Reload** کلیک کنید.
+
+### نصب از سورس
+
+پوشهٔ `clipnote_v1.3.1` در همین مخزن، سورس کامل افزونه است. آن را در Chrome با همان مراحل بالا به‌عنوان **Load unpacked** انتخاب کنید.
+
+## ویکی آنلاین
+
+ویکی رسمی پروژه در GitHub Pages منتشر می‌شود و شامل این بخش‌هاست:
+
+- معرفی امکانات و گردش کار ClipNote
+- راهنمای نصب و شروع سریع
+- توضیح قفل‌گذاری، Markdown و ورود/خروجی داده‌ها
+- مدل به‌روزرسانی خودکار و نکات رفع اشکال
+- حریم خصوصی و امنیت
+- لینک ریلیزها و پروفایل سازندگان
+
+🔗 **[kourosh242.github.io/clipnote](https://kourosh242.github.io/clipnote/)**
 
 ## امنیت و حریم خصوصی
 
-- تمام داده‌ها فقط با `chrome.storage.local` ذخیره می‌شوند.
-- هیچ سرور، API خارجی، آنالیتیکس یا ردیابی وجود ندارد.
-- رمزها و PINها به‌صورت plain text ذخیره نمی‌شوند.
-- قفل یادداشت‌ها با Web Crypto hash می‌شود.
-- 
+- یادداشت‌ها، تنظیمات، دسته‌بندی‌ها و فضاهای کاری فقط با `chrome.storage.local` نگهداری می‌شوند.
+- محتوای یادداشت‌ها به سرور ClipNote یا سرویس تحلیل‌گر ارسال نمی‌شود.
+- رمزها و PINها به‌صورت متن ساده ذخیره نمی‌شوند و با Web Crypto و PBKDF2 هش می‌شوند.
+- تنها ارتباط شبکه‌ای افزونه برای اطلاع از ریلیز عمومی، به API عمومی GitHub است.
+- فونت Vazirmatn و آیکن‌ها داخل افزونه بسته‌بندی شده‌اند تا رابط فارسی به اینترنت وابسته نباشد.
 
-Made with ❤️ by Kourosh & Mehdi.
+## مشارکت و ارتباط
+
+- [پروفایل Kourosh](https://github.com/Kourosh242)
+- [پروفایل Mehdi](https://github.com/MR-SHARIFI-Dev)
+- [گزارش مشکل یا پیشنهاد در GitHub Issues](https://github.com/Kourosh242/clipnote/issues)
+- [تاریخچهٔ تغییرات کامل](CHANGELOG.md)
+
+---
+
+## English
+
+**Version 1.3.1** · built by [**Kourosh**](https://github.com/Kourosh242) and [**Mehdi**](https://github.com/MR-SHARIFI-Dev)
+
+📚 **[Open the ClipNote online wiki](https://kourosh242.github.io/clipnote/)** · 📦 **[Download ClipNote v1.3.1](https://github.com/Kourosh242/clipnote/releases/download/v1.3.1/clipnote-v1.3.1.zip)** · [View the release](https://github.com/Kourosh242/clipnote/releases/tag/v1.3.1)
+
+ClipNote is a Manifest V3 Google Chrome extension for capturing, organizing, searching, protecting, and managing notes locally.
+
+### What changed in 1.3.1
+
+- Bumped the extension and distribution package to **1.3.1**.
+- Removed the manual version-check section and button from the extension UI.
+- Replaced it with a **Version Status** card; **“You are up to date.” is rendered in bold** for the current release.
+- Kept background automatic update notifications, so users do not need to open Settings to trigger a check.
+- Linked the Kourosh and Mehdi names in Settings to their GitHub profiles.
+- Added a responsive bilingual GitHub Pages wiki with the bundled Vazirmatn font.
+- Added the ready-to-install `clipnote-v1.3.1.zip` release asset.
+
+### Install
+
+Download the ZIP from [Release v1.3.1](https://github.com/Kourosh242/clipnote/releases/tag/v1.3.1), extract it, open `chrome://extensions/`, enable **Developer mode**, choose **Load unpacked**, and select the extracted `clipnote` directory.
+
+The complete source lives in `clipnote_v1.3.1/`.
+
+### Privacy
+
+All note data remains in `chrome.storage.local`. The extension does not upload private notes. The background updater only reads public GitHub release metadata; passwords and PINs are hashed locally with Web Crypto PBKDF2.
+
+Made with ❤️ by [Kourosh](https://github.com/Kourosh242) and [Mehdi](https://github.com/MR-SHARIFI-Dev).

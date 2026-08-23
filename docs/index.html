@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#08111f">
+  <meta name="description" content="ClipNote — دفترچه یادداشت محلی و حرفه‌ای برای Google Chrome.">
+  <title>ClipNote | راهنمای رسمی</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="page-shell">
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="ClipNote">
+        <img src="assets/clipnote-icon.png" alt="" width="42" height="42">
+        <span class="brand-copy">
+          <strong>ClipNote</strong>
+          <small>Local notes, beautifully organized</small>
+        </span>
+        <span class="version-pill">v1.3.1</span>
+      </a>
+      <nav class="site-nav" aria-label="راهنمای صفحه">
+        <a href="#features" data-fa="امکانات" data-en="Features">امکانات</a>
+        <a href="#quick-start" data-fa="شروع سریع" data-en="Quick start">شروع سریع</a>
+        <a href="#privacy" data-fa="حریم خصوصی" data-en="Privacy">حریم خصوصی</a>
+        <a href="#team" data-fa="سازندگان" data-en="Team">سازندگان</a>
+      </nav>
+      <button id="language-toggle" class="language-toggle" type="button" aria-label="Switch language">EN</button>
+    </header>
+
+    <main id="top">
+      <section class="hero section-grid">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="eyebrow-dot"></span><span data-fa="راهنمای رسمی نسخه ۱.۳.۱" data-en="Official guide for version 1.3.1">راهنمای رسمی نسخه ۱.۳.۱</span></div>
+          <h1><span data-fa="یادداشت‌هایت را" data-en="Keep your notes">یادداشت‌هایت را</span><em data-fa="ساده و امن" data-en="simple and secure">ساده و امن</em><span data-fa="نگه دار." data-en="and beautifully organized.">نگه دار.</span></h1>
+          <p class="hero-lede" data-fa="ClipNote یک دفترچه یادداشت حرفه‌ای برای Chrome است؛ متن‌های مهمت را از وب ذخیره کن، با برچسب و فضای کاری مرتب کن و همه‌چیز را محلی و خصوصی نگه دار."
+             data-en="ClipNote is a professional notebook for Chrome. Capture important text from the web, organize it with workspaces and tags, and keep everything local and private.">ClipNote یک دفترچه یادداشت حرفه‌ای برای Chrome است؛ متن‌های مهمت را از وب ذخیره کن، با برچسب و فضای کاری مرتب کن و همه‌چیز را محلی و خصوصی نگه دار.</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="https://github.com/Kourosh242/clipnote/releases/download/v1.3.1/clipnote-v1.3.1.zip">
+              <span>↓</span><span data-fa="دانلود نسخه ۱.۳.۱" data-en="Download v1.3.1">دانلود نسخه ۱.۳.۱</span>
+            </a>
+            <a class="button button-secondary" href="https://github.com/Kourosh242/clipnote" target="_blank" rel="noopener">
+              <span>↗</span><span data-fa="مشاهده سورس در GitHub" data-en="View source on GitHub">مشاهده سورس در GitHub</span>
+            </a>
+          </div>
+          <div class="hero-note">
+            <span class="status-dot"></span>
+            <span data-fa="نسخه فعلی: 1.3.1 · Manifest V3 · ۱۰۰٪ محلی" data-en="Current release: 1.3.1 · Manifest V3 · 100% local">نسخه فعلی: 1.3.1 · Manifest V3 · ۱۰۰٪ محلی</span>
+          </div>
+        </div>
+        <div class="hero-visual" aria-label="پیش‌نمایش رابط ClipNote">
+          <div class="glow glow-one"></div>
+          <div class="glow glow-two"></div>
+          <div class="app-window">
+            <div class="window-topbar"><span></span><span></span><span></span><b>ClipNote</b><small>v1.3.1</small></div>
+            <div class="window-body">
+              <aside class="mini-sidebar">
+                <div class="mini-logo"><img src="assets/clipnote-icon.png" alt=""><span>ClipNote</span></div>
+                <div class="mini-search">⌕ &nbsp; <span data-fa="جستجو" data-en="Search">جستجو</span></div>
+                <div class="mini-nav active">▦ &nbsp; <span data-fa="همه یادداشت‌ها" data-en="All notes">همه یادداشت‌ها</span></div>
+                <div class="mini-nav">◈ &nbsp; <span data-fa="فضاهای کاری" data-en="Workspaces">فضاهای کاری</span></div>
+                <div class="mini-nav"># &nbsp; <span data-fa="برچسب‌ها" data-en="Tags">برچسب‌ها</span></div>
+                <div class="mini-sidebar-bottom">＋ <span data-fa="یادداشت جدید" data-en="New note">یادداشت جدید</span></div>
+              </aside>
+              <div class="mini-main">
+                <div class="mini-heading"><div><small data-fa="فضای کاری شخصی" data-en="Personal workspace">فضای کاری شخصی</small><h3 data-fa="همه یادداشت‌ها" data-en="All notes">همه یادداشت‌ها</h3></div><button>＋ <span data-fa="یادداشت جدید" data-en="New note">یادداشت جدید</span></button></div>
+                <div class="mini-status"><span>✓</span><div><small data-fa="وضعیت نسخه" data-en="Version status">وضعیت نسخه</small><strong data-fa="شما به‌روز هستید." data-en="You are up to date.">شما به‌روز هستید.</strong></div><b>v1.3.1</b></div>
+                <div class="mini-cards"><article><i class="blue"></i><small>Today · 10:24</small><h4 data-fa="ایده‌های پروژه" data-en="Project ideas">ایده‌های پروژه</h4><p data-fa="یادداشت‌های مهم و الهام‌های روزانه..." data-en="Important notes and daily inspiration...">یادداشت‌های مهم و الهام‌های روزانه...</p><label>ideas</label><label>work</label></article><article><i class="purple"></i><small>Yesterday · 18:40</small><h4 data-fa="راهنمای API" data-en="API reference">راهنمای API</h4><p data-fa="توکن‌ها، endpointها و نمونه کدها..." data-en="Tokens, endpoints, and code samples...">توکن‌ها، endpointها و نمونه کدها...</p><label>api</label><label>dev</label></article></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="stats-row" aria-label="ClipNote highlights">
+        <div class="stat"><strong>100%</strong><span data-fa="محلی و خصوصی" data-en="Local & private">محلی و خصوصی</span></div>
+        <div class="stat"><strong>MV3</strong><span data-fa="استاندارد Chrome" data-en="Chrome standard">استاندارد Chrome</span></div>
+        <div class="stat"><strong>RTL</strong><span data-fa="پشتیبانی فارسی" data-en="Persian support">پشتیبانی فارسی</span></div>
+        <div class="stat"><strong>1.3.1</strong><span data-fa="آخرین نسخه" data-en="Latest release">آخرین نسخه</span></div>
+      </section>
+
+      <section id="features" class="content-section">
+        <div class="section-heading">
+          <div><span class="section-kicker" data-fa="چرا ClipNote؟" data-en="Why ClipNote?">چرا ClipNote؟</span><h2 data-fa="همه‌چیز برای فکرهای مهم" data-en="Everything for the thoughts that matter">همه‌چیز برای فکرهای مهم</h2></div>
+          <p data-fa="از یک ذخیره سریع تا یک سیستم منظم برای دانش شخصی." data-en="From a quick capture to a thoughtful personal knowledge system.">از یک ذخیره سریع تا یک سیستم منظم برای دانش شخصی.</p>
+        </div>
+        <div class="feature-grid">
+          <article class="feature-card featured-card"><div class="feature-icon">✦</div><h3 data-fa="ذخیره سریع از وب" data-en="Capture from the web">ذخیره سریع از وب</h3><p data-fa="هر متن انتخاب‌شده را از منوی راست‌کلیک با یک کلیک در ClipNote ذخیره کن؛ عنوان، صفحه و لینک منبع هم ثبت می‌شوند." data-en="Save selected text from the context menu in one click. The title, page, and source link are kept with it.">هر متن انتخاب‌شده را از منوی راست‌کلیک با یک کلیک در ClipNote ذخیره کن؛ عنوان، صفحه و لینک منبع هم ثبت می‌شوند.</p><span class="feature-link" data-fa="بدون خروج از صفحه" data-en="Without leaving the page">بدون خروج از صفحه</span></article>
+          <article class="feature-card"><div class="feature-icon">#</div><h3 data-fa="برچسب و پیشنهاد هوشمند" data-en="Smart tags">برچسب و پیشنهاد هوشمند</h3><p data-fa="برچسب‌های سفارشی بساز و اجازه بده ClipNote با توجه به متن، پیشنهادهای کاربردی ارائه کند." data-en="Create custom tags and let ClipNote suggest useful labels based on your content.">برچسب‌های سفارشی بساز و اجازه بده ClipNote با توجه به متن، پیشنهادهای کاربردی ارائه کند.</p></article>
+          <article class="feature-card"><div class="feature-icon">◫</div><h3 data-fa="فضاهای کاری مرتب" data-en="Organized workspaces">فضاهای کاری مرتب</h3><p data-fa="یادداشت‌های پروژه، کارهای شخصی و ایده‌ها را در فضاهای جداگانه مدیریت کن." data-en="Keep project notes, personal tasks, and ideas in separate workspaces.">یادداشت‌های پروژه، کارهای شخصی و ایده‌ها را در فضاهای جداگانه مدیریت کن.</p></article>
+          <article class="feature-card"><div class="feature-icon">⌁</div><h3 data-fa="Markdown و پیش‌نمایش" data-en="Markdown preview">Markdown و پیش‌نمایش</h3><p data-fa="در Split View بنویس، کد و جدول اضافه کن و نتیجه را هم‌زمان ببین." data-en="Write in Split View, add code and tables, and see the result instantly.">در Split View بنویس، کد و جدول اضافه کن و نتیجه را هم‌زمان ببین.</p></article>
+          <article class="feature-card"><div class="feature-icon">⌘</div><h3 data-fa="قفل‌گذاری محلی" data-en="Local protection">قفل‌گذاری محلی</h3><p data-fa="یادداشت‌های حساس را با رمز عبور یا PIN چهاررقمی محافظت کن؛ کلیدها روی دستگاه هش می‌شوند." data-en="Protect sensitive notes with a password or four-digit PIN; secrets are hashed on-device.">یادداشت‌های حساس را با رمز عبور یا PIN چهاررقمی محافظت کن؛ کلیدها روی دستگاه هش می‌شوند.</p></article>
+          <article class="feature-card"><div class="feature-icon">☼</div><h3 data-fa="تم و فونت حرفه‌ای" data-en="Polished themes">تم و فونت حرفه‌ای</h3><p data-fa="تم‌های متنوع، حالت تاریک و فونت محلی Vazirmatn برای تجربه‌ای روان در فارسی و انگلیسی." data-en="Multiple themes, dark mode, and the bundled Vazirmatn font for a smooth bilingual experience.">تم‌های متنوع، حالت تاریک و فونت محلی Vazirmatn برای تجربه‌ای روان در فارسی و انگلیسی.</p></article>
+        </div>
+      </section>
+
+      <section id="quick-start" class="content-section split-section">
+        <div class="guide-panel">
+          <span class="section-kicker" data-fa="شروع سریع" data-en="Quick start">شروع سریع</span>
+          <h2 data-fa="در چند دقیقه آماده‌ای" data-en="Ready in a few minutes">در چند دقیقه آماده‌ای</h2>
+          <p data-fa="فایل ریلیز را بگیر، استخراج کن و مثل یک افزونه حرفه‌ای Chrome شروع کن." data-en="Grab the release, extract it, and start using ClipNote as a polished Chrome extension.">فایل ریلیز را بگیر، استخراج کن و مثل یک افزونه حرفه‌ای Chrome شروع کن.</p>
+          <a class="text-link" href="https://github.com/Kourosh242/clipnote/releases/tag/v1.3.1" target="_blank" rel="noopener"><span data-fa="راهنمای کامل نصب" data-en="Full installation guide">راهنمای کامل نصب</span> <span>↗</span></a>
+        </div>
+        <div class="steps-card">
+          <div class="step"><b>01</b><div><h3 data-fa="دانلود و استخراج" data-en="Download & extract">دانلود و استخراج</h3><p data-fa="فایل clipnote-v1.3.1.zip را دریافت و پوشه clipnote را استخراج کن." data-en="Download clipnote-v1.3.1.zip and extract the clipnote folder.">فایل clipnote-v1.3.1.zip را دریافت و پوشه clipnote را استخراج کن.</p></div></div>
+          <div class="step"><b>02</b><div><h3 data-fa="بازکردن صفحه افزونه‌ها" data-en="Open Extensions">بازکردن صفحه افزونه‌ها</h3><p data-fa="به chrome://extensions برو و Developer mode را فعال کن." data-en="Open chrome://extensions and enable Developer mode.">به chrome://extensions برو و Developer mode را فعال کن.</p></div></div>
+          <div class="step"><b>03</b><div><h3 data-fa="بارگذاری پوشه" data-en="Load the folder">بارگذاری پوشه</h3><p data-fa="روی Load unpacked بزن و پوشه‌ای را انتخاب کن که manifest.json داخل آن است." data-en="Choose Load unpacked and select the folder containing manifest.json.">روی Load unpacked بزن و پوشه‌ای را انتخاب کن که manifest.json داخل آن است.</p></div></div>
+        </div>
+      </section>
+
+      <section class="content-section release-section">
+        <div class="release-card">
+          <div class="release-main"><span class="release-icon">✓</span><div><span class="section-kicker" data-fa="وضعیت نسخه" data-en="Version status">وضعیت نسخه</span><h2><span data-fa="شما به‌روز هستید." data-en="You are up to date.">شما به‌روز هستید.</span></h2><p data-fa="نسخه ۱.۳.۱ آخرین ریلیز رسمی ClipNote است." data-en="Version 1.3.1 is the latest official ClipNote release.">نسخه ۱.۳.۱ آخرین ریلیز رسمی ClipNote است.</p></div></div>
+          <div class="release-actions"><span class="release-version">v1.3.1</span><a class="button button-primary" href="https://github.com/Kourosh242/clipnote/releases/download/v1.3.1/clipnote-v1.3.1.zip"><span>↓</span><span data-fa="دریافت فایل ZIP" data-en="Get the ZIP">دریافت فایل ZIP</span></a></div>
+        </div>
+        <div class="update-note"><span>↻</span><p data-fa="به‌روزرسانی‌ها در پس‌زمینه بررسی می‌شوند و اعلان انتشار نسخه جدید از Chrome می‌آید؛ در رابط افزونه دیگر دکمه بررسی دستی وجود ندارد." data-en="Updates are checked in the background. Chrome notifies you when a new release is available; there is no manual check button in the extension UI.">به‌روزرسانی‌ها در پس‌زمینه بررسی می‌شوند و اعلان انتشار نسخه جدید از Chrome می‌آید؛ در رابط افزونه دیگر دکمه بررسی دستی وجود ندارد.</p></div>
+      </section>
+
+      <section id="privacy" class="content-section privacy-section">
+        <div class="section-heading"><div><span class="section-kicker" data-fa="اعتماد از ابتدا" data-en="Trust by design">اعتماد از ابتدا</span><h2 data-fa="یادداشت‌ها مال تو هستند" data-en="Your notes stay yours">یادداشت‌ها مال تو هستند</h2></div><p data-fa="ClipNote برای حفظ حریم خصوصی ساخته شده است، نه جمع‌آوری داده." data-en="ClipNote is built to protect your privacy, not to collect your data.">ClipNote برای حفظ حریم خصوصی ساخته شده است، نه جمع‌آوری داده.</p></div>
+        <div class="privacy-grid">
+          <article><span>◉</span><h3 data-fa="ذخیره‌سازی محلی" data-en="Local storage">ذخیره‌سازی محلی</h3><p data-fa="یادداشت‌ها و تنظیمات در chrome.storage.local دستگاهت نگهداری می‌شوند." data-en="Notes and settings live in your device's chrome.storage.local.">یادداشت‌ها و تنظیمات در chrome.storage.local دستگاهت نگهداری می‌شوند.</p></article>
+          <article><span>⌁</span><h3 data-fa="بدون ردیابی" data-en="No tracking">بدون ردیابی</h3><p data-fa="هیچ آنالیتیکس، تبلیغ یا سرور ClipNote برای محتوای خصوصی تو وجود ندارد." data-en="There is no analytics, advertising, or ClipNote server for your private content.">هیچ آنالیتیکس، تبلیغ یا سرور ClipNote برای محتوای خصوصی تو وجود ندارد.</p></article>
+          <article><span>⊙</span><h3 data-fa="ارتباط محدود" data-en="Minimal network access">ارتباط محدود</h3><p data-fa="تنها Service Worker اطلاعات عمومی ریلیز GitHub را برای اعلان به‌روزرسانی می‌خواند." data-en="Only the Service Worker reads public GitHub release metadata for update notifications.">تنها Service Worker اطلاعات عمومی ریلیز GitHub را برای اعلان به‌روزرسانی می‌خواند.</p></article>
+        </div>
+      </section>
+
+      <section id="team" class="content-section team-section">
+        <div class="section-heading"><div><span class="section-kicker" data-fa="ساخته‌شده با دقت" data-en="Built with care">ساخته‌شده با دقت</span><h2 data-fa="آشنایی با سازندگان" data-en="Meet the creators">آشنایی با سازندگان</h2></div><p data-fa="برای ارتباط، مشاهده پروژه‌ها یا مشارکت به GitHub سر بزن." data-en="Visit GitHub to connect, explore projects, or contribute.">برای ارتباط، مشاهده پروژه‌ها یا مشارکت به GitHub سر بزن.</p></div>
+        <div class="team-grid">
+          <a class="person-card" href="https://github.com/Kourosh242" target="_blank" rel="noopener"><div class="avatar avatar-blue">K</div><div><strong>Kourosh</strong><span data-fa="توسعه‌دهنده و سازنده ClipNote" data-en="Developer & ClipNote creator">توسعه‌دهنده و سازنده ClipNote</span></div><b>↗</b></a>
+          <a class="person-card" href="https://github.com/MR-SHARIFI-Dev" target="_blank" rel="noopener"><div class="avatar avatar-purple">M</div><div><strong>Mehdi</strong><span data-fa="توسعه‌دهنده و هم‌سازنده ClipNote" data-en="Developer & ClipNote co-creator">توسعه‌دهنده و هم‌سازنده ClipNote</span></div><b>↗</b></a>
+        </div>
+      </section>
+
+      <section class="content-section faq-section">
+        <div class="section-heading"><div><span class="section-kicker" data-fa="راهنما" data-en="Guide">راهنما</span><h2 data-fa="سوال‌های متداول" data-en="Frequently asked questions">سوال‌های متداول</h2></div></div>
+        <div class="faq-grid">
+          <details open><summary data-fa="آیا یادداشت‌ها روی سرور ذخیره می‌شوند؟" data-en="Are notes stored on a server?">آیا یادداشت‌ها روی سرور ذخیره می‌شوند؟</summary><p data-fa="خیر. محتوای یادداشت‌ها محلی است و فقط داده عمومی ریلیز برای سیستم اعلان خوانده می‌شود." data-en="No. Note content is local; only public release metadata is read for notifications.">خیر. محتوای یادداشت‌ها محلی است و فقط داده عمومی ریلیز برای سیستم اعلان خوانده می‌شود.</p></details>
+          <details><summary data-fa="بعد از دانلود ZIP چه‌کار کنم؟" data-en="What do I do after downloading the ZIP?">بعد از دانلود ZIP چه‌کار کنم؟</summary><p data-fa="فایل را استخراج کن، Developer mode را در chrome://extensions فعال کن و Load unpacked را بزن." data-en="Extract it, enable Developer mode at chrome://extensions, then choose Load unpacked.">فایل را استخراج کن، Developer mode را در chrome://extensions فعال کن و Load unpacked را بزن.</p></details>
+          <details><summary data-fa="آیا فارسی و فونت وزیرمتن آفلاین هستند؟" data-en="Does Persian work offline with Vazirmatn?">آیا فارسی و فونت وزیرمتن آفلاین هستند؟</summary><p data-fa="بله. فونت Vazirmatn داخل افزونه و همین ویکی بسته‌بندی شده و به منبع خارجی وابسته نیست." data-en="Yes. Vazirmatn is bundled with the extension and this wiki, with no external font dependency.">بله. فونت Vazirmatn داخل افزونه و همین ویکی بسته‌بندی شده و به منبع خارجی وابسته نیست.</p></details>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-brand"><img src="assets/clipnote-icon.png" alt="" width="30" height="30"><strong>ClipNote</strong><span data-fa="دفترچه‌ای برای چیزهای مهم." data-en="A notebook for what matters.">دفترچه‌ای برای چیزهای مهم.</span></div>
+      <div class="footer-links"><a href="https://github.com/Kourosh242/clipnote/releases" target="_blank" rel="noopener" data-fa="ریلیزها" data-en="Releases">ریلیزها</a><a href="https://github.com/Kourosh242/clipnote/issues" target="_blank" rel="noopener" data-fa="گزارش مشکل" data-en="Report an issue">گزارش مشکل</a><a href="https://github.com/Kourosh242/clipnote/blob/main/CHANGELOG.md" target="_blank" rel="noopener" data-fa="تاریخچه تغییرات" data-en="Changelog">تاریخچه تغییرات</a></div>
+      <small>© 2026 ClipNote · <span data-fa="ساخته‌شده با ❤️ توسط Kourosh و Mehdi" data-en="Made with ❤️ by Kourosh & Mehdi">ساخته‌شده با ❤️ توسط Kourosh و Mehdi</span></small>
+    </footer>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>

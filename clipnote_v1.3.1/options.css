@@ -328,15 +328,6 @@ html[data-lang="fa"] .cn-sidebar.collapsed .cn-sidebar-header {
   font-weight: 600;
 }
 
-.cn-update-badge {
-  margin-inline-start: 8px;
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: var(--cn-warning);
-  color: #ffffff;
-  font-size: 0.72rem;
-  font-weight: 700;
-}
 
 /* ============== Notes Grid ============== */
 .cn-notes-grid {
@@ -642,17 +633,66 @@ html[data-lang="fa"] .cn-sidebar.collapsed .cn-sidebar-header {
 }
 
 /* ============== Settings ============== */
-.cn-settings-tip {
+.cn-version-status {
   margin: 20px 24px 0;
-  border-inline-start: 4px solid var(--cn-primary);
-  background: linear-gradient(135deg, var(--cn-primary-light) 0%, var(--cn-surface) 100%);
+  overflow: hidden;
+  border-color: rgba(var(--cn-success-rgb), 0.26);
+  background: linear-gradient(135deg, rgba(var(--cn-success-rgb), 0.11) 0%, var(--cn-surface) 72%);
 }
 
-.cn-settings-tip-text {
+.cn-version-status-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+}
+
+.cn-version-status-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  border-radius: 50%;
+  background: rgba(var(--cn-success-rgb), 0.16);
+  color: var(--cn-success);
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+.cn-version-status-copy {
+  min-width: 0;
+  flex: 1;
+}
+
+.cn-version-status-label {
   margin: 0;
-  color: var(--cn-text);
+  color: var(--cn-text-secondary);
+  font-size: 0.76rem;
   font-weight: 700;
-  line-height: 1.8;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.cn-version-status-text {
+  margin: 3px 0 0;
+  color: var(--cn-success);
+  line-height: 1.7;
+}
+
+.cn-version-status-text strong {
+  font-weight: 800;
+}
+
+.cn-version-status-value {
+  padding: 6px 11px;
+  border: 1px solid rgba(var(--cn-success-rgb), 0.28);
+  border-radius: 999px;
+  color: var(--cn-success);
+  font-size: 0.8rem;
+  font-weight: 800;
+  white-space: nowrap;
 }
 
 .cn-settings-grid {
@@ -853,6 +893,18 @@ html[data-lang="fa"] .cn-sidebar.collapsed .cn-sidebar-header {
 }
 
 @media (max-width: 640px) {
+  .cn-version-status {
+    margin-inline: 16px;
+  }
+
+  .cn-version-status-row {
+    align-items: flex-start;
+  }
+
+  .cn-version-status-value {
+    margin-inline-start: auto;
+  }
+
   .cn-main-header {
     flex-direction: column;
   }
