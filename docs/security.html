@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>امنیت و حریم خصوصی | ویکی ClipNote</title>
+  <meta name="description" content="امنیت ClipNote 1.3.1: قفل یادداشت با PBKDF2-SHA256، سوال بازیابی، فهرست دسترسی‌ها و سیاست حریم خصوصی — همه داده‌ها محلی است.">
+  <link rel="icon" type="image/png" href="assets/icon128.png">
+  <link rel="stylesheet" href="assets/docs.css">
+</head>
+<body>
+<a class="cn-skip" href="#main"><span class="lang-fa">پرش به محتوا</span><span class="lang-en">Skip to content</span></a>
+
+<header class="cn-header">
+  <div class="cn-wrap cn-header-inner">
+    <a class="cn-logo" href="index.html"><img src="assets/icon128.png" alt=""><span>ClipNote</span><small>v1.3.1</small></a>
+    <nav class="cn-nav" aria-label="Wiki">
+      <a href="index.html"><span class="lang-fa">خانه</span><span class="lang-en">Home</span></a>
+      <a href="guide.html"><span class="lang-fa">راهنمای نصب</span><span class="lang-en">Install</span></a>
+      <a href="features.html"><span class="lang-fa">امکانات</span><span class="lang-en">Features</span></a>
+      <a href="security.html" aria-current="page"><span class="lang-fa">امنیت</span><span class="lang-en">Security</span></a>
+      <a href="data.html"><span class="lang-fa">داده و بکاپ</span><span class="lang-en">Data &amp; Backup</span></a>
+      <a href="faq.html"><span class="lang-fa">سوالات متداول</span><span class="lang-en">FAQ</span></a>
+    </nav>
+    <div class="cn-tools">
+      <button type="button" class="cn-tool-btn" data-lang-btn="fa" aria-pressed="true">فا</button>
+      <button type="button" class="cn-tool-btn" data-lang-btn="en" aria-pressed="false">EN</button>
+      <button type="button" class="cn-tool-btn" data-dark-btn aria-pressed="false" title="Dark / روشن">◐</button>
+    </div>
+  </div>
+</header>
+
+<main id="main" class="cn-content">
+  <div class="cn-wrap">
+
+    <!-- ==================== فارسی ==================== -->
+    <header class="cn-page-head lang-fa">
+      <h1>امنیت و حریم خصوصی</h1>
+      <p class="sub">کلیپ‌نوت هیچ سرور، حساب کاربری یا تحلیل آماری ندارد. این صفحه دقیقاً می‌گوید چه چیزی روی دستگاه شما می‌ماند، چه دسترسی‌هایی گرفته شده و قفل یادداشت تا کجا محافظت می‌کند.</p>
+    </header>
+
+    <section class="lang-fa">
+      <h2>اصل اول: همه‌چیز محلی است</h2>
+      <ul>
+        <li>یادداشت‌ها، تنظیمات، فضای کاری، دسته‌بندی و برچسب‌ها در <code>chrome.storage.local</code> روی همان کامپیوتر ذخیره می‌شوند.</li>
+        <li>هیچ همگام‌سازی ابری، آپلود یا پشتیبان‌گیری خودکار روی سرور وجود ندارد.</li>
+        <li>هیچ ابزار تحلیل، ردیاب یا اسکریپت خارجی بارگذاری نمی‌شود؛ حتی فونت فارسی هم داخل بسته اکستنشن است.</li>
+        <li>تنها درخواست شبکه‌ای که اکستنشن می‌زند، خواندن <strong>شماره نسخه</strong> از گیتهاب برای اطلاع دادن نسخه جدید است.</li>
+      </ul>
+
+      <h2>دسترسی‌ها و دلیل هرکدام</h2>
+      <div class="cn-table-wrap">
+        <table class="cn-table">
+          <thead>
+            <tr><th>دسترسی</th><th>برای چه استفاده می‌شود</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>storage</code></td><td>ذخیره و خواندن یادداشت‌ها و تنظیمات به‌صورت محلی</td></tr>
+            <tr><td><code>clipboardWrite</code></td><td>دکمه کپی روی یادداشت و بلوک‌های کد</td></tr>
+            <tr><td><code>clipboardRead</code></td><td>دکمه چسباندن (Paste) در ویرایشگر</td></tr>
+            <tr><td><code>activeTab</code></td><td>خواندن عنوان و آدرس صفحه‌ای که از آن ذخیره سریع می‌کنید</td></tr>
+            <tr><td><code>contextMenus</code></td><td>آیتم <strong>Save to ClipNote</strong> در منوی راست‌کلیک</td></tr>
+            <tr><td><code>notifications</code></td><td>اعلان ذخیره موفق یا ناموفق، و اعلان نسخه جدید</td></tr>
+            <tr><td><code>alarms</code></td><td>زمان‌بندی بررسی نسخه جدید، چون سرویس‌ورکر همیشه فعال نیست</td></tr>
+            <tr><td><code>api.github.com</code> و <code>github.com</code></td><td>فقط گرفتن شماره نسخه منتشرشده برای مقایسه با نسخه نصب‌شده</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="cn-note">
+        <strong>چیزی که گرفته نشده</strong>
+        <p>هیچ دسترسی به تاریخچه مرور، کوکی‌ها، بوک‌مارک‌ها، تب‌های دیگر یا محتوای صفحات داده نشده است. اکستنشن هیچ اسکریپتی داخل صفحات وب تزریق نمی‌کند.</p>
+      </div>
+
+      <h2>قفل یادداشت</h2>
+      <p>روی هر یادداشت می‌توانید جداگانه قفل بگذارید:</p>
+      <ul>
+        <li><strong>رمز عبور</strong> (حداقل یک کاراکتر) یا <strong>پین ۴ رقمی</strong> (دقیقاً چهار رقم).</li>
+        <li>رمز هرگز ذخیره نمی‌شود؛ فقط <strong>هش</strong> آن با الگوریتم <strong>PBKDF2-SHA256</strong>، با <strong>۱۵۰٬۰۰۰ تکرار</strong> و یک <strong>سالت تصادفی ۱۶ بایتی</strong> نگه داشته می‌شود.</li>
+        <li><strong>سوال بازیابی</strong> اختیاری است و پاسخ آن هم با همین روش هش می‌شود، پس پاسخ هم به‌صورت متن ساده ذخیره نمی‌شود.</li>
+        <li>تا وقتی یادداشت باز نشده، متن و پیش‌نمایش آن مخفی است و فقط عنوان و مشخصات دیده می‌شود.</li>
+        <li>باز بودن یادداشت فقط برای همان نشست است و ذخیره نمی‌شود؛ با دکمه «قفل دوباره» یا بستن و باز کردن اکستنشن دوباره قفل می‌شود.</li>
+      </ul>
+
+      <div class="cn-warn">
+        <strong>محدودیت مهم قفل — حتماً بخوانید</strong>
+        <p>قفل، محتوای یادداشت را <strong>رمزنگاری نمی‌کند</strong>؛ فقط نمایش آن را در رابط کاربری می‌بندد. متن یادداشت به‌صورت متن ساده در حافظه محلی کروم می‌ماند. بنابراین قفل برای جلوگیری از دیده شدن اتفاقی یادداشت توسط کسی که پشت سیستم شما می‌نشیند مناسب است، اما در برابر کسی که به پروفایل کروم یا فایل‌های سیستم شما دسترسی کامل دارد محافظت کامل نیست. دکمه «حذف قفل» هم بدون دانستن رمز قابل استفاده است. برای داده‌های واقعاً حساس، رمزنگاری سطح سیستم‌عامل یا یک ابزار رمزنگاری اختصاصی انتخاب درست‌تری است.</p>
+      </div>
+
+      <h2>فراموش کردن رمز یا پین</h2>
+      <ol class="cn-steps">
+        <li>در پنجره باز کردن یادداشت، گزینه <strong>بازیابی رمز</strong> را بزنید.</li>
+        <li>سوال بازیابی نمایش داده می‌شود؛ پاسخ درست را وارد کنید تا یادداشت باز شود.</li>
+        <li>اگر سوال بازیابی تنظیم نکرده باشید، راهی برای بازگرداندن رمز وجود ندارد؛ در این حالت می‌توانید قفل را از بخش حفاظت حذف کنید.</li>
+      </ol>
+
+      <h2>امن بودن متن و خروجی</h2>
+      <ul>
+        <li>پیش از نمایش هر یادداشت، متن از کاراکترهای خطرناک HTML پاک‌سازی می‌شود؛ پس تگ <code>script</code> داخل یادداشت اجرا نمی‌شود.</li>
+        <li>پیوندهای تولیدشده با <code>rel="noopener noreferrer"</code> و در تب جدید باز می‌شوند.</li>
+        <li>سیاست امنیت محتوا (CSP) اکستنشن اجازه بارگذاری اسکریپت خارجی را نمی‌دهد و ارتباط شبکه‌ای را به <code>api.github.com</code> و <code>github.com</code> محدود می‌کند.</li>
+      </ul>
+
+      <h2>پیشنهادها</h2>
+      <ul>
+        <li>از فایل <code>clipnote-backup-*.json</code> مثل یک فایل خصوصی نگهداری کنید؛ همه یادداشت‌ها، حتی قفل‌شده‌ها، داخل آن هستند.</li>
+        <li>اگر کامپیوتر مشترک است، رمز یا پین را روی یادداشت‌های حساس بگذارید و بعد از کار، زبانه مدیر را ببندید.</li>
+        <li>فایل پشتیبان را بعد از انتقال به کامپیوتر جدید از مسیر عمومی پاک کنید.</li>
+      </ul>
+    </section>
+
+    <!-- ==================== English ==================== -->
+    <header class="cn-page-head lang-en">
+      <h1>Security &amp; privacy</h1>
+      <p class="sub">ClipNote has no server, no account and no analytics. This page states exactly what stays on your device, which permissions are taken, and how far the note lock actually protects you.</p>
+    </header>
+
+    <section class="lang-en">
+      <h2>First principle: everything is local</h2>
+      <ul>
+        <li>Notes, settings, workspaces, categories and tags are stored in <code>chrome.storage.local</code> on the same computer.</li>
+        <li>There is no cloud sync, no upload and no automatic server-side backup.</li>
+        <li>No analytics, trackers or third-party scripts are loaded — even the Persian font is bundled inside the extension.</li>
+        <li>The only network request the extension makes is reading the <strong>version number</strong> from GitHub to announce a new release.</li>
+      </ul>
+
+      <h2>Permissions and why each one exists</h2>
+      <div class="cn-table-wrap">
+        <table class="cn-table">
+          <thead>
+            <tr><th>Permission</th><th>What it is used for</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>storage</code></td><td>Reading and writing notes and settings locally</td></tr>
+            <tr><td><code>clipboardWrite</code></td><td>The copy button on notes and code blocks</td></tr>
+            <tr><td><code>clipboardRead</code></td><td>The Paste button in the editor</td></tr>
+            <tr><td><code>activeTab</code></td><td>Reading the title and URL of the page you quick-save from</td></tr>
+            <tr><td><code>contextMenus</code></td><td>The <strong>Save to ClipNote</strong> item in the right-click menu</td></tr>
+            <tr><td><code>notifications</code></td><td>Save success/failure notices and the new-version notice</td></tr>
+            <tr><td><code>alarms</code></td><td>Scheduling the update check, because the service worker is not always awake</td></tr>
+            <tr><td><code>api.github.com</code> and <code>github.com</code></td><td>Only fetching the published version number to compare with the installed one</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="cn-note">
+        <strong>What is not requested</strong>
+        <p>No access to browsing history, cookies, bookmarks, other tabs or page content. The extension injects no scripts into web pages.</p>
+      </div>
+
+      <h2>Note lock</h2>
+      <p>Every note can be locked individually:</p>
+      <ul>
+        <li>Either a <strong>password</strong> (at least one character) or a <strong>4-digit PIN</strong> (exactly four digits).</li>
+        <li>The secret is never stored; only its <strong>hash</strong> is kept, using <strong>PBKDF2-SHA256</strong> with <strong>150,000 iterations</strong> and a <strong>random 16-byte salt</strong>.</li>
+        <li>The optional <strong>recovery question</strong> answer is hashed the same way, so it is not stored in plain text either.</li>
+        <li>Until a note is unlocked its content and preview stay hidden; only the title and metadata are visible.</li>
+        <li>The unlocked state lasts for the session only and is never persisted; use “relock”, or restart the extension, to close it again.</li>
+      </ul>
+
+      <div class="cn-warn">
+        <strong>Important limitation of the lock — please read</strong>
+        <p>The lock does <strong>not encrypt</strong> note content; it only hides it in the user interface. The note text remains plain text in Chrome's local storage. So the lock is well suited to stop someone who sits at your computer from casually reading a note, but it is not full protection against someone with complete access to your Chrome profile or your file system. The “Remove Lock” button can also be used without knowing the secret. For truly sensitive data, OS-level encryption or a dedicated encryption tool is the better choice.</p>
+      </div>
+
+      <h2>Forgetting the password or PIN</h2>
+      <ol class="cn-steps">
+        <li>In the unlock dialog choose <strong>Recover password</strong>.</li>
+        <li>The recovery question is shown; enter the correct answer to open the note.</li>
+        <li>If no recovery question was set there is no way to restore the secret; in that case you can remove the lock from the Protection panel.</li>
+      </ol>
+
+      <h2>Safe text and output</h2>
+      <ul>
+        <li>Before any note is rendered its text is escaped for dangerous HTML characters, so a <code>script</code> tag inside a note never runs.</li>
+        <li>Generated links open in a new tab with <code>rel="noopener noreferrer"</code>.</li>
+        <li>The extension content security policy (CSP) forbids loading external scripts and limits network connections to <code>api.github.com</code> and <code>github.com</code>.</li>
+      </ul>
+
+      <h2>Recommendations</h2>
+      <ul>
+        <li>Treat the <code>clipnote-backup-*.json</code> file as private: it contains every note, including locked ones.</li>
+        <li>On a shared computer, lock sensitive notes and close the manager tab when you are done.</li>
+        <li>Delete the backup file from any public location after moving to a new computer.</li>
+      </ul>
+    </section>
+
+    <nav class="cn-pager">
+      <a href="features.html">
+        <span class="lang-fa">صفحه قبل</span><span class="lang-en">Previous page</span>
+        <strong><span class="lang-fa">← امکانات</span><span class="lang-en">← Features</span></strong>
+      </a>
+      <a class="next" href="data.html">
+        <span class="lang-fa">صفحه بعد</span><span class="lang-en">Next page</span>
+        <strong><span class="lang-fa">داده و بکاپ →</span><span class="lang-en">Data &amp; Backup →</span></strong>
+      </a>
+    </nav>
+
+  </div>
+</main>
+
+<footer class="cn-footer">
+  <div class="cn-wrap">
+    <p><strong>ClipNote v1.3.1</strong> — <span class="lang-fa">ساخته‌شده توسط کوروش و مهدی</span><span class="lang-en">Created by Kourosh &amp; Mehdi</span></p>
+    <p>kourosh242.github.io/clipnote/</p>
+  </div>
+</footer>
+
+<script src="assets/docs.js"></script>
+</body>
+</html>

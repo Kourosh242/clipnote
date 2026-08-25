@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>راهنمای نصب | ویکی ClipNote</title>
+  <meta name="description" content="نصب مرحله‌به‌مرحله ClipNote 1.3.1 در گوگل کروم، ساخت اولین یادداشت، ذخیره سریع با راست‌کلیک و جدول کامل کلیدهای میان‌بر.">
+  <link rel="icon" type="image/png" href="assets/icon128.png">
+  <link rel="stylesheet" href="assets/docs.css">
+</head>
+<body>
+<a class="cn-skip" href="#main"><span class="lang-fa">پرش به محتوا</span><span class="lang-en">Skip to content</span></a>
+
+<header class="cn-header">
+  <div class="cn-wrap cn-header-inner">
+    <a class="cn-logo" href="index.html"><img src="assets/icon128.png" alt=""><span>ClipNote</span><small>v1.3.1</small></a>
+    <nav class="cn-nav" aria-label="Wiki">
+      <a href="index.html"><span class="lang-fa">خانه</span><span class="lang-en">Home</span></a>
+      <a href="guide.html" aria-current="page"><span class="lang-fa">راهنمای نصب</span><span class="lang-en">Install</span></a>
+      <a href="features.html"><span class="lang-fa">امکانات</span><span class="lang-en">Features</span></a>
+      <a href="security.html"><span class="lang-fa">امنیت</span><span class="lang-en">Security</span></a>
+      <a href="data.html"><span class="lang-fa">داده و بکاپ</span><span class="lang-en">Data &amp; Backup</span></a>
+      <a href="faq.html"><span class="lang-fa">سوالات متداول</span><span class="lang-en">FAQ</span></a>
+    </nav>
+    <div class="cn-tools">
+      <button type="button" class="cn-tool-btn" data-lang-btn="fa" aria-pressed="true">فا</button>
+      <button type="button" class="cn-tool-btn" data-lang-btn="en" aria-pressed="false">EN</button>
+      <button type="button" class="cn-tool-btn" data-dark-btn aria-pressed="false" title="Dark / روشن">◐</button>
+    </div>
+  </div>
+</header>
+
+<main id="main" class="cn-content">
+  <div class="cn-wrap">
+
+    <!-- ==================== فارسی ==================== -->
+    <header class="cn-page-head lang-fa">
+      <h1>راهنمای نصب و شروع سریع</h1>
+      <p class="sub">کل فرایند نصب کمتر از دو دقیقه طول می‌کشد. هیچ حساب کاربری، ثبت‌نام یا سروری در کار نیست.</p>
+    </header>
+
+    <section class="lang-fa">
+      <h2>پیش‌نیازها</h2>
+      <ul>
+        <li>گوگل کروم، یا هر مرورگر مبتنی بر کرومیوم که از Manifest V3 پشتیبانی می‌کند (مثل اج، بریو یا اپرا).</li>
+        <li>فایل زیپ نسخه ۱.۳.۱ از بخش <strong>Releases</strong> مخزن کلیپ‌نوت در گیتهاب (فایل <code>clipnote_1.3.1.zip</code>).</li>
+        <li>یک پوشه پایدار روی کامپیوتر که زیپ را آنجا استخراج کنید؛ تا وقتی اکستنشن نصب است، آن پوشه را حذف یا جابه‌جا نکنید.</li>
+      </ul>
+
+      <h2>نصب مرحله‌به‌مرحله</h2>
+      <ol class="cn-steps">
+        <li>فایل <code>clipnote_1.3.1.zip</code> را دانلود و در یک پوشه ثابت <strong>Extract</strong> کنید. بعد از استخراج باید فایلی به نام <code>manifest.json</code> داخل پوشه ببینید.</li>
+        <li>در نوار آدرس کروم بنویسید <code>chrome://extensions</code> و اینتر بزنید.</li>
+        <li>گزینه <strong>Developer mode</strong> را در گوشه بالای صفحه روشن کنید.</li>
+        <li>روی <strong>Load unpacked</strong> کلیک کنید و همان پوشه‌ای را انتخاب کنید که <code>manifest.json</code> داخل آن است.</li>
+        <li>آیکون کلیپ‌نوت به لیست اکستنشن‌ها اضافه می‌شود. با کلیک روی آیکون پازل در نوار ابزار، آن را <strong>Pin</strong> کنید تا همیشه در دسترس باشد.</li>
+        <li>با <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>N</kbd> پاپ‌آپ را باز کنید؛ اولین نصب به‌صورت خودکار صفحه تنظیمات را هم باز می‌کند.</li>
+      </ol>
+
+      <div class="cn-note">
+        <strong>چرا Load unpacked؟</strong>
+        <p>این نسخه به‌صورت پوشه باز نصب می‌شود، نه از فروشگاه. یعنی همه کد روی دستگاه شماست و می‌توانید خودتان بازش کنید و بخوانید.</p>
+      </div>
+
+      <h2>اولین یادداشت شما</h2>
+      <ol class="cn-steps">
+        <li>پاپ‌آپ را باز کنید و روی دکمه <strong>جدید</strong> بزنید (یا <kbd>Ctrl</kbd> + <kbd>N</kbd>).</li>
+        <li>عنوان و متن را بنویسید. می‌توانید فضای کاری، دسته‌بندی، برچسب‌ها و رنگ یادداشت را هم انتخاب کنید.</li>
+        <li>با <kbd>Ctrl</kbd> + <kbd>S</kbd> ذخیره کنید. اگر ذخیره خودکار فعال باشد، نیازی به این کار نیست.</li>
+      </ol>
+
+      <h2>ذخیره سریع از هر صفحه وب</h2>
+      <ol class="cn-steps">
+        <li>روی هر صفحه‌ای بخشی از متن را با ماوس انتخاب کنید.</li>
+        <li>راست‌کلیک کنید و <strong>Save to ClipNote</strong> را انتخاب کنید.</li>
+        <li>یادداشت با عنوان صفحه، آدرس صفحه، زمان ثبت و برچسب‌های پیشنهادی در فضای کاری فعلی ذخیره می‌شود و یک اعلان تأیید می‌بینید.</li>
+      </ol>
+
+      <h2>فارسی کردن رابط</h2>
+      <ol class="cn-steps">
+        <li>پاپ‌آپ را باز کنید و روی آیکون <strong>باز کردن مدیریت</strong> کلیک کنید تا صفحه مدیر کامل باز شود.</li>
+        <li>به بخش <strong>تنظیمات</strong> بروید.</li>
+        <li>در کارت <strong>زبان</strong>، مقدار را روی <strong>فارسی</strong> بگذارید و ذخیره کنید.</li>
+        <li>از این لحظه همه متن‌ها فارسی، فونت وزیرمتن و چیدمان راست‌چین می‌شود.</li>
+      </ol>
+
+      <h2>کلیدهای میان‌بر</h2>
+      <div class="cn-table-wrap">
+        <table class="cn-table">
+          <thead>
+            <tr><th>میان‌بر</th><th>کار</th><th>کجا</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>N</kbd></td><td>باز کردن پاپ‌آپ کلیپ‌نوت</td><td>کل کروم (در مک <kbd>Command</kbd> + <kbd>Shift</kbd> + <kbd>N</kbd>)</td></tr>
+            <tr><td><kbd>Ctrl</kbd> + <kbd>N</kbd></td><td>یادداشت جدید</td><td>پاپ‌آپ و مدیر</td></tr>
+            <tr><td><kbd>Ctrl</kbd> + <kbd>S</kbd></td><td>ذخیره یادداشت</td><td>پاپ‌آپ و مدیر</td></tr>
+            <tr><td><kbd>Ctrl</kbd> + <kbd>F</kbd></td><td>پریدن به کادر جستجو</td><td>پاپ‌آپ و مدیر</td></tr>
+            <tr><td><kbd>Ctrl</kbd> + <kbd>U</kbd></td><td>بازگشت (Undo) تغییرات ویرایشگر</td><td>پاپ‌آپ</td></tr>
+            <tr><td><kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>U</kbd></td><td>بازگشت (Undo) تغییرات ویرایشگر</td><td>مدیر</td></tr>
+            <tr><td><kbd>Esc</kbd></td><td>بستن پنجره یا مودال باز</td><td>پاپ‌آپ و مدیر</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>اگر نصب نشد</h2>
+      <ul>
+        <li>پوشه اشتباه را انتخاب کرده‌اید: باید پوشه‌ای باشد که مستقیماً <code>manifest.json</code> داخلش است، نه پوشه بالایی زیپ.</li>
+        <li><strong>Developer mode</strong> خاموش است.</li>
+        <li>پوشه را بعد از نصب جابه‌جا یا حذف کرده‌اید؛ اکستنشن را Remove و دوباره از مسیر جدید Load unpacked کنید.</li>
+        <li>اگر میان‌بر <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>N</kbd> کار نمی‌کند، در صفحه <code>chrome://extensions/shortcuts</code> می‌توانید آن را تغییر دهید.</li>
+      </ul>
+    </section>
+
+    <!-- ==================== English ==================== -->
+    <header class="cn-page-head lang-en">
+      <h1>Install &amp; quick start</h1>
+      <p class="sub">The whole installation takes under two minutes. No account, no sign-up, no server.</p>
+    </header>
+
+    <section class="lang-en">
+      <h2>Requirements</h2>
+      <ul>
+        <li>Google Chrome, or any Chromium-based browser that supports Manifest V3 (such as Edge, Brave or Opera).</li>
+        <li>The 1.3.1 zip file from the <strong>Releases</strong> section of the ClipNote repository on GitHub (<code>clipnote_1.3.1.zip</code>).</li>
+        <li>A stable folder on your computer to extract the zip into; do not delete or move it while the extension stays installed.</li>
+      </ul>
+
+      <h2>Step-by-step installation</h2>
+      <ol class="cn-steps">
+        <li>Download <code>clipnote_1.3.1.zip</code> and <strong>extract</strong> it into a fixed folder. After extracting you should see a file called <code>manifest.json</code>.</li>
+        <li>Type <code>chrome://extensions</code> in the address bar and press Enter.</li>
+        <li>Turn on <strong>Developer mode</strong> at the top of the page.</li>
+        <li>Click <strong>Load unpacked</strong> and select the folder that contains <code>manifest.json</code>.</li>
+        <li>ClipNote appears in the extension list. Click the puzzle icon in the toolbar and <strong>Pin</strong> it so it is always reachable.</li>
+        <li>Press <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>N</kbd> to open the popup; a fresh install also opens the settings page automatically.</li>
+      </ol>
+
+      <div class="cn-note">
+        <strong>Why Load unpacked?</strong>
+        <p>This build is installed from a folder, not from a store. That means the whole source stays on your device and you can open and read it yourself.</p>
+      </div>
+
+      <h2>Your first note</h2>
+      <ol class="cn-steps">
+        <li>Open the popup and press the <strong>New</strong> button (or <kbd>Ctrl</kbd> + <kbd>N</kbd>).</li>
+        <li>Type a title and content. You can also pick the workspace, category, tags and note colour.</li>
+        <li>Press <kbd>Ctrl</kbd> + <kbd>S</kbd> to save — not needed when auto save is on.</li>
+      </ol>
+
+      <h2>Quick Save from any web page</h2>
+      <ol class="cn-steps">
+        <li>Select a piece of text with the mouse on any page.</li>
+        <li>Right-click and choose <strong>Save to ClipNote</strong>.</li>
+        <li>The note is stored in the current workspace with the page title, page URL, capture time and suggested tags, and a confirmation notification appears.</li>
+      </ol>
+
+      <h2>Switching the interface language</h2>
+      <ol class="cn-steps">
+        <li>Open the popup and click the <strong>Open Manager</strong> icon to open the full manager tab.</li>
+        <li>Go to <strong>Settings</strong>.</li>
+        <li>In the <strong>Language</strong> card choose <strong>فارسی</strong> and save.</li>
+        <li>From now on all labels are Persian, rendered with Vazirmatn in a right-to-left layout.</li>
+      </ol>
+
+      <h2>Keyboard shortcuts</h2>
+      <div class="cn-table-wrap">
+        <table class="cn-table">
+          <thead>
+            <tr><th>Shortcut</th><th>Action</th><th>Where</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>N</kbd></td><td>Open the ClipNote popup</td><td>All of Chrome (<kbd>Command</kbd> + <kbd>Shift</kbd> + <kbd>N</kbd> on macOS)</td></tr>
+            <tr><td><kbd>Ctrl</kbd> + <kbd>N</kbd></td><td>New note</td><td>Popup and manager</td></tr>
+            <tr><td><kbd>Ctrl</kbd> + <kbd>S</kbd></td><td>Save note</td><td>Popup and manager</td></tr>
+            <tr><td><kbd>Ctrl</kbd> + <kbd>F</kbd></td><td>Jump to the search box</td><td>Popup and manager</td></tr>
+            <tr><td><kbd>Ctrl</kbd> + <kbd>U</kbd></td><td>Undo editor changes</td><td>Popup</td></tr>
+            <tr><td><kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>U</kbd></td><td>Undo editor changes</td><td>Manager</td></tr>
+            <tr><td><kbd>Esc</kbd></td><td>Close the open dialog or modal</td><td>Popup and manager</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>If the install fails</h2>
+      <ul>
+        <li>You selected the wrong folder: pick the folder that directly contains <code>manifest.json</code>, not the outer zip folder.</li>
+        <li><strong>Developer mode</strong> is still off.</li>
+        <li>The folder was moved or deleted after installing; remove the extension and load it again from the new path.</li>
+        <li>If <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>N</kbd> does nothing, change it on <code>chrome://extensions/shortcuts</code>.</li>
+      </ul>
+    </section>
+
+    <nav class="cn-pager">
+      <a href="index.html">
+        <span class="lang-fa">صفحه قبل</span><span class="lang-en">Previous page</span>
+        <strong><span class="lang-fa">← خانه</span><span class="lang-en">← Home</span></strong>
+      </a>
+      <a class="next" href="features.html">
+        <span class="lang-fa">صفحه بعد</span><span class="lang-en">Next page</span>
+        <strong><span class="lang-fa">امکانات →</span><span class="lang-en">Features →</span></strong>
+      </a>
+    </nav>
+
+  </div>
+</main>
+
+<footer class="cn-footer">
+  <div class="cn-wrap">
+    <p><strong>ClipNote v1.3.1</strong> — <span class="lang-fa">ساخته‌شده توسط کوروش و مهدی</span><span class="lang-en">Created by Kourosh &amp; Mehdi</span></p>
+    <p>kourosh242.github.io/clipnote/</p>
+  </div>
+</footer>
+
+<script src="assets/docs.js"></script>
+</body>
+</html>
