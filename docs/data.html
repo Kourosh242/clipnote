@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>داده و بکاپ | ویکی ClipNote</title>
+  <meta name="description" content="ساختار داده‌های ClipNote 1.3.1، خروجی JSON نسخه ۳ و TXT، قواعد ادغام هنگام ورود اطلاعات، مهاجرت خودکار و پاک کردن کامل داده‌ها.">
+  <link rel="icon" type="image/png" href="assets/icon128.png">
+  <link rel="stylesheet" href="assets/docs.css">
+</head>
+<body>
+<a class="cn-skip" href="#main"><span class="lang-fa">پرش به محتوا</span><span class="lang-en">Skip to content</span></a>
+
+<header class="cn-header">
+  <div class="cn-wrap cn-header-inner">
+    <a class="cn-logo" href="index.html"><img src="assets/icon128.png" alt=""><span>ClipNote</span><small>v1.3.1</small></a>
+    <nav class="cn-nav" aria-label="Wiki">
+      <a href="index.html"><span class="lang-fa">خانه</span><span class="lang-en">Home</span></a>
+      <a href="guide.html"><span class="lang-fa">راهنمای نصب</span><span class="lang-en">Install</span></a>
+      <a href="features.html"><span class="lang-fa">امکانات</span><span class="lang-en">Features</span></a>
+      <a href="security.html"><span class="lang-fa">امنیت</span><span class="lang-en">Security</span></a>
+      <a href="data.html" aria-current="page"><span class="lang-fa">داده و بکاپ</span><span class="lang-en">Data &amp; Backup</span></a>
+      <a href="faq.html"><span class="lang-fa">سوالات متداول</span><span class="lang-en">FAQ</span></a>
+    </nav>
+    <div class="cn-tools">
+      <button type="button" class="cn-tool-btn" data-lang-btn="fa" aria-pressed="true">فا</button>
+      <button type="button" class="cn-tool-btn" data-lang-btn="en" aria-pressed="false">EN</button>
+      <button type="button" class="cn-tool-btn" data-dark-btn aria-pressed="false" title="Dark / روشن">◐</button>
+    </div>
+  </div>
+</header>
+
+<main id="main" class="cn-content">
+  <div class="cn-wrap">
+
+    <!-- ==================== فارسی ==================== -->
+    <header class="cn-page-head lang-fa">
+      <h1>داده، بکاپ و جابه‌جایی</h1>
+      <p class="sub">داده‌های شما کجا ذخیره می‌شود، فایل بکاپ چه شکلی است، هنگام ورود اطلاعات چه چیزی با چه چیزی ادغام می‌شود و چطور بدون از دست دادن یادداشت به کامپیوتر دیگر بروید.</p>
+    </header>
+
+    <section class="lang-fa">
+      <h2>داده‌ها کجا ذخیره می‌شوند</h2>
+      <p>همه‌چیز در <code>chrome.storage.local</code> و با این کلیدها نگهداری می‌شود:</p>
+      <div class="cn-table-wrap">
+        <table class="cn-table">
+          <thead>
+            <tr><th>کلید</th><th>محتوا</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>clipnote_notes</code></td><td>همه یادداشت‌ها</td></tr>
+            <tr><td><code>clipnote_settings</code></td><td>تنظیمات ظاهر، ویرایشگر و زبان</td></tr>
+            <tr><td><code>clipnote_workspaces</code></td><td>فضاهای کاری</td></tr>
+            <tr><td><code>clipnote_categories</code></td><td>دسته‌بندی‌ها</td></tr>
+            <tr><td><code>clipnote_custom_tags</code></td><td>برچسب‌های سفارشی</td></tr>
+            <tr><td><code>clipnote_last_quick_save</code></td><td>اطلاعات آخرین ذخیره سریع برای بنر پاپ‌آپ</td></tr>
+            <tr><td><code>clipnote_update_info</code></td><td>نتیجه آخرین بررسی نسخه (کش ۶ ساعته)</td></tr>
+            <tr><td><code>clipnote_last_notified_version</code></td><td>نسخه‌ای که قبلاً برایش اعلان داده شده</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>ساختار یک یادداشت</h2>
+      <p>هر یادداشت این فیلدها را دارد: <code>id</code>، <code>title</code>، <code>content</code>، <code>tags</code>، <code>category</code>، <code>color</code>، <code>isFavorite</code>، <code>isPinned</code>، <code>createdAt</code>، <code>updatedAt</code>، <code>workspaceId</code>، بخش <code>source</code> (نوع ثبت، عنوان صفحه، آدرس صفحه و زمان ثبت) و بخش <code>lock</code> برای قفل.</p>
+
+      <h2>گرفتن خروجی (بکاپ)</h2>
+      <p>در بخش <strong>تنظیمات ← داده</strong> سه دکمه وجود دارد:</p>
+      <ul>
+        <li><strong>Export JSON:</strong> فایل کامل بکاپ با نامی مثل <code>clipnote-backup-2026-08-25.json</code>. این فایل شامل یادداشت‌ها، تنظیمات، دسته‌بندی‌ها، فضای کاری، برچسب‌های سفارشی و اطلاعات آماری است و فرمت آن <strong>نسخه ۳</strong> است.</li>
+        <li><strong>Export TXT:</strong> یک فایل متنی خوانا برای آرشیو یا خواندن با ویرایشگر متن؛ برای هر یادداشت عنوان، فضای کاری، دسته، برچسب‌ها، تاریخ ساخت و ویرایش، آدرس منبع و متن کامل نوشته می‌شود.</li>
+        <li><strong>Import JSON:</strong> وارد کردن یک فایل بکاپ با ادغام هوشمند (توضیح در پایین).</li>
+      </ul>
+
+      <h2>هنگام ورود اطلاعات چه اتفاقی می‌افتد</h2>
+      <p>ورود اطلاعات، داده فعلی شما را <strong>پاک نمی‌کند</strong>؛ بلکه ادغام می‌کند:</p>
+      <ul>
+        <li><strong>فضاهای کاری:</strong> بر اساس شناسه ادغام می‌شوند؛ نام از فایل ورودی گرفته می‌شود و قدیمی‌ترین تاریخ ساخت نگه داشته می‌شود. فضای پیش‌فرض همیشه تضمین می‌شود.</li>
+        <li><strong>یادداشت‌ها:</strong> بر اساس شناسه ادغام می‌شوند؛ اگر یادداشتی در هر دو باشد، نسخه‌ای که <em>زمان ویرایش جدیدتری</em> دارد برنده است.</li>
+        <li><strong>دسته‌بندی‌ها و برچسب‌های سفارشی:</strong> اجتماع دو مجموعه، بدون تکرار.</li>
+        <li><strong>تنظیمات:</strong> مقادیر فایل ورودی روی تنظیمات فعلی اعمال می‌شوند؛ اگر فضای کاری فعال وجود نداشته باشد به فضای پیش‌فرض برمی‌گردد.</li>
+        <li><strong>آخرین ذخیره سریع:</strong> تازه‌ترین مورد نگه داشته می‌شود.</li>
+        <li>در پایان، یک مرحله <strong>مهاجرت خودکار</strong> اجرا می‌شود تا ساختار داده‌ها با نسخه فعلی هم‌خوان شود.</li>
+      </ul>
+      <div class="cn-warn">
+        <strong>قبل از ورود اطلاعات</strong>
+        <p>همیشه اول یک خروجی JSON از وضعیت فعلی بگیرید. اگر فایل اشتباهی وارد کنید، یادداشت‌ها پاک نمی‌شوند ولی ممکن است با داده فایل ورودی ترکیب شوند.</p>
+      </div>
+
+      <h2>مهاجرت خودکار</h2>
+      <p>هر بار که اکستنشن نصب یا به‌روز می‌شود و هر بار که مرورگر باز می‌شود، داده‌ها بررسی و در صورت نیاز ترمیم می‌شوند: یادداشت بدون فضای کاری معتبر به فضای پیش‌فرض منتقل می‌شود، تم قدیمی <code>default</code> به <code>blue</code> تبدیل می‌شود، فیلدهای جاافتاده با مقدار پیش‌فرض پر می‌شوند و برچسب‌ها یکدست‌سازی می‌شوند.</p>
+
+      <h2>انتقال به کامپیوتر دیگر</h2>
+      <ol class="cn-steps">
+        <li>در کامپیوتر اول: <strong>تنظیمات ← Export JSON</strong> و فایل را ذخیره کنید.</li>
+        <li>کلیپ‌نوت را طبق <a href="guide.html">راهنمای نصب</a> روی کامپیوتر دوم نصب کنید.</li>
+        <li>در <strong>تنظیمات ← Import JSON</strong> همان فایل را انتخاب کنید.</li>
+        <li>بعد از اطمینان از درست بودن یادداشت‌ها، فایل بکاپ را از مسیرهای عمومی پاک کنید.</li>
+      </ol>
+
+      <h2>پاک کردن کامل داده‌ها</h2>
+      <p>دکمه <strong>Clear All Data</strong> در بخش داده، همه یادداشت‌ها، دسته‌بندی‌ها، فضای کاری، برچسب‌ها و تنظیمات را حذف می‌کند. قبل از اجرا یک پیام تأیید نمایش داده می‌شود و این عمل <strong>قابل بازگشت نیست</strong>.</p>
+
+      <div class="cn-tip">
+        <strong>پیشنهاد بکاپ‌گیری</strong>
+        <p>قبل از به‌روزرسانی اکستنشن یا تغییر پروفایل کروم، یک خروجی JSON بگیرید. چون هیچ سروری در کار نیست، تنها نسخه پشتیبان شما همان فایل است.</p>
+      </div>
+    </section>
+
+    <!-- ==================== English ==================== -->
+    <header class="cn-page-head lang-en">
+      <h1>Data, backup &amp; moving</h1>
+      <p class="sub">Where your data lives, what the backup file looks like, what merges with what on import, and how to move to another computer without losing a note.</p>
+    </header>
+
+    <section class="lang-en">
+      <h2>Where the data is stored</h2>
+      <p>Everything lives in <code>chrome.storage.local</code> under these keys:</p>
+      <div class="cn-table-wrap">
+        <table class="cn-table">
+          <thead>
+            <tr><th>Key</th><th>Content</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>clipnote_notes</code></td><td>All notes</td></tr>
+            <tr><td><code>clipnote_settings</code></td><td>Appearance, editor and language settings</td></tr>
+            <tr><td><code>clipnote_workspaces</code></td><td>Workspaces</td></tr>
+            <tr><td><code>clipnote_categories</code></td><td>Categories</td></tr>
+            <tr><td><code>clipnote_custom_tags</code></td><td>Custom tags</td></tr>
+            <tr><td><code>clipnote_last_quick_save</code></td><td>Info about the last quick save, used by the popup banner</td></tr>
+            <tr><td><code>clipnote_update_info</code></td><td>Result of the last update check (6-hour cache)</td></tr>
+            <tr><td><code>clipnote_last_notified_version</code></td><td>The version that already produced a notification</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>Anatomy of a note</h2>
+      <p>Each note carries these fields: <code>id</code>, <code>title</code>, <code>content</code>, <code>tags</code>, <code>category</code>, <code>color</code>, <code>isFavorite</code>, <code>isPinned</code>, <code>createdAt</code>, <code>updatedAt</code>, <code>workspaceId</code>, a <code>source</code> object (capture type, page title, page URL and capture time) and a <code>lock</code> object for protection.</p>
+
+      <h2>Exporting (backup)</h2>
+      <p>Under <strong>Settings → Data</strong> there are three buttons:</p>
+      <ul>
+        <li><strong>Export JSON:</strong> the full backup, named like <code>clipnote-backup-2026-08-25.json</code>. It contains notes, settings, categories, workspaces, custom tags and counts, and its format is <strong>version 3</strong>.</li>
+        <li><strong>Export TXT:</strong> a readable text file for archiving or reading in a text editor; for each note it writes the title, workspace, category, tags, created and updated dates, source URL and the full content.</li>
+        <li><strong>Import JSON:</strong> restoring a backup file with smart merging (explained below).</li>
+      </ul>
+
+      <h2>What happens on import</h2>
+      <p>Importing does <strong>not erase</strong> your current data; it merges:</p>
+      <ul>
+        <li><strong>Workspaces:</strong> merged by id; the name comes from the imported file and the earliest creation time is kept. The default workspace is always guaranteed.</li>
+        <li><strong>Notes:</strong> merged by id; when a note exists in both, the copy with the <em>newer update time</em> wins.</li>
+        <li><strong>Categories and custom tags:</strong> the union of both sets, without duplicates.</li>
+        <li><strong>Settings:</strong> values from the imported file are applied over the current ones; if the active workspace no longer exists it falls back to the default workspace.</li>
+        <li><strong>Last quick save:</strong> the most recent entry is kept.</li>
+        <li>Finally an automatic <strong>migration</strong> step runs so the data structure matches the current version.</li>
+      </ul>
+      <div class="cn-warn">
+        <strong>Before importing</strong>
+        <p>Always export your current state to JSON first. Importing the wrong file will not delete your notes, but it can mix them with the imported data.</p>
+      </div>
+
+      <h2>Automatic migration</h2>
+      <p>Every install, update and browser start triggers a data check and repair when needed: a note without a valid workspace is moved to the default one, the legacy <code>default</code> theme becomes <code>blue</code>, missing fields are filled with defaults, and tags are normalised.</p>
+
+      <h2>Moving to another computer</h2>
+      <ol class="cn-steps">
+        <li>On the first computer: <strong>Settings → Export JSON</strong> and keep the file.</li>
+        <li>Install ClipNote on the second computer following the <a href="guide.html">install guide</a>.</li>
+        <li>Choose that file under <strong>Settings → Import JSON</strong>.</li>
+        <li>Once you have confirmed the notes are there, delete the backup file from public locations.</li>
+      </ol>
+
+      <h2>Wiping all data</h2>
+      <p>The <strong>Clear All Data</strong> button in the Data section removes every note, category, workspace, tag and setting. A confirmation is shown first and the action <strong>cannot be undone</strong>.</p>
+
+      <div class="cn-tip">
+        <strong>Backup advice</strong>
+        <p>Export to JSON before updating the extension or changing your Chrome profile. Because there is no server, that file is your only copy.</p>
+      </div>
+    </section>
+
+    <nav class="cn-pager">
+      <a href="security.html">
+        <span class="lang-fa">صفحه قبل</span><span class="lang-en">Previous page</span>
+        <strong><span class="lang-fa">← امنیت</span><span class="lang-en">← Security</span></strong>
+      </a>
+      <a class="next" href="faq.html">
+        <span class="lang-fa">صفحه بعد</span><span class="lang-en">Next page</span>
+        <strong><span class="lang-fa">سوالات متداول →</span><span class="lang-en">FAQ →</span></strong>
+      </a>
+    </nav>
+
+  </div>
+</main>
+
+<footer class="cn-footer">
+  <div class="cn-wrap">
+    <p><strong>ClipNote v1.3.1</strong> — <span class="lang-fa">ساخته‌شده توسط کوروش و مهدی</span><span class="lang-en">Created by Kourosh &amp; Mehdi</span></p>
+    <p>kourosh242.github.io/clipnote/</p>
+  </div>
+</footer>
+
+<script src="assets/docs.js"></script>
+</body>
+</html>

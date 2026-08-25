@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>سوالات متداول | ویکی ClipNote</title>
+  <meta name="description" content="سوالات متداول ClipNote 1.3.1: رمز فراموش‌شده، انتقال داده، آپدیت دستی، میان‌برها، ذخیره سریع با راست‌کلیک و رفع اشکال.">
+  <link rel="icon" type="image/png" href="assets/icon128.png">
+  <link rel="stylesheet" href="assets/docs.css">
+</head>
+<body>
+<a class="cn-skip" href="#main"><span class="lang-fa">پرش به محتوا</span><span class="lang-en">Skip to content</span></a>
+
+<header class="cn-header">
+  <div class="cn-wrap cn-header-inner">
+    <a class="cn-logo" href="index.html"><img src="assets/icon128.png" alt=""><span>ClipNote</span><small>v1.3.1</small></a>
+    <nav class="cn-nav" aria-label="Wiki">
+      <a href="index.html"><span class="lang-fa">خانه</span><span class="lang-en">Home</span></a>
+      <a href="guide.html"><span class="lang-fa">راهنمای نصب</span><span class="lang-en">Install</span></a>
+      <a href="features.html"><span class="lang-fa">امکانات</span><span class="lang-en">Features</span></a>
+      <a href="security.html"><span class="lang-fa">امنیت</span><span class="lang-en">Security</span></a>
+      <a href="data.html"><span class="lang-fa">داده و بکاپ</span><span class="lang-en">Data &amp; Backup</span></a>
+      <a href="faq.html" aria-current="page"><span class="lang-fa">سوالات متداول</span><span class="lang-en">FAQ</span></a>
+    </nav>
+    <div class="cn-tools">
+      <button type="button" class="cn-tool-btn" data-lang-btn="fa" aria-pressed="true">فا</button>
+      <button type="button" class="cn-tool-btn" data-lang-btn="en" aria-pressed="false">EN</button>
+      <button type="button" class="cn-tool-btn" data-dark-btn aria-pressed="false" title="Dark / روشن">◐</button>
+    </div>
+  </div>
+</header>
+
+<main id="main" class="cn-content">
+  <div class="cn-wrap">
+
+    <!-- ==================== فارسی ==================== -->
+    <header class="cn-page-head lang-fa">
+      <h1>سوالات متداول</h1>
+      <p class="sub">پاسخ پرسش‌هایی که بیشتر پرسیده می‌شوند، همراه با راه‌حل‌های رفع اشکال.</p>
+    </header>
+
+    <section class="lang-fa">
+      <details class="cn-faq">
+        <summary>آیا کلیپ‌نوت برای کار کردن به اینترنت نیاز دارد؟</summary>
+        <div>
+          <p>خیر. همه یادداشت‌ها محلی ذخیره می‌شوند و کل رابط، از جمله فونت فارسی، داخل بسته اکستنشن است. تنها ارتباط شبکه‌ای، خواندن شماره نسخه از گیتهاب برای اطلاع دادن نسخه جدید است؛ اگر آفلاین باشید فقط همین اطلاع‌رسانی کار نمی‌کند و بقیه امکانات بدون مشکل اجرا می‌شوند.</p>
+        </div>
+      </details>
+
+      <details class="cn-faq">
+        <summary>رمز یا پین یک یادداشت را فراموش کرده‌ام، چه کار کنم؟</summary>
+        <div>
+          <p>اگر موقع قفل کردن <strong>سوال بازیابی</strong> گذاشته باشید، در پنجره باز کردن یادداشت گزینه <strong>بازیابی رمز</strong> را بزنید و پاسخ را وارد کنید. اگر سوال بازیابی نداشته باشید، امکان بازگرداندن رمز وجود ندارد؛ در این حالت از بخش <strong>حفاظت</strong> در ویرایشگر می‌توانید قفل را حذف کنید. توجه کنید که قفل فقط نمایش متن را می‌بندد و محتوا رمزنگاری نمی‌شود؛ جزئیات در صفحه <a href="security.html">امنیت</a> آمده است.</p>
+        </div>
+      </details>
+
+      <details class="cn-faq">
+        <summary>چطور یادداشت‌ها را به کامپیوتر دیگر منتقل کنم؟</summary>
+        <div>
+          <p>از <strong>تنظیمات ← Export JSON</strong> بکاپ بگیرید، اکستنشن را روی دستگاه جدید نصب کنید و همان فایل را با <strong>Import JSON</strong> وارد کنید. ورود اطلاعات با داده موجود ادغام می‌شود و چیزی را پاک نمی‌کند.</p>
+        </div>
+      </details>
+
+      <details class="cn-faq">
+        <summary>چرا اکستنشن خودش به‌روز نمی‌شود؟</summary>
+        <div>
+          <p>چون به‌صورت پوشه باز (Load unpacked) نصب می‌شود، نه از فروشگاه؛ پس کروم نمی‌تواند خودش جایگزینش کند. کلیپ‌نوت هر ۶ ساعت شماره نسخه را چک می‌کند و اگر نسخه جدیدتری باشد اعلان می‌دهد. برای به‌روزرسانی، نسخه جدید را دانلود و استخراج کنید و در <code>chrome://extensions</code> دکمه Reload را بزنید یا پوشه جدید را Load unpacked کنید.</p>
+        </div>
+      </details>
+
+      <details class="cn-faq">
+        <summary>قبل از به‌روزرسانی باید چه کار کنم؟</summary>
+        <div>
+          <p>یک خروجی JSON بگیرید. مرحله مهاجرت خودکار داده‌ها را با نسخه جدید هم‌خوان می‌کند، اما داشتن یک فایل بکاپ همیشه مطمئن‌تر است.</p>
+        </div>
+      </details>
+
+      <details class="cn-faq">
+        <summary>اگر اکستنشن را حذف (Remove) کنم داده‌هایم چه می‌شود؟</summary>
+        <div>
+          <p>با حذف اکستنشن، داده‌های ذخیره‌شده در حافظه محلی کروم هم پاک می‌شود. پس قبل از حذف، حتماً <strong>Export JSON</strong> بگیرید.</p>
+        </div>
+      </details>
+
+      <details class="cn-faq">
+        <summary>آیا روی اج، بریو یا اپرا هم کار می‌کند؟</summary>
+        <div>
+          <p>کلیپ‌نوت برای کروم و Manifest V3 ساخته شده است. مرورگرهای مبتنی بر کرومیوم معمولاً با همان روش Load unpacked آن را می‌پذیرند، اما این حالت‌ها به‌صورت رسمی آزمایش نشده‌اند.</p>
+        </div>
+      </details>
+
+      <details class="cn-faq">
+        <summary>میان‌بر <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>N</kbd> کار نمی‌کند.</summary>
+        <div>
+          <p>این کلید ممکن است توسط مرورگر یا یک اکستنشن دیگر اشغال شده باشد. به <code>chrome://extensions/shortcuts</code> بروید و میان‌بر «Open ClipNote popup» را روی ترکیب دیگری تنظیم کنید. همیشه می‌توانید با کلیک روی آیکون کلیپ‌نوت هم پاپ‌آپ را باز کنید.</p>
+        </div>
+      </details>
+
+      <details class="cn-faq">
+        <summary>گزینه <strong>Save to ClipNote</strong> را در راست‌کلیک نمی‌بینم.</summary>
+        <div>
+          <p>این گزینه فقط وقتی متن را انتخاب کرده باشید ظاهر می‌شود. اگر هنوز دیده نمی‌شود، یک بار مرورگر را کامل ببندید و دوباره باز کنید؛ منوی راست‌کلیک هنگام نصب و هنگام شروع به کار مرورگر ساخته می‌شود.</p>
+        </div>
+      </details>
+
+      <details class="cn-faq">
+        <summary>چطور رابط را فارسی و راست‌چین کنم؟</summary>
+        <div>
+          <p>مدیر را باز کنید، به <strong>تنظیمات</strong> بروید و در کارت <strong>زبان</strong> مقدار را روی فارسی بگذارید و ذخیره کنید. فونت وزیرمتن و چیدمان راست‌چین خودکار فعال می‌شود.</p>
+        </div>
+      </details>
+
+      <details class="cn-faq">
+        <summary>آیا می‌توانم داخل یادداشت تصویر بگذارم؟</summary>
+        <div>
+          <p>بله، با سینتکس مارک‌داون: <code>![توضیح](آدرس تصویر)</code>. تصویر از آدرسی که داده‌اید بارگذاری می‌شود، پس برای دیدنش به اینترنت نیاز دارید. خودِ فایل تصویر در اکستنشن ذخیره نمی‌شود.</p>
+        </div>
+      </details>
+
+      <details class="cn-faq">
+        <summary>اندازه متن برایم کوچک است.</summary>
+        <div>
+          <p>در <strong>تنظیمات ← ظاهر</strong> لغزنده اندازه فونت را بین ۱۲ تا ۲۰ پیکسل تنظیم کنید. تم و حالت تاریک هم در همان بخش هستند.</p>
+        </div>
+      </details>
+
+      <details class="cn-faq">
+        <summary>اعلان نسخه جدید را دریافت نمی‌کنم.</summary>
+        <div>
+          <p>برای هر نسخه فقط یک بار اعلان داده می‌شود و نتیجه بررسی تا ۶ ساعت کش می‌شود. همچنین اگر آفلاین باشید یا گیتهاب در دسترس نباشد، بررسی انجام نمی‌شود. وضعیت نسخه را همیشه می‌توانید در بالای صفحه <strong>تنظیمات</strong> ببینید.</p>
+        </div>
+      </details>
+
+      <details class="cn-faq">
+        <summary>چطور همه‌چیز را از صفر شروع کنم؟</summary>
+        <div>
+          <p>در <strong>تنظیمات ← داده</strong> دکمه <strong>Clear All Data</strong> را بزنید. همه یادداشت‌ها، دسته‌ها، فضای کاری، برچسب‌ها و تنظیمات حذف می‌شوند و این کار برگشت‌پذیر نیست.</p>
+        </div>
+      </details>
+
+      <details class="cn-faq">
+        <summary>چطور نسخه نصب‌شده را بفهمم؟</summary>
+        <div>
+          <p>در صفحه <strong>تنظیمات</strong>، بخش «وضعیت نسخه» شماره نسخه و وضعیت به‌روز بودن را نشان می‌دهد. همین شماره در کارت «درباره» هم تکرار شده است.</p>
+        </div>
+      </details>
+    </section>
+
+    <!-- ==================== English ==================== -->
+    <header class="cn-page-head lang-en">
+      <h1>Frequently asked questions</h1>
+      <p class="sub">Answers to the questions that come up most often, plus troubleshooting.</p>
+    </header>
+
+    <section class="lang-en">
+      <details class="cn-faq">
+        <summary>Does ClipNote need an internet connection?</summary>
+        <div>
+          <p>No. All notes are stored locally and the whole interface, including the Persian font, is bundled inside the extension. The only network activity is reading the version number from GitHub to announce a new release; when you are offline only that notice is skipped and everything else works normally.</p>
+        </div>
+      </details>
+
+      <details class="cn-faq">
+        <summary>I forgot the password or PIN of a note, what now?</summary>
+        <div>
+          <p>If you set a <strong>recovery question</strong> when locking, use <strong>Recover password</strong> in the unlock dialog and type the answer. Without a recovery question the secret cannot be restored; you can then remove the lock from the <strong>Protection</strong> panel in the editor. Remember that the lock only hides the text in the UI and does not encrypt it — details on the <a href="security.html">security</a> page.</p>
+        </div>
+      </details>
+
+      <details class="cn-faq">
+        <summary>How do I move my notes to another computer?</summary>
+        <div>
+          <p>Take a backup with <strong>Settings → Export JSON</strong>, install the extension on the new machine and load that file with <strong>Import JSON</strong>. Import merges with existing data and never deletes anything.</p>
+        </div>
+      </details>
+
+      <details class="cn-faq">
+        <summary>Why does the extension not update itself?</summary>
+        <div>
+          <p>Because it is installed unpacked (Load unpacked) rather than from a store, Chrome cannot replace it automatically. ClipNote checks the version number every 6 hours and notifies you when something newer exists. To update, download and extract the new version and press Reload in <code>chrome://extensions</code>, or load the new folder.</p>
+        </div>
+      </details>
+
+      <details class="cn-faq">
+        <summary>What should I do before updating?</summary>
+        <div>
+          <p>Export a JSON backup. The automatic migration step aligns your data with the new version, but having a backup file is always safer.</p>
+        </div>
+      </details>
+
+      <details class="cn-faq">
+        <summary>What happens to my data if I remove the extension?</summary>
+        <div>
+          <p>Removing the extension also clears the data stored in Chrome's local storage. Always run <strong>Export JSON</strong> first.</p>
+        </div>
+      </details>
+
+      <details class="cn-faq">
+        <summary>Does it work in Edge, Brave or Opera?</summary>
+        <div>
+          <p>ClipNote is built for Chrome and Manifest V3. Chromium-based browsers usually accept it with the same Load unpacked method, but those cases are not officially tested.</p>
+        </div>
+      </details>
+
+      <details class="cn-faq">
+        <summary><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>N</kbd> does nothing.</summary>
+        <div>
+          <p>The combination may already be taken by the browser or another extension. Open <code>chrome://extensions/shortcuts</code> and assign a different key to “Open ClipNote popup”. Clicking the ClipNote icon always opens the popup as well.</p>
+        </div>
+      </details>
+
+      <details class="cn-faq">
+        <summary>I do not see <strong>Save to ClipNote</strong> in the right-click menu.</summary>
+        <div>
+          <p>The item only appears when text is selected. If it is still missing, close and reopen the browser once; the context menu is created on install and on browser startup.</p>
+        </div>
+      </details>
+
+      <details class="cn-faq">
+        <summary>How do I make the interface Persian and right-to-left?</summary>
+        <div>
+          <p>Open the manager, go to <strong>Settings</strong>, set the <strong>Language</strong> card to فارسی and save. Vazirmatn and the RTL layout are enabled automatically.</p>
+        </div>
+      </details>
+
+      <details class="cn-faq">
+        <summary>Can I put an image inside a note?</summary>
+        <div>
+          <p>Yes, with Markdown syntax: <code>![alt](image url)</code>. The image loads from the address you give, so viewing it requires internet; the image file itself is not stored in the extension.</p>
+        </div>
+      </details>
+
+      <details class="cn-faq">
+        <summary>The text is too small for me.</summary>
+        <div>
+          <p>Adjust the font size slider between 12 and 20 pixels under <strong>Settings → Appearance</strong>. The theme and dark mode live in the same section.</p>
+        </div>
+      </details>
+
+      <details class="cn-faq">
+        <summary>I never get the new-version notification.</summary>
+        <div>
+          <p>Each version triggers only one notification and the check result is cached for 6 hours. If you are offline or GitHub is unreachable the check does not run. The version status is always visible at the top of <strong>Settings</strong>.</p>
+        </div>
+      </details>
+
+      <details class="cn-faq">
+        <summary>How do I start over from scratch?</summary>
+        <div>
+          <p>Press <strong>Clear All Data</strong> under <strong>Settings → Data</strong>. All notes, categories, workspaces, tags and settings are removed and this cannot be undone.</p>
+        </div>
+      </details>
+
+      <details class="cn-faq">
+        <summary>How do I check which version I have?</summary>
+        <div>
+          <p>The <strong>Settings</strong> page shows a Version Status section with the version number and whether you are up to date. The same number appears in the About card.</p>
+        </div>
+      </details>
+    </section>
+
+    <nav class="cn-pager">
+      <a href="data.html">
+        <span class="lang-fa">صفحه قبل</span><span class="lang-en">Previous page</span>
+        <strong><span class="lang-fa">← داده و بکاپ</span><span class="lang-en">← Data &amp; Backup</span></strong>
+      </a>
+      <a class="next" href="index.html">
+        <span class="lang-fa">بازگشت</span><span class="lang-en">Back</span>
+        <strong><span class="lang-fa">خانه →</span><span class="lang-en">Home →</span></strong>
+      </a>
+    </nav>
+
+  </div>
+</main>
+
+<footer class="cn-footer">
+  <div class="cn-wrap">
+    <p><strong>ClipNote v1.3.1</strong> — <span class="lang-fa">ساخته‌شده توسط کوروش و مهدی</span><span class="lang-en">Created by Kourosh &amp; Mehdi</span></p>
+    <p>kourosh242.github.io/clipnote/</p>
+  </div>
+</footer>
+
+<script src="assets/docs.js"></script>
+</body>
+</html>
