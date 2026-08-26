@@ -21,8 +21,6 @@ ClipNote یک افزونهٔ مرورگر سریع، آفلاین و حریم‌
 - ذخیره‌سازی محلی؛ بدون سرور و بدون ارسال محتوای یادداشت‌ها
 
 ### نصب از سورس
-
-1. این مخزن را دریافت کنید یا فایل [ClipNote-v1.3.2.zip](https://github.com/Kourosh242/clipnote/releases/tag/1.3.2) را دانلود کنید.
 2. در Chrome/Edge به `chrome://extensions` بروید و **Developer mode** را روشن کنید.
 3. روی **Load unpacked** بزنید و پوشهٔ `clipnote-v1.3.2` را انتخاب کنید.
 4. برای کار با نسخهٔ منتشرشده، از صفحهٔ Release فایل ZIP را نصب کنید.
