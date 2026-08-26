@@ -38,8 +38,17 @@
     getNoteWorkspace,
     truncateText,
     migrateStorageData,
-    parseMarkdown
+    parseMarkdown,
+    setSharedLocale,
+    createLockSession,
+    getNoteDisplayContent,
+    persistUnlockedContent,
+    unlockNoteSession,
+    unlockNoteSessionByRecovery,
+    remainingLockoutSeconds
   } = window.ClipNote;
+
+  const lockSession = createLockSession();
 
   const I18N = {
     en: {
@@ -59,7 +68,10 @@
       unlockFirst: 'Unlock note first', invalidSecret: 'Invalid password or PIN', unlocked: 'Note unlocked',
       addTitleOrContent: 'Please enter a title or content', untitled: 'Untitled Note', note: 'note', notes: 'notes', chars: 'chars',
       previewHidden: '🔒 Preview hidden until unlocked', savedFromWeb: 'Saved from webpage', general: 'General', deleteConfirm: 'Delete this note?',
-      noSuggestions: 'No suggestions yet.', noTagsYet: 'No tags yet.', customTagAdded: 'Custom tag added', enterTagName: 'Enter new tag name'
+      noSuggestions: 'No suggestions yet.', noTagsYet: 'No tags yet.', customTagAdded: 'Custom tag added', enterTagName: 'Enter new tag name',
+      accept: 'Accept', ignore: 'Ignore', unsavedConfirm: 'Discard unsaved changes?', unlockRequired: 'Unlock note first',
+      passwordsMismatch: 'Password and confirmation do not match.', tooManyAttempts: 'Too many attempts. Try again in {n}s.',
+      unlockError: 'Could not unlock this note.', saveFailed: 'Save failed.', lockedChars: 'hidden'
     },
     fa: {
       new: 'جدید', openManager: 'باز کردن مدیریت', search: 'جستجوی یادداشت‌ها... (Ctrl+F)',
@@ -69,7 +81,7 @@
       titlePlaceholder: 'عنوان / موضوع', contentPlaceholder: 'یادداشت خود را اینجا بنویسید...', tagsPlaceholder: 'python, api, md',
       workspace: 'فضای کاری', category: 'دسته‌بندی', noCategory: 'بدون دسته‌بندی', tags: 'برچسب‌ها', addTag: '+ برچسب',
       quickTags: 'برچسب‌های سریع', suggestions: 'برچسب‌های پیشنهادی', acceptAll: 'افزودن همه', color: 'رنگ',
-      pin: 'پین', favorite: 'علاقه‌مندی', saveNote: 'ذخیره یادداشت', saveChanges: 'ذخیره تغییرات',
+      pin: 'پین', favorite: 'علاقه‌مندی', save: 'ذخیره', saveNote: 'ذخیره یادداشت', saveChanges: 'ذخیره تغییرات',
       close: 'بستن', copy: 'کپی', edit: 'ویرایش', delete: 'حذف', undo: 'بازگشت', cancel: 'لغو', unlock: 'باز کردن',
       editor: 'ویرایشگر', preview: 'پیش‌نمایش', unlockNote: 'باز کردن یادداشت', unlockHelp: 'برای باز کردن این یادداشت رمز یا پین را وارد کنید.',
       recoverPassword: 'بازیابی رمز', recoveryQuestion: 'سوال بازیابی', recoveryAnswer: 'جواب', recoveryUnavailable: 'برای این یادداشت سوال بازیابی ثبت نشده است.', recoveryFailed: 'پاسخ سوال بازیابی نادرست است.', recoverySuccess: 'بازیابی با موفقیت انجام شد. اکنون می‌توانید یادداشت را باز کنید.',
@@ -78,7 +90,10 @@
       unlockFirst: 'ابتدا یادداشت را باز کنید', invalidSecret: 'رمز یا پین نادرست است', unlocked: 'یادداشت باز شد',
       addTitleOrContent: 'لطفاً عنوان یا محتوا وارد کنید', untitled: 'یادداشت بدون عنوان', note: 'یادداشت', notes: 'یادداشت', chars: 'کاراکتر',
       previewHidden: '🔒 پیش‌نمایش تا زمان باز شدن مخفی است', savedFromWeb: 'ذخیره‌شده از وب', general: 'عمومی', deleteConfirm: 'این یادداشت حذف شود؟',
-      noSuggestions: 'فعلاً پیشنهادی وجود ندارد.', noTagsYet: 'هنوز برچسبی وجود ندارد.', customTagAdded: 'برچسب سفارشی اضافه شد', enterTagName: 'نام برچسب جدید را وارد کنید'
+      noSuggestions: 'فعلاً پیشنهادی وجود ندارد.', noTagsYet: 'هنوز برچسبی وجود ندارد.', customTagAdded: 'برچسب سفارشی اضافه شد', enterTagName: 'نام برچسب جدید را وارد کنید',
+      accept: 'پذیرفتن', ignore: 'نادیده بگیر', unsavedConfirm: 'تغییرات ذخیره‌نشده نادیده گرفته شود؟', unlockRequired: 'ابتدا یادداشت را باز کنید',
+      passwordsMismatch: 'رمز و تکرار آن یکی نیست.', tooManyAttempts: 'تلاش‌های زیاد. {n} ثانیه دیگر دوباره تلاش کنید.',
+      unlockError: 'باز کردن این یادداشت ممکن نشد.', saveFailed: 'ذخیره نشد.', lockedChars: 'مخفی'
     }
   };
 
@@ -201,6 +216,16 @@
     btnCopyNote: document.getElementById('btn-popup-copy-note'),
     btnDeleteNote: document.getElementById('btn-popup-delete-note'),
     btnSaveNote: document.getElementById('btn-popup-save-note'),
+    confirmModal: document.getElementById('popup-confirm-modal'),
+    confirmTitle: document.getElementById('popup-confirm-title'),
+    confirmText: document.getElementById('popup-confirm-text'),
+    btnConfirmCancel: document.getElementById('btn-popup-confirm-cancel'),
+    btnConfirmOk: document.getElementById('btn-popup-confirm-ok'),
+    tagModal: document.getElementById('popup-tag-modal'),
+    tagModalTitle: document.getElementById('popup-tag-modal-title'),
+    tagInput: document.getElementById('popup-tag-input'),
+    btnTagCancel: document.getElementById('btn-popup-tag-cancel'),
+    btnTagSave: document.getElementById('btn-popup-tag-save')
   };
 
   function locale() {
@@ -306,6 +331,13 @@
     els.btnCopyNote.textContent = t('copy');
     els.btnDeleteNote.textContent = t('delete');
     els.btnSaveNote.textContent = t('saveChanges');
+    if (els.confirmTitle) els.confirmTitle.textContent = t('deleteConfirm');
+    if (els.btnConfirmCancel) els.btnConfirmCancel.textContent = t('cancel');
+    if (els.btnConfirmOk) els.btnConfirmOk.textContent = t('delete');
+    if (els.tagModalTitle) els.tagModalTitle.textContent = t('addTag');
+    if (els.tagInput) els.tagInput.placeholder = t('enterTagName');
+    if (els.btnTagCancel) els.btnTagCancel.textContent = t('cancel');
+    if (els.btnTagSave) els.btnTagSave.textContent = t('save');
   }
 
   async function init() {
@@ -425,8 +457,8 @@
     els.notePin.addEventListener('change', onPopupEditorInput);
     els.noteFavorite.addEventListener('change', onPopupEditorInput);
 
-    els.btnCloseNote.addEventListener('click', closeNoteModal);
-    els.btnCloseNoteX.addEventListener('click', closeNoteModal);
+    els.btnCloseNote.addEventListener('click', requestCloseNoteModal);
+    els.btnCloseNoteX.addEventListener('click', requestCloseNoteModal);
     els.btnStartEdit.addEventListener('click', () => setPopupNoteMode('edit'));
     els.btnNoteUndo.addEventListener('click', undoPopupNoteChange);
     els.btnCopyNote.addEventListener('click', () => {
@@ -438,6 +470,27 @@
     els.btnModePreview.addEventListener('click', () => setPopupEditorMode('preview'));
     els.btnNoteAddTag.addEventListener('click', () => addCustomTagFromPrompt('editor'));
     els.btnNoteAcceptAll.addEventListener('click', applyAllEditorSuggestions);
+
+    if (els.btnConfirmCancel) els.btnConfirmCancel.addEventListener('click', closePopupConfirm);
+    if (els.btnConfirmOk) els.btnConfirmOk.addEventListener('click', confirmPopupConfirm);
+    if (els.btnTagCancel) els.btnTagCancel.addEventListener('click', closeTagModal);
+    if (els.btnTagSave) els.btnTagSave.addEventListener('click', saveTagModal);
+    if (els.tagInput) {
+      els.tagInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') saveTagModal();
+        if (e.key === 'Escape') closeTagModal();
+      });
+    }
+
+    const bindCopyCode = (root) => {
+      if (!root) return;
+      root.addEventListener('click', (e) => {
+        const button = e.target.closest('.cn-copy-code-btn');
+        if (button && button.dataset.code) copyToClipboard(button.dataset.code, button);
+      });
+    };
+    bindCopyCode(els.notePreview);
+    bindCopyCode(els.noteViewContent);
 
     document.addEventListener('keydown', (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f' && isListVisible()) {
@@ -457,13 +510,15 @@
           saveQuickCapture();
         }
       }
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'u' && !els.noteModal.classList.contains('cn-hidden')) {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z' && !els.noteModal.classList.contains('cn-hidden')) {
         e.preventDefault();
         undoPopupNoteChange();
       }
       if (e.key === 'Escape') {
+        if (els.tagModal && !els.tagModal.classList.contains('cn-hidden')) return closeTagModal();
+        if (els.confirmModal && !els.confirmModal.classList.contains('cn-hidden')) return closePopupConfirm();
         if (!els.unlockModal.classList.contains('cn-hidden')) return closeUnlockModal();
-        if (!els.noteModal.classList.contains('cn-hidden')) return closeNoteModal();
+        if (!els.noteModal.classList.contains('cn-hidden')) return requestCloseNoteModal();
         if (!els.quickCapture.classList.contains('cn-hidden')) return hideQuickCapture();
       }
     });
@@ -492,6 +547,7 @@
     renderCaptureSuggestions();
     renderNotes();
     if (currentViewingNoteId && !els.noteModal.classList.contains('cn-hidden')) {
+      if (popupDirty) return;
       openNoteModal(currentViewingNoteId);
     }
   }
@@ -626,8 +682,8 @@
       item.innerHTML = `
         <span class="cn-tag">${escapeHtml(tag)}</span>
         <div class="cn-inline-actions">
-          <button class="cn-btn cn-btn-ghost cn-btn-sm" type="button" data-accept="1">${t('acceptAll')}</button>
-          <button class="cn-btn cn-btn-ghost cn-btn-sm" type="button" data-ignore="1">${t('cancel')}</button>
+          <button class="cn-btn cn-btn-ghost cn-btn-sm" type="button" data-accept="1">${t('accept')}</button>
+          <button class="cn-btn cn-btn-ghost cn-btn-sm" type="button" data-ignore="1">${t('ignore')}</button>
         </div>
       `;
       item.querySelector('[data-accept]').addEventListener('click', () => onAccept(tag));
@@ -710,23 +766,7 @@
   }
 
   async function addCustomTagFromPrompt(scope = 'capture') {
-    const value = prompt(t('enterTagName'));
-    const tag = normalizeTag(value || '');
-    if (!tag) return;
-    customTags = normalizeTags([...customTags, tag]);
-    await saveCustomTags(customTags);
-    renderTagDataLists();
-    if (scope === 'capture') {
-      addTagToInput(tag, els.captureTags);
-      renderCaptureQuickTags();
-      renderCaptureSuggestions();
-    } else {
-      addTagToInput(tag, els.noteTags);
-      renderNoteQuickTags();
-      renderNoteSuggestions();
-      onPopupEditorInput();
-    }
-    showToast(t('customTagAdded'), 'success');
+    openTagModal(scope);
   }
 
   async function saveQuickCapture() {
@@ -751,8 +791,9 @@
     }, workspaces);
 
     allNotes.unshift(note);
+    const saved = await saveNotes(allNotes);
+    if (!saved) return;
     await Promise.all([
-      saveNotes(allNotes),
       saveSettings({ ...settings, currentWorkspaceId: workspaceId }),
       mergeCustomTags(tags)
     ]);
@@ -798,7 +839,7 @@
     if (currentFilter === 'favorites') notes = notes.filter(note => note.isFavorite);
     if (currentWorkspaceFilter !== 'all') notes = notes.filter(note => note.workspaceId === currentWorkspaceFilter);
     const query = els.search.value.trim();
-    if (query) notes = filterNotes(notes, query);
+    if (query) notes = filterNotes(notes, query, (note) => getNoteDisplayContent(note, lockSession));
     return sortNotes(notes);
   }
 
@@ -842,9 +883,10 @@
     const noteLocked = isNoteLocked(note) && !unlockedNotes.has(note.id);
     const workspace = getNoteWorkspace(note, workspaces);
     const colorStyle = NOTE_COLORS[note.color] || NOTE_COLORS.blue;
+    const displayContent = getNoteDisplayContent(note, lockSession);
     const preview = noteLocked
       ? t('previewHidden')
-      : escapeHtml((note.content || '').replace(/#/g, '').replace(/\n/g, ' ').slice(0, 100)) || t('untitled');
+      : escapeHtml((displayContent || '').replace(/#/g, '').replace(/\n/g, ' ').slice(0, 100)) || t('untitled');
 
     const badges = [];
     if (workspace) badges.push(`<span class="cn-label cn-workspace-badge">${escapeHtml(workspaceLabel(workspace))}</span>`);
@@ -874,7 +916,7 @@
       <div class="cn-note-meta">
         <span>${formatLocalRelativeDate(note.updatedAt)}</span>
         <span>•</span>
-        <span>${(note.content || '').length} ${t('chars')}</span>
+        <span>${noteLocked ? t('lockedChars') : `${(displayContent || '').length} ${t('chars')}`}</span>
       </div>
       ${badges.length ? `<div class="cn-note-badges">${badges.join('')}</div>` : ''}
     `;
@@ -887,18 +929,22 @@
 
     item.querySelector('[data-action="pin"]').addEventListener('click', async (e) => {
       e.stopPropagation();
+      if (noteLocked) return showToast(t('unlockRequired'), 'warning');
       note.isPinned = !note.isPinned;
       note.updatedAt = Date.now();
-      await saveNotes(allNotes);
+      const ok = await saveNotes(allNotes);
+      if (!ok) return;
       renderNotes();
       showToast(note.isPinned ? t('pinnedAdded') : t('pinnedRemoved'), 'success');
     });
 
     item.querySelector('[data-action="favorite"]').addEventListener('click', async (e) => {
       e.stopPropagation();
+      if (noteLocked) return showToast(t('unlockRequired'), 'warning');
       note.isFavorite = !note.isFavorite;
       note.updatedAt = Date.now();
-      await saveNotes(allNotes);
+      const ok = await saveNotes(allNotes);
+      if (!ok) return;
       renderNotes();
       showToast(note.isFavorite ? t('favoriteAdded') : t('favoriteRemoved'), 'success');
     });
@@ -906,7 +952,7 @@
     item.querySelector('[data-action="copy"]').addEventListener('click', (e) => {
       e.stopPropagation();
       if (noteLocked) return showToast(t('unlockFirst'), 'warning');
-      copyToClipboard(note.content || note.title || '', e.currentTarget);
+      copyToClipboard(getNoteDisplayContent(note, lockSession) || note.title || '', e.currentTarget);
     });
 
     item.querySelector('[data-action="edit"]').addEventListener('click', (e) => {
@@ -915,13 +961,20 @@
       openNoteModal(note.id, 'edit');
     });
 
-    item.querySelector('[data-action="delete"]').addEventListener('click', async (e) => {
+    item.querySelector('[data-action="delete"]').addEventListener('click', (e) => {
       e.stopPropagation();
-      if (!confirm(t('deleteConfirm'))) return;
-      allNotes = allNotes.filter(entry => entry.id !== note.id);
-      await saveNotes(allNotes);
-      renderNotes();
-      showToast(t('deleted'), 'success');
+      if (noteLocked) return showToast(t('unlockRequired'), 'warning');
+      openPopupConfirm({
+        title: t('deleteConfirm'),
+        onConfirm: async () => {
+          allNotes = allNotes.filter(entry => entry.id !== note.id);
+          const ok = await saveNotes(allNotes);
+          if (!ok) return;
+          if (currentViewingNoteId === note.id) closeNoteModal();
+          renderNotes();
+          showToast(t('deleted'), 'success');
+        }
+      });
     });
 
     return item;
@@ -986,8 +1039,22 @@
       els.recoveryAnswer.focus();
       return;
     }
-    const valid = await verifyRecoveryAnswer(note, els.recoveryAnswer.value);
-    if (!valid) return showToast(t('recoveryFailed'), 'error');
+    try {
+      if (remainingLockoutSeconds(note.id)) {
+        return showToast(t('tooManyAttempts').replace('{n}', remainingLockoutSeconds(note.id)), 'error');
+      }
+      await unlockNoteSessionByRecovery(note, els.recoveryAnswer.value, lockSession);
+      if (note.lock && note.lock.encrypted) {
+        const ok = await saveNotes(allNotes);
+        if (!ok) return;
+      }
+    } catch (error) {
+      if (error.message === 'LOCKED_OUT' || error.message === 'INVALID_SECRET') {
+        const wait = remainingLockoutSeconds(note.id);
+        return showToast(wait ? t('tooManyAttempts').replace('{n}', wait) : t('recoveryFailed'), 'error');
+      }
+      return showToast(t('unlockError'), 'error');
+    }
     unlockedNotes.add(note.id);
     renderNotes();
     const callback = unlockSuccessCallback;
@@ -1000,20 +1067,31 @@
     const note = allNotes.find(entry => entry.id === unlockTargetNoteId);
     if (!note) return closeUnlockModal();
 
-    if (!els.recoveryPanel.classList.contains('cn-hidden') && els.recoveryAnswer.value.trim()) {
-      const validRecovery = await verifyRecoveryAnswer(note, els.recoveryAnswer.value);
-      if (!validRecovery) return showToast(t('recoveryFailed'), 'error');
-      unlockedNotes.add(note.id);
-      renderNotes();
-      const recoveryCallback = unlockSuccessCallback;
-      closeUnlockModal();
-      showToast(t('recoverySuccess'), 'success');
-      if (recoveryCallback) recoveryCallback();
-      return;
-    }
+    try {
+      if (remainingLockoutSeconds(note.id)) {
+        return showToast(t('tooManyAttempts').replace('{n}', remainingLockoutSeconds(note.id)), 'error');
+      }
+      if (!els.recoveryPanel.classList.contains('cn-hidden') && els.recoveryAnswer.value.trim()) {
+        await unlockNoteSessionByRecovery(note, els.recoveryAnswer.value, lockSession);
+        if (note.lock && note.lock.encrypted) await saveNotes(allNotes);
+        unlockedNotes.add(note.id);
+        renderNotes();
+        const recoveryCallback = unlockSuccessCallback;
+        closeUnlockModal();
+        showToast(t('recoverySuccess'), 'success');
+        if (recoveryCallback) recoveryCallback();
+        return;
+      }
 
-    const valid = await verifyNoteSecret(note, els.unlockSecret.value);
-    if (!valid) return showToast(t('invalidSecret'), 'error');
+      await unlockNoteSession(note, els.unlockSecret.value, lockSession);
+      if (note.lock && note.lock.encrypted) await saveNotes(allNotes);
+    } catch (error) {
+      if (error.message === 'LOCKED_OUT' || error.message === 'INVALID_SECRET') {
+        const wait = remainingLockoutSeconds(note.id);
+        return showToast(wait ? t('tooManyAttempts').replace('{n}', wait) : t('invalidSecret'), 'error');
+      }
+      return showToast(t('unlockError'), 'error');
+    }
     unlockedNotes.add(note.id);
     renderNotes();
     const callback = unlockSuccessCallback;
@@ -1023,9 +1101,11 @@
   }
 
   function getPopupEditorState() {
+    const rawTitle = els.noteEditTitle.value.trim();
+    const content = els.noteEditContent.value;
     return {
-      title: els.noteEditTitle.value.trim() || t('untitled'),
-      content: els.noteEditContent.value,
+      title: rawTitle || truncateText((content || '').split('\n').find(Boolean) || '', 60) || t('untitled'),
+      content,
       workspaceId: els.noteWorkspace.value || DEFAULT_WORKSPACE_ID,
       category: els.noteCategory.value || '',
       tags: parseTagsInput(els.noteTags.value),
@@ -1076,7 +1156,8 @@
 
   function getEditorSuggestions() {
     const note = allNotes.find(entry => entry.id === currentViewingNoteId);
-    return suggestTags(`${els.noteEditTitle.value}\n${els.noteEditContent.value}`, parseTagsInput(els.noteTags.value), note?.ignoredSuggestedTags || popupEditorIgnoredSuggestions);
+    const ignored = normalizeTags([...(note?.ignoredSuggestedTags || []), ...popupEditorIgnoredSuggestions]);
+    return suggestTags(`${els.noteEditTitle.value}\n${els.noteEditContent.value}`, parseTagsInput(els.noteTags.value), ignored);
   }
 
   function renderNoteSuggestions() {
@@ -1142,17 +1223,18 @@
     if (note.category) badges.push(`<span class="cn-label" style="background:${colorStyle.bg};color:${colorStyle.text};border:1px solid ${colorStyle.border}">${escapeHtml(note.category)}</span>`);
     if (note.tags?.length) badges.push(...note.tags.map(tag => `<span class="cn-tag">${escapeHtml(tag)}</span>`));
 
+    const displayContent = getNoteDisplayContent(note, lockSession);
     els.noteTitle.textContent = note.title || t('untitled');
-    els.noteMeta.textContent = `${formatLocalRelativeDate(note.updatedAt)} • ${(note.content || '').length} ${t('chars')}`;
+    els.noteMeta.textContent = `${formatLocalRelativeDate(note.updatedAt)} • ${(displayContent || '').length} ${t('chars')}`;
     els.noteSource.textContent = workspace ? workspaceLabel(workspace) : '';
     els.noteViewBadges.innerHTML = badges.join('');
-    els.noteViewContent.innerHTML = note.content ? parseMarkdown(note.content) : `<p>${escapeHtml(t('untitled'))}</p>`;
+    els.noteViewContent.innerHTML = displayContent ? parseMarkdown(displayContent) : `<p>${escapeHtml(t('untitled'))}</p>`;
 
     renderWorkspaceOptions();
     renderCategoryOptions();
     renderTagDataLists();
     els.noteEditTitle.value = note.title || '';
-    els.noteEditContent.value = note.content || '';
+    els.noteEditContent.value = displayContent || '';
     els.noteWorkspace.value = note.workspaceId || DEFAULT_WORKSPACE_ID;
     els.noteCategory.value = note.category || '';
     els.noteTags.value = formatTags(note.tags || []);
@@ -1162,8 +1244,22 @@
     renderNoteQuickTags();
     renderNoteSuggestions();
     resetPopupEditorHistory(getPopupEditorState());
+    popupDirty = false;
     setPopupNoteMode(mode);
     els.noteModal.classList.remove('cn-hidden');
+  }
+
+  function requestCloseNoteModal() {
+    if (popupNoteMode === 'edit' && popupDirty) {
+      openPopupConfirm({
+        title: t('unsavedConfirm'),
+        okLabel: isFa() ? 'بستن' : 'Discard',
+        danger: true,
+        onConfirm: () => closeNoteModal()
+      });
+      return;
+    }
+    closeNoteModal();
   }
 
   function closeNoteModal() {
@@ -1171,6 +1267,7 @@
     popupEditorIgnoredSuggestions = [];
     popupEditorHistory = [];
     popupEditorHistoryIndex = -1;
+    popupDirty = false;
     clearTimeout(popupHistoryTimer);
     popupNoteMode = 'view';
     els.noteModal.classList.add('cn-hidden');
@@ -1201,18 +1298,24 @@
     if (!note) return;
     const next = getPopupEditorState();
     note.title = next.title;
-    note.content = next.content;
     note.workspaceId = next.workspaceId;
     note.category = next.category;
     note.tags = next.tags;
     note.color = next.color;
     note.isPinned = next.isPinned;
     note.isFavorite = next.isFavorite;
+    note.ignoredSuggestedTags = normalizeTags(popupEditorIgnoredSuggestions);
     note.updatedAt = Date.now();
-    await Promise.all([
-      saveNotes(allNotes),
-      mergeCustomTags(next.tags)
-    ]);
+    try {
+      await persistUnlockedContent(note, next.content, lockSession);
+    } catch (error) {
+      showToast(t('unlockRequired'), 'warning');
+      return;
+    }
+    const saved = await saveNotes(allNotes);
+    if (!saved) return;
+    await mergeCustomTags(next.tags);
+    popupDirty = false;
     await refreshState();
     renderWorkspaceOptions();
     renderCategoryOptions();
@@ -1224,12 +1327,77 @@
 
   async function deleteCurrentPopupNote() {
     if (!currentViewingNoteId) return;
-    if (!confirm(t('deleteConfirm'))) return;
-    allNotes = allNotes.filter(note => note.id !== currentViewingNoteId);
-    await saveNotes(allNotes);
-    closeNoteModal();
-    renderNotes();
-    showToast(t('deleted'), 'success');
+    openPopupConfirm({
+      title: t('deleteConfirm'),
+      onConfirm: async () => {
+        allNotes = allNotes.filter(note => note.id !== currentViewingNoteId);
+        const ok = await saveNotes(allNotes);
+        if (!ok) return;
+        closeNoteModal();
+        renderNotes();
+        showToast(t('deleted'), 'success');
+      }
+    });
+  }
+
+  let popupConfirmHandler = null;
+  let tagModalScope = 'capture';
+
+  function openPopupConfirm({ title, text = '', okLabel = null, danger = true, onConfirm }) {
+    popupConfirmHandler = onConfirm || null;
+    if (els.confirmTitle) els.confirmTitle.textContent = title || t('deleteConfirm');
+    if (els.confirmText) els.confirmText.textContent = text || '';
+    if (els.btnConfirmOk) {
+      els.btnConfirmOk.textContent = okLabel || t('delete');
+      els.btnConfirmOk.classList.toggle('cn-btn-danger', !!danger);
+      els.btnConfirmOk.classList.toggle('cn-btn-primary', !danger);
+    }
+    if (els.confirmModal) els.confirmModal.classList.remove('cn-hidden');
+  }
+
+  function closePopupConfirm() {
+    popupConfirmHandler = null;
+    if (els.confirmModal) els.confirmModal.classList.add('cn-hidden');
+  }
+
+  async function confirmPopupConfirm() {
+    const handler = popupConfirmHandler;
+    closePopupConfirm();
+    if (handler) await handler();
+  }
+
+  function openTagModal(scope = 'capture') {
+    tagModalScope = scope;
+    if (els.tagModalTitle) els.tagModalTitle.textContent = t('addTag');
+    if (els.tagInput) els.tagInput.value = '';
+    if (els.tagModal) els.tagModal.classList.remove('cn-hidden');
+    if (els.tagInput) els.tagInput.focus();
+  }
+
+  function closeTagModal() {
+    if (els.tagModal) els.tagModal.classList.add('cn-hidden');
+    if (els.tagInput) els.tagInput.value = '';
+  }
+
+  async function saveTagModal() {
+    const tag = normalizeTag(els.tagInput ? els.tagInput.value : '');
+    if (!tag) return;
+    customTags = normalizeTags([...customTags, tag]);
+    const ok = await saveCustomTags(customTags);
+    if (!ok) return;
+    renderTagDataLists();
+    if (tagModalScope === 'editor') {
+      addTagToInput(tag, els.noteTags);
+      renderNoteQuickTags();
+      renderNoteSuggestions();
+      onPopupEditorInput();
+    } else {
+      addTagToInput(tag, els.captureTags);
+      renderCaptureQuickTags();
+      renderCaptureSuggestions();
+    }
+    closeTagModal();
+    showToast(t('customTagAdded'), 'success');
   }
 
   function openNoteEditor(id) {

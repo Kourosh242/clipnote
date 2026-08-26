@@ -254,7 +254,7 @@
               <p id="version-status-label" class="cn-version-status-label">Version Status</p>
               <p id="version-status-text" class="cn-version-status-text"><strong>You are up to date.</strong></p>
             </div>
-            <span id="version-status-value" class="cn-version-status-value">v1.3.1</span>
+            <span id="version-status-value" class="cn-version-status-value">v1.3.2</span>
           </div>
         </section>
 
@@ -348,7 +348,7 @@
           <div class="cn-settings-card cn-card">
             <div class="cn-card-body">
               <h3 class="cn-settings-title" id="about-title">About</h3>
-              <p><strong>ClipNote</strong> <span id="about-version">v1.3.1</span></p>
+              <p><strong>ClipNote</strong> <span id="about-version">v1.3.2</span></p>
               <p class="cn-text-sm cn-text-muted">
                 <span id="about-created-prefix">Created by </span>
                 <a id="about-kourosh-link" href="https://github.com/Kourosh242" target="_blank" rel="noopener noreferrer">Kourosh</a>
@@ -414,7 +414,7 @@
       <div class="cn-setting-row">
         <label for="lock-secret" id="lock-secret-label">Password / PIN</label>
         <div class="cn-password-row">
-          <input type="password" id="lock-secret" class="cn-input" placeholder="Enter password or 4-digit PIN">
+          <input type="password" id="lock-secret" class="cn-input" placeholder="Enter password or 4-digit PIN" autocomplete="new-password">
           <button id="btn-toggle-lock-secret" class="cn-btn cn-btn-ghost cn-btn-sm cn-password-toggle" type="button">👁</button>
         </div>
       </div>
@@ -438,7 +438,7 @@
       <h3 id="unlock-modal-title">Unlock Note</h3>
       <p id="unlock-modal-text" class="cn-text-sm cn-text-muted">Enter the password or PIN to view this note.</p>
       <div class="cn-password-row">
-        <input type="password" id="unlock-secret" class="cn-input" placeholder="Password or PIN">
+        <input type="password" id="unlock-secret" class="cn-input" placeholder="Password or PIN" autocomplete="off">
         <button id="btn-toggle-unlock-secret" class="cn-btn cn-btn-ghost cn-btn-sm cn-password-toggle" type="button">👁</button>
       </div>
       <div id="unlock-recovery-panel" class="cn-recovery-panel cn-hidden">
@@ -456,4 +456,6 @@
   <script src="shared.js"></script>
   <script src="options.js"></script>
 </body>
+</html>
+
 </html>

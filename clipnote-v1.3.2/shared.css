@@ -840,12 +840,17 @@ code, pre, .cn-code-block, .cn-inline-code {
 #cn-toast-container {
   position: fixed;
   top: 16px;
-  right: 16px;
+  inset-inline-end: 16px;
   z-index: 10000;
   display: flex;
   flex-direction: column;
   gap: 8px;
   pointer-events: none;
+}
+
+html[data-lang="fa"] #cn-toast-container {
+  inset-inline-end: 16px;
+  inset-inline-start: auto;
 }
 
 .cn-toast {
@@ -959,7 +964,7 @@ code, pre, .cn-code-block, .cn-inline-code {
 
 .cn-markdown ul, .cn-markdown ol {
   margin: 0.6em 0;
-  padding-left: 1.5em;
+  padding-inline-start: 1.5em;
 }
 
 .cn-markdown li {
@@ -969,9 +974,12 @@ code, pre, .cn-code-block, .cn-inline-code {
 .cn-markdown blockquote {
   margin: 1em 0;
   padding: 8px 16px;
-  border-left: 4px solid var(--cn-primary);
+  border-inline-start: 4px solid var(--cn-primary);
   background: var(--cn-surface-2);
-  border-radius: 0 var(--cn-radius-sm) var(--cn-radius-sm) 0;
+  border-start-start-radius: 0;
+  border-start-end-radius: var(--cn-radius-sm);
+  border-end-end-radius: var(--cn-radius-sm);
+  border-end-start-radius: 0;
   color: var(--cn-text-secondary);
   font-style: italic;
 }

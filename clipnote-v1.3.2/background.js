@@ -8,8 +8,38 @@ importScripts('shared.js');
 const CONTEXT_MENU_ID = 'clipnote-save-selection';
 
 const UPDATE_CHECK_ALARM = 'clipnote-update-check';
-const UPDATE_CHECK_FIRST_DELAY_MINUTES = 5; // first check shortly after install/startup
-const UPDATE_CHECK_PERIOD_MINUTES = 360; // then every 6 hours
+const UPDATE_CHECK_FIRST_DELAY_MINUTES = 5;
+const UPDATE_CHECK_PERIOD_MINUTES = 360;
+
+const BG_I18N = {
+  en: {
+    menuTitle: 'Save to ClipNote',
+    saved: 'Saved successfully to ClipNote.',
+    saveFailed: 'Quick save failed.',
+    updateAvailable: (label) => `New version v${label} is available. Click to view the release.`
+  },
+  fa: {
+    menuTitle: 'ذخیره در ClipNote',
+    saved: 'با موفقیت در ClipNote ذخیره شد.',
+    saveFailed: 'ذخیره سریع انجام نشد.',
+    updateAvailable: (label) => `نسخه جدید v${label} آماده است. برای مشاهده کلیک کنید.`
+  }
+};
+
+async function getBgLang() {
+  try {
+    const settings = await ClipNote.getSettings();
+    return settings.language === 'fa' ? 'fa' : 'en';
+  } catch (error) {
+    return 'en';
+  }
+}
+
+function bt(lang, key, ...args) {
+  const pack = BG_I18N[lang] || BG_I18N.en;
+  const value = pack[key];
+  return typeof value === 'function' ? value(...args) : value;
+}
 
 async function ensureBaseStorage() {
   await ClipNote.migrateStorageData();
@@ -22,11 +52,12 @@ function setupUpdateAlarm() {
   }, () => void chrome.runtime.lastError);
 }
 
-function createContextMenus() {
+async function createContextMenus() {
+  const lang = await getBgLang();
   chrome.contextMenus.removeAll(() => {
     chrome.contextMenus.create({
       id: CONTEXT_MENU_ID,
-      title: 'Save to ClipNote',
+      title: bt(lang, 'menuTitle'),
       contexts: ['selection']
     }, () => {
       if (chrome.runtime.lastError) {
@@ -40,6 +71,7 @@ async function saveSelectionToClipNote(info, tab) {
   const selectedText = (info.selectionText || '').trim();
   if (!selectedText) return;
 
+  const lang = await getBgLang();
   try {
     const [notes, settings, workspaces] = await Promise.all([
       ClipNote.getNotes(),
@@ -73,8 +105,9 @@ async function saveSelectionToClipNote(info, tab) {
     }, workspaces);
 
     notes.unshift(note);
+    const saved = await ClipNote.saveNotes(notes);
+    if (!saved) throw new Error('storage');
     await Promise.all([
-      ClipNote.saveNotes(notes),
       ClipNote.mergeCustomTags(tags),
       ClipNote.saveLastQuickSave({
         id: note.id,
@@ -91,7 +124,7 @@ async function saveSelectionToClipNote(info, tab) {
       type: 'basic',
       iconUrl: 'icons/icon128.png',
       title: 'ClipNote',
-      message: 'Saved successfully to ClipNote.'
+      message: bt(lang, 'saved')
     }, () => void chrome.runtime.lastError);
   } catch (error) {
     console.error('Quick save failed:', error);
@@ -99,7 +132,7 @@ async function saveSelectionToClipNote(info, tab) {
       type: 'basic',
       iconUrl: 'icons/icon128.png',
       title: 'ClipNote',
-      message: 'Quick save failed.'
+      message: bt(lang, 'saveFailed')
     }, () => void chrome.runtime.lastError);
   }
 }
@@ -121,7 +154,7 @@ chrome.runtime.onInstalled.addListener(async (details) => {
     }
 
     await ensureBaseStorage();
-    createContextMenus();
+    await createContextMenus();
     setupUpdateAlarm();
     console.log('ClipNote installed/updated:', details.reason);
   } catch (error) {
@@ -131,7 +164,7 @@ chrome.runtime.onInstalled.addListener(async (details) => {
 
 chrome.runtime.onStartup.addListener(async () => {
   await ensureBaseStorage();
-  createContextMenus();
+  await createContextMenus();
   setupUpdateAlarm();
 });
 
@@ -177,4 +210,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 
   return false;
+});
+
+chrome.storage.onChanged.addListener((changes, areaName) => {
+  if (areaName !== 'local') return;
+  if (changes[ClipNote.STORAGE_KEYS.SETTINGS]) {
+    createContextMenus().catch(() => {});
+  }
 });

@@ -32,7 +32,7 @@ const DEFAULT_SETTINGS = {
   language: 'en'
 };
 
-const DEFAULT_CATEGORIES = ['Work', 'Personal', 'Programming', 'Shopping', 'Ideas', 'Passwords'];
+const DEFAULT_CATEGORIES = ['Work', 'Personal', 'Programming', 'Shopping', 'Ideas'];
 const DEFAULT_TAGS = ['python', 'css', 'api_key', 'text', 'md'];
 const DEFAULT_WORKSPACES = [{ id: DEFAULT_WORKSPACE_ID, name: 'General', createdAt: 0 }];
 
@@ -50,6 +50,10 @@ const EMPTY_LOCK = Object.freeze({
   type: null,
   salt: '',
   hash: '',
+  encrypted: false,
+  contentIv: '',
+  wrappedKey: '',
+  wrapIv: '',
   recovery: null
 });
 
@@ -66,13 +70,47 @@ const SMART_TAG_RULES = [
   { tag: 'bug', regex: /\b(bug|fix|issue|error|exception|debug)\b/i },
   { tag: 'regex', regex: /\b(regex|regexp|regular expression)\b/i },
   { tag: 'markdown', regex: /(^|\s)(#+\s|```|\*\*|\[[^\]]+\]\([^)]+\)|\|.+\|)/im },
-  { tag: 'json', regex: /\{[\s\S]*\}|\[[\s\S]*\]|\bjson\b/i },
+  { tag: 'json', regex: /\bjson\b/i },
   { tag: 'docker', regex: /\b(docker|dockerfile|compose|container)\b/i },
   { tag: 'linux', regex: /\b(linux|ubuntu|debian|bash|shell|chmod|systemctl)\b/i },
   { tag: 'git', regex: /\b(git|github|gitlab|commit|branch|merge)\b/i },
-  { tag: 'md', regex: /\bmarkdown\b|(^|\s)#\s|```/im },
-  { tag: 'text', regex: /[\s\S]{8,}/i }
+  { tag: 'md', regex: /\bmarkdown\b|(^|\s)#\s|```/im }
 ];
+
+const SHARED_I18N = {
+  en: {
+    copied: 'Copied Successfully',
+    copyFailed: 'Copy Failed',
+    cannotReadClipboard: 'Cannot read clipboard',
+    exportCompleted: 'Export Completed',
+    noNotesExport: 'No notes to export',
+    invalidBackup: 'Invalid backup file',
+    importCompleted: 'Import Completed',
+    importFailed: 'Import Failed',
+    saveFailed: 'Save failed. Storage may be full.'
+  },
+  fa: {
+    copied: 'با موفقیت کپی شد',
+    copyFailed: 'کپی انجام نشد',
+    cannotReadClipboard: 'خواندن کلیپ‌بورد ممکن نیست',
+    exportCompleted: 'خروجی گرفته شد',
+    noNotesExport: 'یادداشتی برای خروجی نیست',
+    invalidBackup: 'فایل پشتیبان نامعتبر است',
+    importCompleted: 'ورود انجام شد',
+    importFailed: 'ورود ناموفق بود',
+    saveFailed: 'ذخیره نشد. ممکن است فضای ذخیره‌سازی پر باشد.'
+  }
+};
+
+let sharedLocale = 'en';
+
+function setSharedLocale(lang) {
+  sharedLocale = lang === 'fa' ? 'fa' : 'en';
+}
+
+function ts(key) {
+  return SHARED_I18N[sharedLocale][key] || SHARED_I18N.en[key] || key;
+}
 
 const GITHUB_REPO_URL = 'https://github.com/Kourosh242/clipnote';
 const GITHUB_RELEASES_URL = `${GITHUB_REPO_URL}/releases/latest`;
@@ -331,7 +369,9 @@ async function getNotes() {
 }
 
 async function saveNotes(notes) {
-  return await setStorage(STORAGE_KEYS.NOTES, notes);
+  const ok = await setStorage(STORAGE_KEYS.NOTES, notes);
+  if (!ok) showToast(ts('saveFailed'), 'error');
+  return ok;
 }
 
 async function getSettings() {
@@ -398,7 +438,8 @@ function createNote(data = {}, workspaces = DEFAULT_WORKSPACES) {
   const workspaceId = ensureWorkspaceId(data.workspaceId || DEFAULT_WORKSPACE_ID, workspaces);
   const rawTitle = normalizeText(data.title);
   const rawContent = typeof data.content === 'string' ? data.content : '';
-  const computedTitle = rawTitle || truncateText(rawContent.split('\n').find(Boolean) || '', 60) || 'Untitled Note';
+  const lookLikeCipher = !!(data.lock && data.lock.encrypted);
+  const computedTitle = rawTitle || (lookLikeCipher ? '' : truncateText(rawContent.split('\n').find(Boolean) || '', 60)) || '';
 
   return {
     id: data.id || generateId('note'),
@@ -465,10 +506,10 @@ function getNoteWorkspace(note, workspaces) {
 }
 
 // ============== Date Helpers ==============
-function formatDate(timestamp) {
+function formatDate(timestamp, locale = 'en-US') {
   if (!timestamp) return '';
   const d = new Date(timestamp);
-  return d.toLocaleString('en-US', {
+  return d.toLocaleString(locale === 'fa' ? 'fa-IR' : locale, {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
@@ -504,7 +545,7 @@ function getTimelineBucket(timestamp, nowTs = Date.now()) {
   const targetDay = startOfDay(noteDate).getTime();
   const diffDays = Math.floor((today - targetDay) / 86400000);
 
-  if (diffDays === 0) return 'today';
+  if (diffDays <= 0) return 'today';
   if (diffDays === 1) return 'yesterday';
   if (diffDays < 7) return 'this_week';
   if (noteDate.getFullYear() === now.getFullYear() && noteDate.getMonth() === now.getMonth()) {
@@ -545,7 +586,7 @@ function getTimelineGroups(notes, sortFn = sortNotes) {
 // ============== Tag Helpers ==============
 function extractTags(text) {
   if (typeof text !== 'string') return [];
-  const matches = text.match(/#[\w\-.]+/g) || [];
+  const matches = text.match(/#[\p{L}\p{N}_\-.]+/gu) || [];
   return normalizeTags(matches);
 }
 
@@ -599,43 +640,71 @@ function linkifyUrls(text) {
 }
 
 // ============== Markdown Parser ==============
+function safeMarkdownUrl(url) {
+  const value = String(url || '').trim();
+  if (!value) return '#';
+  const decoded = value.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"');
+  const lower = decoded.toLowerCase();
+  if (lower.startsWith('javascript:') || lower.startsWith('data:') || lower.startsWith('vbscript:')) return '#';
+  return value;
+}
+
 function parseMarkdown(text) {
   if (!text) return '';
 
-  let html = escapeHtml(text);
-  const codeBlocks = [];
-  const placeholder = (index) => `\n<!--CNCB${index}-->\n`;
+  const fences = [];
+  const inlines = [];
+  let src = String(text);
 
-  html = html.replace(/```([\w]*)\n?([\s\S]*?)```/g, (match, lang, code) => {
-    const language = lang ? escapeHtml(lang) : '';
-    const codeContent = code.replace(/^\n|\n$/g, '');
-    const blockHtml = `<div class="cn-code-block"><div class="cn-code-header"><span class="cn-code-lang">${language || 'code'}</span><button class="cn-copy-code-btn" data-code="${escapeHtml(codeContent).replace(/"/g, '&quot;')}">Copy</button></div><pre><code>${escapeHtml(codeContent)}</code></pre></div>`;
-    const index = codeBlocks.push(blockHtml) - 1;
-    return placeholder(index);
+  src = src.replace(/```([\w]*)\n?([\s\S]*?)```/g, (match, lang, code) => {
+    const codeContent = String(code || '').replace(/^\n|\n$/g, '');
+    const index = fences.push({ lang: lang || '', code: codeContent }) - 1;
+    return `\n%%CNCB${index}%%\n`;
   });
 
-  html = html.replace(/`([^`]+)`/g, '<code class="cn-inline-code">$1</code>');
+  src = src.replace(/`([^`\n]+)`/g, (match, code) => {
+    const index = inlines.push(code) - 1;
+    return `%%CNIC${index}%%`;
+  });
+
+  let html = escapeHtml(src);
+
   html = html.replace(/^###### (.*$)/gim, '<h6>$1</h6>');
   html = html.replace(/^##### (.*$)/gim, '<h5>$1</h5>');
   html = html.replace(/^#### (.*$)/gim, '<h4>$1</h4>');
   html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
   html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
   html = html.replace(/^# (.*$)/gim, '<h1>$1</h1>');
-  html = html.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
-  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-  html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
-  html = html.replace(/__(.+?)__/g, '<strong>$1</strong>');
-  html = html.replace(/_(.+?)_/g, '<em>$1</em>');
+  html = html.replace(/\*\*\*(?=\S)([\s\S]*?\S)\*\*\*/g, '<strong><em>$1</em></strong>');
+  html = html.replace(/\*\*(?=\S)([\s\S]*?\S)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/(?<![*\w])\*(?!\s)([^*\n]+?)(?<!\s)\*(?![*\w])/g, '<em>$1</em>');
+  html = html.replace(/(?<![A-Za-z0-9_])__(.+?)__(?![A-Za-z0-9_])/g, (match, inner) => {
+    if (/^[A-Za-z0-9_]+$/.test(inner)) return match;
+    return `<strong>${inner}</strong>`;
+  });
+  html = html.replace(/(?<![A-Za-z0-9_])_(?!_)(?=\S)([^_\n]+?)(?<!\s)_(?!_)(?![A-Za-z0-9_])/g, '<em>$1</em>');
   html = html.replace(/~~(.+?)~~/g, '<del>$1</del>');
-  html = html.replace(/^> (.*$)/gim, '<blockquote>$1</blockquote>');
+  html = html.replace(/^&gt; (.*$)/gim, '<blockquote>$1</blockquote>');
   html = html.replace(/^---+$/gim, '<hr>');
-  html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" class="cn-md-image" loading="lazy">');
-  html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="cn-link">$1</a>');
+  html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match, alt, url) => {
+    return `<img src="${safeMarkdownUrl(url)}" alt="${alt}" class="cn-md-image" loading="lazy">`;
+  });
+  html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (match, label, url) => {
+    return `<a href="${safeMarkdownUrl(url)}" target="_blank" rel="noopener noreferrer" class="cn-link">${label}</a>`;
+  });
   html = parseTables(html);
   html = parseLists(html);
 
-  codeBlocks.forEach((block, index) => {
-    html = html.replace(placeholder(index), block);
+  inlines.forEach((code, index) => {
+    html = html.replace(`%%CNIC${index}%%`, `<code class="cn-inline-code">${escapeHtml(code)}</code>`);
+  });
+
+  fences.forEach((block, index) => {
+    const language = escapeHtml(block.lang);
+    const codeContent = escapeHtml(block.code);
+    const attr = codeContent.replace(/"/g, '&quot;');
+    const blockHtml = `<div class="cn-code-block"><div class="cn-code-header"><span class="cn-code-lang">${language || 'code'}</span><button class="cn-copy-code-btn" data-code="${attr}">Copy</button></div><pre><code>${codeContent}</code></pre></div>`;
+    html = html.replace(`%%CNCB${index}%%`, blockHtml);
   });
 
   html = html.split(/\n\n+/).map(block => {
@@ -709,12 +778,16 @@ function parseLists(html) {
   const result = [];
   const listStack = [];
 
+  function closeOne() {
+    const item = listStack.pop();
+    if (!item) return '';
+    const closeTag = item.ordered ? '</ol>' : '</ul>';
+    return item.closeLi ? `${closeTag}</li>` : closeTag;
+  }
+
   function closeLists() {
     let out = '';
-    while (listStack.length > 0) {
-      const item = listStack.pop();
-      out += item.ordered ? '</ol>' : '</ul>';
-    }
+    while (listStack.length > 0) out += closeOne();
     return out;
   }
 
@@ -729,20 +802,26 @@ function parseLists(html) {
       const orderedList = !!ordered;
 
       if (listStack.length === 0) {
-        listStack.push({ indent, ordered: orderedList });
+        listStack.push({ indent, ordered: orderedList, closeLi: false });
         result.push(orderedList ? '<ol>' : '<ul>');
       } else {
         const top = listStack[listStack.length - 1];
         if (indent > top.indent) {
-          listStack.push({ indent, ordered: orderedList });
-          result.push(orderedList ? '<ol>' : '<ul>');
+          const last = result[result.length - 1];
+          if (last && last.startsWith('<li>') && last.endsWith('</li>')) {
+            result[result.length - 1] = last.slice(0, -5);
+            listStack.push({ indent, ordered: orderedList, closeLi: true });
+            result.push(orderedList ? '<ol>' : '<ul>');
+          } else {
+            listStack.push({ indent, ordered: orderedList, closeLi: false });
+            result.push(orderedList ? '<ol>' : '<ul>');
+          }
         } else if (indent < top.indent || orderedList !== top.ordered) {
           while (listStack.length > 0 && (listStack[listStack.length - 1].indent > indent || listStack[listStack.length - 1].ordered !== orderedList)) {
-            const item = listStack.pop();
-            result.push(item.ordered ? '</ol>' : '</ul>');
+            result.push(closeOne());
           }
           if (listStack.length === 0 || listStack[listStack.length - 1].indent < indent) {
-            listStack.push({ indent, ordered: orderedList });
+            listStack.push({ indent, ordered: orderedList, closeLi: false });
             result.push(orderedList ? '<ol>' : '<ul>');
           }
         }
@@ -762,7 +841,7 @@ function parseLists(html) {
 async function copyToClipboard(text, buttonElement = null) {
   try {
     await navigator.clipboard.writeText(text);
-    showToast('Copied Successfully', 'success');
+    showToast(ts('copied'), 'success');
     if (buttonElement) {
       const originalText = buttonElement.textContent;
       buttonElement.textContent = 'Copied!';
@@ -780,10 +859,10 @@ async function copyToClipboard(text, buttonElement = null) {
       textarea.select();
       document.execCommand('copy');
       document.body.removeChild(textarea);
-      showToast('Copied Successfully', 'success');
+      showToast(ts('copied'), 'success');
       return true;
     } catch (e) {
-      showToast('Copy Failed', 'error');
+      showToast(ts('copyFailed'), 'error');
       return false;
     }
   }
@@ -794,18 +873,25 @@ async function readFromClipboard() {
     return await navigator.clipboard.readText();
   } catch (err) {
     console.error('Paste failed:', err);
-    showToast('Cannot read clipboard', 'error');
+    showToast(ts('cannotReadClipboard'), 'error');
     return '';
   }
 }
 
 // ============== Search ==============
-function filterNotes(notes, query) {
+function filterNotes(notes, query, getContent = null) {
   if (!query || !query.trim()) return notes;
   const q = query.toLowerCase().trim();
   return (notes || []).filter(note => {
     const inTitle = (note.title || '').toLowerCase().includes(q);
-    const inContent = (note.content || '').toLowerCase().includes(q);
+    const locked = isNoteLocked(note);
+    let inContent = false;
+    if (!locked) {
+      inContent = (note.content || '').toLowerCase().includes(q);
+    } else if (typeof getContent === 'function') {
+      const plain = getContent(note);
+      if (typeof plain === 'string') inContent = plain.toLowerCase().includes(q);
+    }
     const inTags = (note.tags || []).some(tag => tag.toLowerCase().includes(q));
     const inCategory = (note.category || '').toLowerCase().includes(q);
     return inTitle || inContent || inTags || inCategory;
@@ -975,36 +1061,42 @@ async function exportToJson() {
     `clipnote-backup-${new Date().toISOString().slice(0, 10)}.json`,
     'application/json'
   );
-  showToast('Export Completed', 'success');
+  showToast(ts('exportCompleted'), 'success');
 }
 
 async function exportToTxt() {
-  const [notes, workspaces] = await Promise.all([getNotes(), getWorkspaces()]);
+  const [notes, workspaces, settings] = await Promise.all([getNotes(), getWorkspaces(), getSettings()]);
   if (!notes.length) {
-    showToast('No notes to export', 'info');
+    showToast(ts('noNotesExport'), 'info');
     return;
   }
 
   const workspaceMap = getWorkspaceMap(workspaces);
+  const locale = settings.language === 'fa' ? 'fa' : 'en-US';
   const lines = [];
 
   notes.forEach(note => {
+    const locked = isNoteLocked(note);
     lines.push('='.repeat(60));
-    lines.push(`Title: ${note.title}`);
+    lines.push(`Title: ${note.title || ''}`);
     lines.push(`Workspace: ${workspaceMap.get(note.workspaceId)?.name || 'General'}`);
     lines.push(`Category: ${note.category || 'None'}`);
     lines.push(`Tags: ${(note.tags || []).join(', ') || 'None'}`);
-    lines.push(`Created: ${formatDate(note.createdAt)}`);
-    lines.push(`Updated: ${formatDate(note.updatedAt)}`);
+    lines.push(`Created: ${formatDate(note.createdAt, locale)}`);
+    lines.push(`Updated: ${formatDate(note.updatedAt, locale)}`);
     if (note.source?.pageUrl) lines.push(`Source URL: ${note.source.pageUrl}`);
     if (note.source?.pageTitle) lines.push(`Source Title: ${note.source.pageTitle}`);
     lines.push('-'.repeat(60));
-    lines.push(note.content || '');
+    if (locked) {
+      lines.push(note.lock?.encrypted ? '[encrypted]' : '[locked]');
+    } else {
+      lines.push(note.content || '');
+    }
     lines.push('');
   });
 
   downloadFile(lines.join('\n'), `clipnote-notes-${new Date().toISOString().slice(0, 10)}.txt`, 'text/plain');
-  showToast('Export Completed', 'success');
+  showToast(ts('exportCompleted'), 'success');
 }
 
 async function importFromJson(file) {
@@ -1014,7 +1106,7 @@ async function importFromJson(file) {
       try {
         const data = JSON.parse(e.target.result);
         if (!data.notes || !Array.isArray(data.notes)) {
-          showToast('Invalid backup file', 'error');
+          showToast(ts('invalidBackup'), 'error');
           resolve(false);
           return;
         }
@@ -1049,11 +1141,11 @@ async function importFromJson(file) {
         });
 
         await migrateStorageData();
-        showToast('Import Completed', 'success');
+        showToast(ts('importCompleted'), 'success');
         resolve(true);
       } catch (err) {
         console.error(err);
-        showToast('Import Failed', 'error');
+        showToast(ts('importFailed'), 'error');
         resolve(false);
       }
     };
@@ -1175,8 +1267,231 @@ async function verifyNoteSecret(note, secret) {
 
 async function verifyRecoveryAnswer(note, answer) {
   if (!hasRecoveryQuestion(note)) return false;
-  const result = await hashSecret(String(answer || ''), note.lock.recovery.salt);
+  const result = await hashSecret(normalizeText(answer), note.lock.recovery.salt);
   return result.hash === note.lock.recovery.hash;
+}
+
+function createLockSession() {
+  const map = new Map();
+  return {
+    has: (id) => map.has(id),
+    get: (id) => map.get(id) || null,
+    getPlain: (id) => map.get(id)?.plaintext ?? null,
+    getDek: (id) => map.get(id)?.dek ?? null,
+    set: (id, value) => map.set(id, value),
+    delete: (id) => map.delete(id),
+    clear: () => map.clear()
+  };
+}
+
+async function deriveKek(secret, saltBase64 = '') {
+  const encoder = new TextEncoder();
+  const saltBytes = saltBase64 ? base64ToBytes(saltBase64) : crypto.getRandomValues(new Uint8Array(16));
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw',
+    encoder.encode(String(secret || '')),
+    'PBKDF2',
+    false,
+    ['deriveKey']
+  );
+  const kek = await crypto.subtle.deriveKey({
+    name: 'PBKDF2',
+    salt: saltBytes,
+    iterations: 150000,
+    hash: 'SHA-256'
+  }, keyMaterial, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+  return { kek, salt: bytesToBase64(saltBytes) };
+}
+
+async function generateDek() {
+  return crypto.subtle.generateKey({ name: 'AES-GCM', length: 256 }, true, ['encrypt', 'decrypt']);
+}
+
+async function wrapDek(dek, kek) {
+  const raw = new Uint8Array(await crypto.subtle.exportKey('raw', dek));
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const cipher = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, kek, raw);
+  return { wrappedKey: bytesToBase64(new Uint8Array(cipher)), wrapIv: bytesToBase64(iv) };
+}
+
+async function unwrapDek(wrappedKey, wrapIv, kek) {
+  const raw = await crypto.subtle.decrypt(
+    { name: 'AES-GCM', iv: base64ToBytes(wrapIv) },
+    kek,
+    base64ToBytes(wrappedKey)
+  );
+  return crypto.subtle.importKey('raw', raw, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+}
+
+async function encryptText(text, dek) {
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const cipher = await crypto.subtle.encrypt(
+    { name: 'AES-GCM', iv },
+    dek,
+    new TextEncoder().encode(String(text || ''))
+  );
+  return { ciphertext: bytesToBase64(new Uint8Array(cipher)), iv: bytesToBase64(iv) };
+}
+
+async function decryptText(ciphertext, dek, ivBase64) {
+  const plain = await crypto.subtle.decrypt(
+    { name: 'AES-GCM', iv: base64ToBytes(ivBase64) },
+    dek,
+    base64ToBytes(ciphertext)
+  );
+  return new TextDecoder().decode(plain);
+}
+
+function getNoteDisplayContent(note, session) {
+  if (!note) return '';
+  if (!isNoteLocked(note)) return note.content || '';
+  if (session && session.has(note.id)) return session.getPlain(note.id) || '';
+  if (note.lock && note.lock.encrypted) return '';
+  return note.content || '';
+}
+
+async function applyEncryptionToNote(note, type, secret, session) {
+  const plaintext = session && session.has(note.id)
+    ? (session.getPlain(note.id) || '')
+    : (note.lock && note.lock.encrypted ? '' : (note.content || ''));
+  const lockMeta = await createNoteLock(type, secret);
+  const dek = await generateDek();
+  const { kek } = await deriveKek(secret, lockMeta.salt);
+  const wrapped = await wrapDek(dek, kek);
+  const enc = await encryptText(plaintext, dek);
+  note.content = enc.ciphertext;
+  note.lock = {
+    ...lockMeta,
+    encrypted: true,
+    contentIv: enc.iv,
+    wrappedKey: wrapped.wrappedKey,
+    wrapIv: wrapped.wrapIv,
+    recovery: note.lock && note.lock.recovery ? note.lock.recovery : null
+  };
+  if (session) session.set(note.id, { dek, plaintext });
+  return note;
+}
+
+async function persistUnlockedContent(note, plaintext, session) {
+  if (isNoteLocked(note) && note.lock.encrypted) {
+    const dek = session && session.getDek(note.id);
+    if (!dek) throw new Error('UNLOCK_REQUIRED');
+    const enc = await encryptText(plaintext, dek);
+    note.content = enc.ciphertext;
+    note.lock.contentIv = enc.iv;
+    session.set(note.id, { dek, plaintext });
+    return note;
+  }
+  note.content = plaintext;
+  return note;
+}
+
+async function unlockNoteSession(note, secret, session) {
+  const blockedUntil = getUnlockBlock(note.id);
+  if (blockedUntil) {
+    const err = new Error('LOCKED_OUT');
+    err.until = blockedUntil;
+    throw err;
+  }
+  let valid = false;
+  try {
+    valid = await verifyNoteSecret(note, secret);
+  } catch (error) {
+    recordUnlockFailure(note.id);
+    throw new Error('UNLOCK_ERROR');
+  }
+  if (!valid) {
+    const rec = recordUnlockFailure(note.id);
+    const err = new Error('INVALID_SECRET');
+    err.until = rec.until;
+    throw err;
+  }
+  resetUnlockFailures(note.id);
+  if (note.lock.encrypted && note.lock.wrappedKey && note.lock.wrapIv) {
+    const { kek } = await deriveKek(secret, note.lock.salt);
+    const dek = await unwrapDek(note.lock.wrappedKey, note.lock.wrapIv, kek);
+    const plaintext = await decryptText(note.content, dek, note.lock.contentIv);
+    session.set(note.id, { dek, plaintext });
+    return plaintext;
+  }
+  const plaintext = note.content || '';
+  await applyEncryptionToNote(note, note.lock.type || 'password', secret, session);
+  return session.getPlain(note.id) || plaintext;
+}
+
+async function unlockNoteSessionByRecovery(note, answer, session) {
+  const blockedUntil = getUnlockBlock(note.id);
+  if (blockedUntil) {
+    const err = new Error('LOCKED_OUT');
+    err.until = blockedUntil;
+    throw err;
+  }
+  let valid = false;
+  try {
+    valid = await verifyRecoveryAnswer(note, answer);
+  } catch (error) {
+    recordUnlockFailure(note.id);
+    throw new Error('UNLOCK_ERROR');
+  }
+  if (!valid) {
+    const rec = recordUnlockFailure(note.id);
+    const err = new Error('INVALID_SECRET');
+    err.until = rec.until;
+    throw err;
+  }
+  resetUnlockFailures(note.id);
+  const recovery = note.lock.recovery;
+  if (note.lock.encrypted && recovery && recovery.wrappedKey && recovery.wrapIv) {
+    const { kek } = await deriveKek(normalizeText(answer), recovery.salt);
+    const dek = await unwrapDek(recovery.wrappedKey, recovery.wrapIv, kek);
+    const plaintext = await decryptText(note.content, dek, note.lock.contentIv);
+    session.set(note.id, { dek, plaintext });
+    return plaintext;
+  }
+  session.set(note.id, { dek: null, plaintext: note.lock.encrypted ? '' : (note.content || ''), legacy: true });
+  return session.getPlain(note.id) || '';
+}
+
+async function attachRecoveryToNote(note, question, answer, session) {
+  const dek = session && session.getDek(note.id);
+  const recovery = await createRecoveryData(question, answer);
+  if (dek) {
+    const { kek } = await deriveKek(normalizeText(answer), recovery.salt);
+    const wrapped = await wrapDek(dek, kek);
+    recovery.wrappedKey = wrapped.wrappedKey;
+    recovery.wrapIv = wrapped.wrapIv;
+  }
+  note.lock.recovery = recovery;
+  return note;
+}
+
+const unlockGuard = new Map();
+
+function getUnlockBlock(noteId) {
+  const rec = unlockGuard.get(noteId);
+  if (!rec || !rec.until) return 0;
+  if (Date.now() >= rec.until) return 0;
+  return rec.until;
+}
+
+function recordUnlockFailure(noteId) {
+  const rec = unlockGuard.get(noteId) || { n: 0, until: 0 };
+  rec.n += 1;
+  if (rec.n >= 5) {
+    rec.until = Date.now() + Math.min(30000 * (2 ** (rec.n - 5)), 5 * 60 * 1000);
+  }
+  unlockGuard.set(noteId, rec);
+  return rec;
+}
+
+function resetUnlockFailures(noteId) {
+  unlockGuard.delete(noteId);
+}
+
+function remainingLockoutSeconds(noteId) {
+  const until = getUnlockBlock(noteId);
+  if (!until) return 0;
+  return Math.ceil((until - Date.now()) / 1000);
 }
 
 // ============== Migration ==============
@@ -1328,7 +1643,19 @@ const ClipNote = {
   hasRecoveryQuestion,
   verifyNoteSecret,
   verifyRecoveryAnswer,
-  migrateStorageData
+  migrateStorageData,
+  setSharedLocale,
+  createLockSession,
+  getNoteDisplayContent,
+  applyEncryptionToNote,
+  persistUnlockedContent,
+  unlockNoteSession,
+  unlockNoteSessionByRecovery,
+  attachRecoveryToNote,
+  getUnlockBlock,
+  recordUnlockFailure,
+  resetUnlockFailures,
+  remainingLockoutSeconds
 };
 
 if (typeof globalThis !== 'undefined') {

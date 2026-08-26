@@ -46,8 +46,20 @@
     verifyRecoveryAnswer,
     getNoteWorkspace,
     truncateText,
-    migrateStorageData
+    migrateStorageData,
+    setSharedLocale,
+    createLockSession,
+    getNoteDisplayContent,
+    applyEncryptionToNote,
+    persistUnlockedContent,
+    unlockNoteSession,
+    unlockNoteSessionByRecovery,
+    attachRecoveryToNote,
+    remainingLockoutSeconds,
+    checkForUpdates
   } = window.ClipNote;
+
+  const lockSession = createLockSession();
 
   const I18N = {
     en: {
@@ -227,7 +239,26 @@
       themeGreen: 'Green',
       themePurple: 'Purple',
       themeOrange: 'Orange',
-      themeDarkPro: 'Dark Pro'
+      themeDarkPro: 'Dark Pro',
+      accept: 'Accept',
+      ignore: 'Ignore',
+      passwordsMismatch: 'Password and confirmation do not match.',
+      tooManyAttempts: 'Too many attempts. Try again in {n}s.',
+      unlockError: 'Could not unlock this note.',
+      cannotDeleteDefaultWorkspace: 'The default workspace cannot be deleted.',
+      updateAvailable: 'A new version is available.',
+      checkingUpdates: 'Checking for updates…',
+      updateCheckFailed: 'Could not check for updates.',
+      viewRelease: 'View release',
+      colorRed: 'Red',
+      colorBlue: 'Blue',
+      colorGreen: 'Green',
+      colorOrange: 'Orange',
+      colorPurple: 'Purple',
+      colorGray: 'Gray',
+      tagDeleted: 'Tag removed',
+      emptyNoteDiscarded: 'Empty note discarded',
+      lockedChars: 'hidden'
     },
     fa: {
       allNotes: 'همه یادداشت‌ها',
@@ -406,7 +437,26 @@
       themeGreen: 'سبز',
       themePurple: 'بنفش',
       themeOrange: 'نارنجی',
-      themeDarkPro: 'دارک پرو'
+      themeDarkPro: 'دارک پرو',
+      accept: 'پذیرفتن',
+      ignore: 'نادیده بگیر',
+      passwordsMismatch: 'رمز و تکرار آن یکی نیست.',
+      tooManyAttempts: 'تلاش‌های زیاد. {n} ثانیه دیگر دوباره تلاش کنید.',
+      unlockError: 'باز کردن این یادداشت ممکن نشد.',
+      cannotDeleteDefaultWorkspace: 'ورک‌اسپیس پیش‌فرض را نمی‌توان حذف کرد.',
+      updateAvailable: 'نسخه جدیدی در دسترس است.',
+      checkingUpdates: 'در حال بررسی به‌روزرسانی…',
+      updateCheckFailed: 'بررسی به‌روزرسانی ممکن نشد.',
+      viewRelease: 'مشاهده انتشار',
+      colorRed: 'قرمز',
+      colorBlue: 'آبی',
+      colorGreen: 'سبز',
+      colorOrange: 'نارنجی',
+      colorPurple: 'بنفش',
+      colorGray: 'خاکستری',
+      tagDeleted: 'برچسب حذف شد',
+      emptyNoteDiscarded: 'یادداشت خالی حذف شد',
+      lockedChars: 'مخفی'
     }
   };
 
@@ -648,6 +698,8 @@
 
     await applyTheme(settings);
     applyLocale();
+    if (settings.sidebarCollapsed) els.sidebar.classList.add('collapsed');
+    refreshVersionStatus();
     renderColorOptions();
     renderSettingColorOptions();
     renderWorkspaceSelectors();
@@ -669,8 +721,12 @@
       }
     });
 
-    window.addEventListener('beforeunload', () => {
-      if (currentView === 'edit' && isDirty) saveCurrentNote(false);
+    window.addEventListener('beforeunload', (event) => {
+      if (currentView === 'edit' && isDirty) {
+        saveCurrentNote(false);
+        event.preventDefault();
+        event.returnValue = '';
+      }
     });
 
     chrome.storage.onChanged.addListener(handleStorageChanges);
@@ -696,6 +752,7 @@
     document.documentElement.lang = locale();
     document.documentElement.dir = isFa() ? 'rtl' : 'ltr';
     document.documentElement.setAttribute('data-lang', locale());
+    setSharedLocale(locale());
 
     document.getElementById('nav-all-notes-label').textContent = t('allNotes');
     document.getElementById('workspace-section-title').textContent = t('workspaces');
@@ -752,13 +809,12 @@
     document.getElementById('language-select-label').textContent = t('languageSelect');
     document.getElementById('language-help').textContent = t('languageHelp');
     if (els.versionStatusLabel) els.versionStatusLabel.textContent = t('versionStatus');
-    if (els.versionStatusText) els.versionStatusText.innerHTML = `<strong>${t('upToDate')}</strong>`;
-    if (els.versionStatusValue) els.versionStatusValue.textContent = `v${chrome.runtime.getManifest().version || '1.3.1'}`;
+    if (els.versionStatusValue) els.versionStatusValue.textContent = `v${chrome.runtime.getManifest().version || '1.3.2'}`;
     document.getElementById('data-title').textContent = t('data');
     document.getElementById('data-help').textContent = t('dataHelp');
     document.getElementById('about-title').textContent = t('about');
     if (els.aboutVersion) {
-      els.aboutVersion.textContent = 'v' + (chrome.runtime.getManifest().version || '1.3.1');
+      els.aboutVersion.textContent = 'v' + (chrome.runtime.getManifest().version || '1.3.2');
     }
     if (els.aboutCreatedPrefix) els.aboutCreatedPrefix.textContent = t('createdBy');
     if (els.aboutAuthorsAnd) els.aboutAuthorsAnd.textContent = t('authorsAnd');
@@ -918,6 +974,7 @@
     els.btnOverviewView.addEventListener('click', () => setListMode('overview'));
 
     els.btnBack.addEventListener('click', async () => {
+      if (await maybeDiscardEmptyNewNote()) return;
       if (isDirty) await saveCurrentNote(false);
       await showView('list');
     });
@@ -962,7 +1019,7 @@
     });
     els.btnAddTag.addEventListener('click', addCustomTagFromPrompt);
     els.btnApplyAllSuggestions.addEventListener('click', applyAllSuggestedTags);
-    els.btnEditSuggestions.addEventListener('click', mergeSuggestionsIntoInput);
+    els.btnEditSuggestions.addEventListener('click', () => els.noteTags.focus());
 
     els.btnLockNote.addEventListener('click', () => openLockModal('create'));
     els.btnChangeLock.addEventListener('click', () => openLockModal('change'));
@@ -976,8 +1033,9 @@
     els.settingTheme.addEventListener('change', saveSettingsFromUI);
     els.settingFontSize.addEventListener('input', () => {
       els.fontSizeValue.textContent = `${els.settingFontSize.value}px`;
-      saveSettingsFromUI();
+      document.documentElement.style.setProperty('--cn-font-size', `${els.settingFontSize.value}px`);
     });
+    els.settingFontSize.addEventListener('change', saveSettingsFromUI);
     els.settingAnimations.addEventListener('change', saveSettingsFromUI);
     els.settingAutoSave.addEventListener('change', saveSettingsFromUI);
     els.settingLanguage.addEventListener('change', saveSettingsFromUI);
@@ -1043,14 +1101,15 @@
         saveCurrentNote(true);
       }
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f') {
+        if (currentView === 'edit') return;
         e.preventDefault();
-        currentView === 'edit' ? els.noteContent.focus() : els.listSearch.focus();
+        els.listSearch.focus();
       }
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'n') {
         e.preventDefault();
         createNewNote();
       }
-      if (e.ctrlKey && e.altKey && e.key.toLowerCase() === 'u' && currentView === 'edit') {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z' && currentView === 'edit') {
         e.preventDefault();
         undoEditorChange();
       }
@@ -1245,16 +1304,28 @@
     scopedNotes().forEach(note => {
       (note.tags || []).forEach(tag => usage.set(tag, (usage.get(tag) || 0) + 1));
     });
+    (customTags || []).forEach(tag => {
+      if (!usage.has(tag)) usage.set(tag, 0);
+    });
+    const customSet = new Set(customTags || []);
 
     [...usage.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).forEach(([tag, count]) => {
       const item = document.createElement('div');
       item.className = `cn-tag-item ${currentTagFilter === tag ? 'active' : ''}`;
-      item.innerHTML = `<span class="cn-tag">${escapeHtml(tag)}</span><span class="cn-nav-count">${count}</span>`;
-      item.addEventListener('click', () => {
+      const canDelete = customSet.has(tag);
+      item.innerHTML = `<span class="cn-tag">${escapeHtml(tag)}</span><span class="cn-nav-count">${count}</span>${canDelete ? '<button class="cn-action-btn danger cn-tag-delete" type="button" data-action="delete-tag" title="×">×</button>' : ''}`;
+      item.addEventListener('click', (event) => {
+        if (event.target.closest('[data-action="delete-tag"]')) return;
         currentTagFilter = currentTagFilter === tag ? null : tag;
         currentCategoryFilter = null;
         renderAllListState();
       });
+      if (canDelete) {
+        item.querySelector('[data-action="delete-tag"]').addEventListener('click', async (event) => {
+          event.stopPropagation();
+          await deleteCustomTag(tag);
+        });
+      }
       els.tagsList.appendChild(item);
     });
   }
@@ -1264,10 +1335,14 @@
     if (currentCategoryFilter) notes = notes.filter(note => note.category === currentCategoryFilter);
     if (currentTagFilter) notes = notes.filter(note => (note.tags || []).includes(currentTagFilter));
 
-    const query = (els.listSearch.value || els.globalSearch.value).trim();
-    if (query) notes = filterNotes(notes, query);
+    const listQ = (els.listSearch.value || '').trim();
+    const globalQ = (els.globalSearch.value || '').trim();
+    const query = listQ || globalQ;
+    if (query) notes = filterNotes(notes, query, (note) => getNoteDisplayContent(note, lockSession));
 
     notes.sort((a, b) => {
+      if (a.isPinned && !b.isPinned) return -1;
+      if (!a.isPinned && b.isPinned) return 1;
       if (sortMode === 'created-desc') return (b.createdAt || 0) - (a.createdAt || 0);
       if (sortMode === 'title-asc') return (a.title || '').localeCompare(b.title || '');
       if (sortMode === 'title-desc') return (b.title || '').localeCompare(a.title || '');
@@ -1328,9 +1403,10 @@
     const noteLocked = isProtected(note) && !unlockedNotes.has(note.id);
     const workspace = getNoteWorkspace(note, workspaces);
     const colorStyle = NOTE_COLORS[note.color] || NOTE_COLORS.blue;
+    const displayContent = getNoteDisplayContent(note, lockSession);
     const preview = noteLocked
       ? t('previewHidden')
-      : escapeHtml((note.content || '').replace(/#/g, '').replace(/\n/g, ' ').slice(0, 140)) || t('untitled');
+      : escapeHtml((displayContent || '').replace(/#/g, '').replace(/\n/g, ' ').slice(0, 140)) || t('untitled');
     const badges = [];
     if (workspace) badges.push(`<span class="cn-label cn-workspace-badge">${escapeHtml(workspaceLabel(workspace))}</span>`);
     if (note.category) badges.push(`<span class="cn-label" style="background:${colorStyle.bg};color:${colorStyle.text};border:1px solid ${colorStyle.border}">${escapeHtml(note.category)}</span>`);
@@ -1358,7 +1434,7 @@
       <div class="cn-note-meta">
         <span>${localRelativeDate(note.updatedAt)}</span>
         <span>•</span>
-        <span>${(note.content || '').length} ${t('chars')}</span>
+        <span>${noteLocked ? t('lockedChars') : `${(displayContent || '').length} ${t('chars')}`}</span>
       </div>
       ${badges.length ? `<div class="cn-note-badges">${badges.join('')}</div>` : ''}
     `;
@@ -1371,7 +1447,7 @@
     card.querySelector('[data-action="copy"]').addEventListener('click', (e) => {
       e.stopPropagation();
       if (noteLocked) return showToast(t('unlockFirst'), 'warning');
-      copyToClipboard(`${note.title}\n\n${note.content}`, e.currentTarget);
+      copyToClipboard(`${note.title}\n\n${displayContent}`, e.currentTarget);
     });
     card.querySelector('[data-action="edit"]').addEventListener('click', (e) => {
       e.stopPropagation();
@@ -1379,6 +1455,7 @@
     });
     card.querySelector('[data-action="delete"]').addEventListener('click', (e) => {
       e.stopPropagation();
+      if (noteLocked) return showToast(t('unlockFirst'), 'warning');
       currentNoteId = note.id;
       els.deleteModal.classList.remove('cn-hidden');
     });
@@ -1388,6 +1465,67 @@
   function updateCounts() {
     document.getElementById('count-all').textContent = allNotes.length;
     els.settingsNoteCount.textContent = allNotes.length;
+  }
+
+  async function maybeDiscardEmptyNewNote() {
+    const note = findNote();
+    if (!note || currentView !== 'edit') return false;
+    const title = (els.noteTitle.value || '').trim();
+    const content = (els.noteContent.value || '').trim();
+    const tags = parseTagsInput(els.noteTags.value);
+    const empty = !title && !content && !tags.length && !isProtected(note);
+    if (!empty) return false;
+    allNotes = allNotes.filter(entry => entry.id !== note.id);
+    await saveNotes(allNotes);
+    unlockedNotes.delete(note.id);
+    lockSession.delete(note.id);
+    currentNoteId = null;
+    isDirty = false;
+    showToast(t('emptyNoteDiscarded'), 'info');
+    await showView('list');
+    return true;
+  }
+
+  async function deleteCustomTag(tag) {
+    const normalized = normalizeTag(tag);
+    if (!normalized) return;
+    customTags = (customTags || []).filter(item => item !== normalized);
+    const saved = await saveCustomTags(customTags);
+    if (!saved) return;
+    if (currentTagFilter === normalized) currentTagFilter = null;
+    renderTagSuggestionsDataList();
+    renderQuickTagPanel();
+    renderTagsSidebar();
+    showToast(t('tagDeleted'), 'success');
+  }
+
+  async function refreshVersionStatus() {
+    if (!els.versionStatusText) return;
+    const section = document.querySelector('.cn-version-status');
+    const icon = section ? section.querySelector('.cn-version-status-icon') : null;
+    els.versionStatusText.innerHTML = `<strong>${t('checkingUpdates')}</strong>`;
+    try {
+      const info = await checkForUpdates(false);
+      const version = chrome.runtime.getManifest().version || '1.3.2';
+      if (els.versionStatusValue) els.versionStatusValue.textContent = `v${version}`;
+      if (info && info.hasUpdate) {
+        if (section) section.classList.add('has-update');
+        if (icon) icon.textContent = '!';
+        const url = info.latestReleaseUrl || info.url || 'https://github.com/Kourosh242/clipnote';
+        els.versionStatusText.innerHTML = `<strong>${t('updateAvailable')}</strong> <a href="${url}" target="_blank" rel="noopener noreferrer">${t('viewRelease')}</a>`;
+      } else if (info && info.error) {
+        if (section) section.classList.remove('has-update');
+        if (icon) icon.textContent = '!';
+        els.versionStatusText.innerHTML = `<strong>${t('updateCheckFailed')}</strong>`;
+      } else {
+        if (section) section.classList.remove('has-update');
+        if (icon) icon.textContent = '✓';
+        els.versionStatusText.innerHTML = `<strong>${t('upToDate')}</strong>`;
+      }
+    } catch (error) {
+      if (section) section.classList.remove('has-update');
+      els.versionStatusText.innerHTML = `<strong>${t('updateCheckFailed')}</strong>`;
+    }
   }
 
   async function createNewNote() {
@@ -1402,7 +1540,8 @@
       tags: currentTagFilter ? [currentTagFilter] : []
     }, workspaces);
     allNotes.unshift(note);
-    await saveNotes(allNotes);
+    const created = await saveNotes(allNotes);
+    if (!created) return;
     currentNoteId = note.id;
     unlockedNotes.add(note.id);
     isDirty = false;
@@ -1419,7 +1558,7 @@
       await showView('list');
       return;
     }
-    if (isProtected(note) && !unlockedNotes.has(note.id)) {
+    if (isProtected(note) && !unlockedNotes.has(note.id) && !lockSession.has(note.id)) {
       openUnlockModal(note, async () => {
         unlockedNotes.add(note.id);
         await openEditor(note.id);
@@ -1433,11 +1572,12 @@
 
   function fillEditor(note) {
     currentNoteId = note.id;
+    const displayContent = getNoteDisplayContent(note, lockSession);
     els.noteTitle.value = note.title || '';
-    els.noteContent.value = note.content || '';
+    els.noteContent.value = displayContent || '';
     els.noteCreated.textContent = `${t('created')}: ${localDate(note.createdAt)}`;
     els.noteUpdated.textContent = `${t('updated')}: ${localDate(note.updatedAt)}`;
-    els.noteChars.textContent = `${(note.content || '').length} ${t('chars')}`;
+    els.noteChars.textContent = `${(displayContent || '').length} ${t('chars')}`;
     els.autoSaveStatus.textContent = '';
     populateCategorySelect();
     renderWorkspaceSelectors();
@@ -1566,7 +1706,7 @@
     const index = allNotes.findIndex(note => note.id === currentNoteId);
     if (index === -1) return;
 
-    allNotes[index] = createNote({
+    const next = createNote({
       ...existing,
       ...values,
       createdAt: existing.createdAt,
@@ -1575,11 +1715,17 @@
       source: existing.source,
       ignoredSuggestedTags: existing.ignoredSuggestedTags
     }, workspaces);
+    try {
+      await persistUnlockedContent(next, values.content, lockSession);
+    } catch (error) {
+      showToast(t('unlockFirst'), 'warning');
+      return;
+    }
+    allNotes[index] = next;
 
-    await Promise.all([
-      saveNotes(allNotes),
-      mergeCustomTags(allNotes[index].tags)
-    ]);
+    const saved = await saveNotes(allNotes);
+    if (!saved) return;
+    await mergeCustomTags(allNotes[index].tags);
 
     isDirty = false;
     customTags = await getCustomTags();
@@ -1616,7 +1762,8 @@
       updatedAt: Date.now()
     }, workspaces);
     allNotes.unshift(duplicate);
-    await saveNotes(allNotes);
+    const duplicated = await saveNotes(allNotes);
+    if (!duplicated) return;
     unlockedNotes.add(duplicate.id);
     currentNoteId = duplicate.id;
     updateCounts();
@@ -1626,8 +1773,10 @@
 
   async function deleteCurrentNote() {
     allNotes = allNotes.filter(note => note.id !== currentNoteId);
-    await saveNotes(allNotes);
+    const deleted = await saveNotes(allNotes);
+    if (!deleted) return;
     unlockedNotes.delete(currentNoteId);
+    lockSession.delete(currentNoteId);
     currentNoteId = null;
     isDirty = false;
     closeDeleteModal();
@@ -1699,8 +1848,8 @@
       item.innerHTML = `
         <span class="cn-tag">${escapeHtml(tag)}</span>
         <div class="cn-inline-actions">
-          <button class="cn-btn cn-btn-ghost cn-btn-sm" data-action="accept" type="button">${t('acceptAll')}</button>
-          <button class="cn-btn cn-btn-ghost cn-btn-sm" data-action="ignore" type="button">${t('cancel')}</button>
+          <button class="cn-btn cn-btn-ghost cn-btn-sm" data-action="accept" type="button">${t('accept')}</button>
+          <button class="cn-btn cn-btn-ghost cn-btn-sm" data-action="ignore" type="button">${t('ignore')}</button>
         </div>
       `;
       item.querySelector('[data-action="accept"]').addEventListener('click', () => {
@@ -1770,7 +1919,7 @@
       button.type = 'button';
       button.className = 'cn-color-option';
       button.style.background = color.border;
-      button.title = color.name;
+      button.title = t('color' + key.charAt(0).toUpperCase() + key.slice(1)) || color.name;
       button.dataset.color = key;
       button.addEventListener('click', () => {
         setSelectedColor(key);
@@ -1788,7 +1937,7 @@
       button.type = 'button';
       button.className = 'cn-color-option';
       button.style.background = color.border;
-      button.title = color.name;
+      button.title = t('color' + key.charAt(0).toUpperCase() + key.slice(1)) || color.name;
       button.dataset.color = key;
       button.addEventListener('click', () => {
         document.querySelectorAll('#setting-default-color .cn-color-option').forEach(item => item.classList.remove('selected'));
@@ -1827,6 +1976,11 @@
   }
 
   function updateCharCount() {
+    const note = findNote();
+    if (note && isProtected(note) && !unlockedNotes.has(note.id) && !lockSession.has(note.id)) {
+      els.noteChars.textContent = t('lockedChars');
+      return;
+    }
     els.noteChars.textContent = `${els.noteContent.value.length} ${t('chars')}`;
   }
 
@@ -1895,6 +2049,8 @@
     els.lockConfirmSecret.placeholder = t('confirmPlaceholder');
     els.lockSecret.inputMode = pinMode ? 'numeric' : 'text';
     els.lockConfirmSecret.inputMode = pinMode ? 'numeric' : 'text';
+    els.lockSecret.maxLength = pinMode ? 4 : 128;
+    els.lockConfirmSecret.maxLength = pinMode ? 4 : 128;
   }
 
   function closeLockModal() {
@@ -1915,9 +2071,9 @@
     const note = findNote();
     if (!note || !isProtected(note)) return;
     try {
-      note.lock.recovery = await createRecoveryData(els.recoveryQuestion.value, els.recoveryAnswer.value);
-      isDirty = true;
-      await saveCurrentNote(true);
+      await attachRecoveryToNote(note, els.recoveryQuestion.value, els.recoveryAnswer.value, lockSession);
+      const saved = await saveNotes(allNotes);
+      if (!saved) return;
       renderRecoveryPanel();
       showToast(t('recoverySaved'), 'success');
     } catch (error) {
@@ -1941,16 +2097,35 @@
     const type = els.lockType.value;
     const secret = els.lockSecret.value;
     const confirmSecret = els.lockConfirmSecret.value;
-    if (!secret || secret !== confirmSecret) {
+    if (!secret) {
       showToast(t('invalidSecret'), 'error');
       return;
     }
+    if (secret !== confirmSecret) {
+      showToast(t('passwordsMismatch'), 'error');
+      return;
+    }
     try {
-      note.lock = await createNoteLock(type, secret);
+      const values = getCurrentNoteValues();
+      note.title = values.title;
+      note.workspaceId = values.workspaceId;
+      note.category = values.category;
+      note.tags = values.tags;
+      note.color = values.color;
+      note.isPinned = values.isPinned;
+      note.isFavorite = values.isFavorite;
+      note.updatedAt = Date.now();
+      if (!isProtected(note) || !note.lock?.encrypted) {
+        note.content = values.content;
+      } else {
+        await persistUnlockedContent(note, values.content, lockSession);
+      }
+      await applyEncryptionToNote(note, type, secret, lockSession);
       unlockedNotes.add(note.id);
-      isDirty = true;
+      const saved = await saveNotes(allNotes);
+      if (!saved) return;
+      isDirty = false;
       closeLockModal();
-      await saveCurrentNote(true);
       renderLockState();
       showToast(lockModalMode === 'change' ? t('lockChanged') : t('noteLocked'), 'success');
     } catch (error) {
@@ -1962,10 +2137,18 @@
     const note = findNote();
     if (!note || !isProtected(note)) return;
     if (!confirm(t('confirmRemoveLock'))) return;
-    note.lock = { enabled: false, type: null, salt: '', hash: '' };
+    if (note.lock?.encrypted && !lockSession.has(note.id)) {
+      showToast(t('unlockFirst'), 'warning');
+      return;
+    }
+    note.content = getNoteDisplayContent(note, lockSession);
+    note.lock = { enabled: false, type: null, salt: '', hash: '', encrypted: false };
     unlockedNotes.delete(note.id);
-    isDirty = true;
-    await saveCurrentNote(true);
+    lockSession.delete(note.id);
+    const saved = await saveNotes(allNotes);
+    if (!saved) return;
+    isDirty = false;
+    fillEditor(note);
     renderLockState();
     showToast(t('lockRemoved'), 'success');
   }
@@ -1974,6 +2157,7 @@
     const note = findNote();
     if (!note || !isProtected(note)) return;
     unlockedNotes.delete(note.id);
+    lockSession.delete(note.id);
     showToast(t('noteRelocked'), 'info');
     await showView('list');
   }
@@ -1989,6 +2173,7 @@
     els.unlockSecret.value = '';
     els.unlockSecret.type = 'password';
     els.unlockSecret.inputMode = note.lock?.type === 'pin' ? 'numeric' : 'text';
+    els.unlockSecret.maxLength = note.lock?.type === 'pin' ? 4 : 128;
     els.unlockRecoveryAnswer.value = '';
     els.unlockRecoveryQuestion.textContent = hasRecoveryQuestion(note) ? note.lock.recovery.question : t('recoveryUnavailable');
     els.unlockRecoveryPanel.classList.add('cn-hidden');
@@ -2020,8 +2205,22 @@
       els.unlockRecoveryAnswer.focus();
       return;
     }
-    const valid = await verifyRecoveryAnswer(note, els.unlockRecoveryAnswer.value);
-    if (!valid) return showToast(t('recoveryFailed'), 'error');
+    try {
+      if (remainingLockoutSeconds(note.id)) {
+        return showToast(t('tooManyAttempts').replace('{n}', remainingLockoutSeconds(note.id)), 'error');
+      }
+      await unlockNoteSessionByRecovery(note, els.unlockRecoveryAnswer.value, lockSession);
+      if (note.lock && note.lock.encrypted) {
+        const ok = await saveNotes(allNotes);
+        if (!ok) return;
+      }
+    } catch (error) {
+      if (error.message === 'LOCKED_OUT' || error.message === 'INVALID_SECRET') {
+        const wait = remainingLockoutSeconds(note.id);
+        return showToast(wait ? t('tooManyAttempts').replace('{n}', wait) : t('recoveryFailed'), 'error');
+      }
+      return showToast(t('unlockError'), 'error');
+    }
     unlockedNotes.add(note.id);
     const callback = unlockSuccessCallback;
     closeUnlockModal();
@@ -2033,19 +2232,36 @@
     const note = findNote(unlockTargetNoteId);
     if (!note) return closeUnlockModal();
 
-    if (!els.unlockRecoveryPanel.classList.contains('cn-hidden') && els.unlockRecoveryAnswer.value.trim()) {
-      const validRecovery = await verifyRecoveryAnswer(note, els.unlockRecoveryAnswer.value);
-      if (!validRecovery) return showToast(t('recoveryFailed'), 'error');
-      unlockedNotes.add(note.id);
-      const recoveryCallback = unlockSuccessCallback;
-      closeUnlockModal();
-      showToast(t('recoverySuccess'), 'success');
-      if (recoveryCallback) await recoveryCallback();
-      return;
-    }
+    try {
+      if (remainingLockoutSeconds(note.id)) {
+        return showToast(t('tooManyAttempts').replace('{n}', remainingLockoutSeconds(note.id)), 'error');
+      }
+      if (!els.unlockRecoveryPanel.classList.contains('cn-hidden') && els.unlockRecoveryAnswer.value.trim()) {
+        await unlockNoteSessionByRecovery(note, els.unlockRecoveryAnswer.value, lockSession);
+        if (note.lock && note.lock.encrypted) {
+          const ok = await saveNotes(allNotes);
+          if (!ok) return;
+        }
+        unlockedNotes.add(note.id);
+        const recoveryCallback = unlockSuccessCallback;
+        closeUnlockModal();
+        showToast(t('recoverySuccess'), 'success');
+        if (recoveryCallback) await recoveryCallback();
+        return;
+      }
 
-    const valid = await verifyNoteSecret(note, els.unlockSecret.value);
-    if (!valid) return showToast(t('invalidSecret'), 'error');
+      await unlockNoteSession(note, els.unlockSecret.value, lockSession);
+      if (note.lock && note.lock.encrypted) {
+        const ok = await saveNotes(allNotes);
+        if (!ok) return;
+      }
+    } catch (error) {
+      if (error.message === 'LOCKED_OUT' || error.message === 'INVALID_SECRET') {
+        const wait = remainingLockoutSeconds(note.id);
+        return showToast(wait ? t('tooManyAttempts').replace('{n}', wait) : t('invalidSecret'), 'error');
+      }
+      return showToast(t('unlockError'), 'error');
+    }
     unlockedNotes.add(note.id);
     const callback = unlockSuccessCallback;
     closeUnlockModal();
@@ -2089,6 +2305,7 @@
     await saveSettings(settings);
     await applyTheme(settings);
     applyLocale();
+    refreshVersionStatus();
     renderWorkspaceSelectors();
     renderWorkspacesSidebar();
     renderCategoriesSidebar();
@@ -2119,7 +2336,8 @@
       [STORAGE_KEYS.CATEGORIES]: DEFAULT_CATEGORIES,
       [STORAGE_KEYS.WORKSPACES]: DEFAULT_WORKSPACES,
       [STORAGE_KEYS.CUSTOM_TAGS]: [],
-      [STORAGE_KEYS.SETTINGS]: DEFAULT_SETTINGS
+      [STORAGE_KEYS.SETTINGS]: DEFAULT_SETTINGS,
+      [STORAGE_KEYS.LAST_QUICK_SAVE]: null
     });
     allNotes = [];
     categories = [...DEFAULT_CATEGORIES];
@@ -2188,6 +2406,7 @@
   }
 
   async function deleteWorkspace(workspaceId) {
+    if (workspaceId === DEFAULT_WORKSPACE_ID) return showToast(t('cannotDeleteDefaultWorkspace'), 'warning');
     if (workspaces.length <= 1) return showToast(t('atLeastOneWorkspace'), 'warning');
     const workspace = workspaces.find(item => item.id === workspaceId);
     const fallback = workspaces.find(item => item.id !== workspaceId);
@@ -2226,7 +2445,7 @@
   async function saveCategoryFromModal() {
     const name = els.categoryInput.value.trim();
     if (!name) return showToast(t('categoryRequired'), 'error');
-    if (categories.includes(name) && name !== editingCategory) return showToast(t('categoryExists'), 'error');
+    if (categories.some(item => item.toLowerCase() === name.toLowerCase() && item !== editingCategory)) return showToast(t('categoryExists'), 'error');
     if (editingCategory) {
       const index = categories.indexOf(editingCategory);
       if (index !== -1) categories[index] = name;

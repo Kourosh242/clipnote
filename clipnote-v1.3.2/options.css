@@ -685,6 +685,25 @@ html[data-lang="fa"] .cn-sidebar.collapsed .cn-sidebar-header {
   font-weight: 800;
 }
 
+.cn-version-status.has-update {
+  border-color: rgba(var(--cn-warning-rgb), 0.35);
+  background: linear-gradient(135deg, rgba(var(--cn-warning-rgb), 0.12) 0%, var(--cn-surface) 72%);
+}
+
+.cn-version-status.has-update .cn-version-status-icon,
+.cn-version-status.has-update .cn-version-status-text,
+.cn-version-status.has-update .cn-version-status-value {
+  color: var(--cn-warning);
+}
+
+.cn-version-status.has-update .cn-version-status-icon {
+  background: rgba(var(--cn-warning-rgb), 0.16);
+}
+
+.cn-version-status.has-update .cn-version-status-value {
+  border-color: rgba(var(--cn-warning-rgb), 0.28);
+}
+
 .cn-version-status-value {
   padding: 6px 11px;
   border: 1px solid rgba(var(--cn-success-rgb), 0.28);
@@ -951,4 +970,19 @@ html[data-lang="fa"] .cn-version-status-row {
   .cn-editor-container.preview-mode .cn-editor-pane {
     display: none;
   }
+}
+
+
+.cn-tag-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.cn-tag-delete {
+  margin-inline-start: auto;
+  width: 22px;
+  height: 22px;
+  line-height: 1;
+  padding: 0;
+  font-size: 14px;
 }
