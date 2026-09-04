@@ -1,4 +1,4 @@
-# ClipNote 1.3.2 — ویکی رسمی
+# ClipNote 1.3.3 — ویکی رسمی
 
 ## فارسی
 
@@ -7,7 +7,7 @@ ClipNote دفترچهٔ یادداشت کلیپ‌بورد برای مرورگر
 - [قابلیت‌ها و راهنمای کاربر](User-Guide.md)
 - [پشتیبان‌گیری و حریم خصوصی](Privacy-and-Data.md)
 - [راهنمای توسعه‌دهنده](Development.md)
-- [تغییرات 1.3.2](Changelog-1.3.2.md)
+- [تغییرات 1.3.3](Changelog-1.3.3.md)
 - [مستندات آنلاین فارسی و انگلیسی](https://kourosh242.github.io/clipnote/)
 
 ## English
@@ -17,4 +17,4 @@ ClipNote is an offline-first clipboard notebook for Chromium browsers. Start wit
 - [User guide](User-Guide.md)
 - [Privacy and data](Privacy-and-Data.md)
 - [Development](Development.md)
-- [1.3.2 changelog](Changelog-1.3.2.md)
+- [1.3.3 changelog](Changelog-1.3.3.md)
